@@ -1,0 +1,34 @@
+# --
+# Kernel/Output/HTML/Templates/Standard/Exaprobe/APA_TicketUO.tt - overview
+# Copyright (C) (2017) (Aurelien PAGES) (apages2@free.fr)
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+            <div class="WidgetSimple">
+                <div class="Header">
+                    <h2>[% Translate("UO Pool") | html %]</h2>
+                </div>
+                <div class="Content">
+                    <fieldset class="TableLike FixedLabelSmall Narrow">
+[% RenderBlockStart("Contract") %]
+                        <label>[% Translate("UO Pool") | html %]:</label>
+                        <p class="Value">[% Data.Caff | html %]</p>
+                        <label>[% Translate("Contracted") | html %]:</label>
+                        <p class="Value">[% Data.ContractQuota | html %]</p>
+                        <div class="Clear"></div>
+						<label>[% Translate("Available") | html %]:</label>
+                        <p class="Value">[% Data.AvailableQuota | html %]</p>
+                        <div class="Clear"></div>
+						<label>[% Translate("Deadline") | html %]:</label>
+                        <p class="Value">[% Data.DateFin | Localize("Date") | html %]</p>
+						<label>[% Translate("Recommended <br> Deduct : ") %]</label>
+                        <p class="Value">[% Data.Decompt | html %]</p>
+                        <div class="Clear"></div>
+						<br>
+[% RenderBlockEnd("Contract") %]						
+                    </fieldset>
+                </div>
+            </div>

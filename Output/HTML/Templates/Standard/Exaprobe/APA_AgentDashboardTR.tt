@@ -1,0 +1,1523 @@
+# --
+# Kernel/Output/HTML/Templates/Standard/Exaprobe/APA_AgentDashboardTR.tt - overview
+# Copyright (C) (2017) (Aurelien PAGES) (apages2@free.fr)
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+<style>
+.thservice {
+background-color: #285566 !important;
+color: #ccc !important;
+vertical-align: middle !important;
+} 
+
+</style>
+[% RenderBlockStart("ContentLargeTRAddAdmin") %]
+<h2><button class="CallForAction buttonadd"><span><i class="fa fa-plus-square"></i> [% Translate("Add Contract") | html %]</span></button></h2>
+<input type="hidden" id="CustomerID" value="[% Data.CustomerID | html %]">
+<table>
+<tr class="insertcontrat">
+</tr>
+</table>
+[% RenderBlockEnd("ContentLargeTRAddAdmin") %]
+<table class="DataTable">
+   <thead>
+		<tr>
+			<th class="thservice" COLSPAN=9><center>[% Translate("MCO") | html %]</th>
+		</tr>
+        <tr  class="MCO">
+			<th><center>[% Translate("Affaire Code") | html %]</th>
+            <th><center>[% Translate("Contract Type") | html %]</th>
+            <th><center>[% Translate("Perimeter") | html %]</th>
+			<th><center>[% Translate("Description") | html %]</th>
+			<th><center>[% Translate("GTR") | html %]</th>
+			<th><center>[% Translate("HNO") | html %]</th>
+            <th><center>[% Translate("Start Date") | html %]</th>
+            <th><center>[% Translate("End Date") | html %]</th>
+			<th><center>[% Translate("Action") | html %]</th>
+        </tr>
+    </thead>
+[% RenderBlockStart("ContentLargeMCOListRowAdmin") %]
+    <tbody>
+	[% toto = Data.TR_ID %]
+        <tr class="TR_[% Data.TR_ID | html %]">
+ 
+			 <td><center>
+                <input type="text" style="text-align:center" id="Caff_[% Data.TR_ID | html %]" size="17" maxlength="13" Value="[% Data.TR_Caff | html %]">
+            </td>
+			<td><center>
+				[% IF  Data.TR_Type == 'PACK_BASIC' %]
+					<select class="selectpack" id="Typepack_[% Data.TR_ID | html %]">
+						<option value="MCO_P-BAS" selected> PACK_BASIC </option>
+						<option value="MCO_P-ESS"> PACK_ESSENTIEL </option>
+						<option value="MCO_P-PRE"> PACK_PREMIER </option>
+						<option value="MCO_P-GLD"> PACK_GOLD </option>
+					</select>
+				[% ELSIF Data.TR_Type == 'PACK_ESSENTIEL' %]
+					<select class="selectpack" id="Typepack_[% Data.TR_ID | html %]">
+						<option value="MCO_P-BAS"> PACK_BASIC </option>
+						<option value="MCO_P-ESS" selected> PACK_ESSENTIEL </option>
+						<option value="MCO_P-PRE"> PACK_PREMIER </option>
+						<option value="MCO_P-GLD"> PACK_GOLD </option>
+					</select>
+				[% ELSIF Data.TR_Type == 'PACK_PREMIER' %]
+					<select class="selectpack" id="Typepack_[% Data.TR_ID | html %]">
+						<option value="MCO_P-BAS"> PACK_BASIC </option>
+						<option value="MCO_P-ESS"> PACK_ESSENTIEL </option>
+						<option value="MCO_P-PRE" selected> PACK_PREMIER </option>
+						<option value="MCO_P-GLD"> PACK_GOLD </option>
+					</select>
+				[% ELSIF Data.TR_Type == 'PACK_GOLD' %]
+					<select class="selectpack" id="Typepack_[% Data.TR_ID | html %]">
+						<option value="MCO_P-BAS"> PACK_BASIC </option>
+						<option value="MCO_P-ESS"> PACK_ESSENTIEL </option>
+						<option value="MCO_P-PRE"> PACK_PREMIER </option>
+						<option value="MCO_P-GLD" selected> PACK_GOLD </option>
+					</select>
+				[% END %]
+            </td>
+			<td><center>
+                <textarea id="Perimeter_[% Data.TR_ID | html %]" cols="27" rows="8" maxlength="3000">[% Data.TR_Perimetre | html %]</textarea>
+            </td>
+			<td><center>
+                <textarea id="Description_[% Data.TR_ID | html %]" cols="27" rows="8" maxlength="3000">[% Data.TR_Description | html %]</textarea>
+            </td>
+			<td id="Option1_[% Data.TR_ID | html %]"><center>
+				<select class="selectoption1_[% Data.TR_ID | html %]" id="Typeoption1_[% Data.TR_ID | html %]">
+					[% IF  Data.TR_Type == 'PACK_BASIC' || Data.TR_Type == 'PACK_ESSENTIEL' %]
+						<option value="Aucune" selected> Aucune </option>
+					[% ELSIF Data.TR_Type == 'PACK_PREMIER' %]
+						[% IF  Data.TR_Option1 == 'GTR J+1' %]
+								<option value="Aucune"> Aucune </option>
+								<option value="GTR J+1 selected"> GTR J+1 </option>
+								<option value="GTR J+3"> GTR J+3 </option>
+						[% ELSIF  Data.TR_Option1 == 'GTR J+3' %]
+								<option value="Aucune"> Aucune </option>
+								<option value="GTR J+1"> GTR J+1 </option>
+								<option value="GTR J+3" selected> GTR J+3 </option>
+						[% ELSIF  Data.TR_Option1 == 'Aucune' %]
+								<option value="Aucune" selected> Aucune </option>
+								<option value="GTR J+1"> GTR J+1 </option>
+								<option value="GTR J+3" selected> GTR J+3 </option>
+						[% END %]
+					[% ELSIF Data.TR_Type == 'PACK_GOLD' %]
+						[% IF  Data.TR_Option1 == 'GTR 4H' %]
+								<option value="Aucune"> Aucune </option>
+								<option value="GTR 4H" selected> GTR 4H </option>
+								<option value="GTR J+1"> GTR J+1 </option>
+						[% ELSIF  Data.TR_Option1 == 'GTR J+1' %]
+								<option value="Aucune"> Aucune </option>
+								<option value="GTR 4H"> GTR 4H </option>
+								<option value="GTR J+1" selected> GTR J+1 </option>
+						[% ELSIF  Data.TR_Option1 == 'Aucune' %]
+								<option value="Aucune" selected> Aucune </option>
+								<option value="GTR 4H"> GTR 4H </option>
+								<option value="GTR J+1"> GTR J+1 </option>
+						[% END %]
+					[% END %]
+				</select>
+            </td>
+			<td><center>
+                [% IF  Data.TR_Option2 == 'NON' %]
+					<select class="selectoption2" id="Typeoption2_[% Data.TR_ID | html %]">
+						<option value="NON" selected> NON </option>
+						<option value="OUI"> OUI </option>
+					</select>
+				[% ELSIF  Data.TR_Option2 == 'OUI' %]
+					<select class="selectoption2" id="Typeoption2_[% Data.TR_ID | html %]">
+						<option value="NON"> NON </option>
+						<option value="OUI" selected> OUI </option>
+					</select>
+				[% END %]
+					
+            </td>
+			 <td><center>
+                <input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_[% Data.TR_ID | html %]" maxlength="10" size="10" value="[% Data.TR_DateDebut | Localize("Date") | html %]">
+            </td>
+			 <td style="text-align:center">
+                <input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_[% Data.TR_ID | html %]" maxlength="10" size="10" value="[% Data.TR_DateFin | Localize("Date") | html %]">
+            </td>
+				<td ROWSPAN=2 style="text-align:center"><input type="button" class="buttonapply" value="[% Translate("Apply") | html %]" id="BApp_[% Data.TR_ID | html %]"><br><input type="button" class="buttondel" value="[% Translate("Delete") | html %]" id="BDel_[% Data.TR_ID | html %]"></td>
+            </tr>
+			<tr class="TR_[% Data.TR_ID | html %]">
+			<td COLSPAN=8><textarea id="Commentaire_[% Data.TR_ID | html %]" cols="160" rows="2" maxlength="3000">[% Data.TR_Commentaire | html %]</textarea></td>
+			</tr>
+		 </tbody>
+	
+[% RenderBlockEnd("ContentLargeMCOListRowAdmin") %]
+[% RenderBlockStart("ContentLargeMCOListRowAgent") %]
+    <tbody>
+
+        <tr class="TR_[% Data.TR_ID | html %]" title="[% Data.TR_Commentaire | html %]">
+             <td><center>
+                [% Data.TR_Caff | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Type | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Perimetre | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Description | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Option1 | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Option2 | html %]
+            </td>
+			 <td><center>
+                [% Data.TR_DateDebut | Localize("Date") | html %]
+            </td>
+			 <td style="text-align:center">
+                [% Data.TR_DateFin | Localize("Date") | html %]
+            </td>
+            <td></td>
+            </tr>
+		 </tbody>
+	
+[% RenderBlockEnd("ContentLargeMCOListRowAgent") %]
+
+</table>
+</BR>
+[% RenderBlockStart("ContentLargeMCOListNone") %]
+    <table class="DataTable">
+	<tbody>
+		<tr>
+            <td>
+                [% Translate("none") | html %]
+            </td>
+        </tr>
+	 </tbody>
+	</table>
+</BR>
+[% RenderBlockEnd("ContentLargeMCOListNone") %]
+    <table class="DataTable">
+	<thead>
+		<tr>
+			<th class="thservice" COLSPAN=9><center>[% Translate("Banque d'UO") | html %]</th>
+		</tr>
+        <tr class="UO">
+			<th><center>[% Translate("Affaire Code") | html %]</th>
+            <th><center>[% Translate("Contract Type") | html %]</th>
+            <th><center>[% Translate("Perimeter") | html %]</th>
+			<th><center>[% Translate("Description") | html %]</th>
+			<th><center>[% Translate("UO") | html %]</th>
+			<th><center>[% Translate("Solde") | html %]</th>
+            <th><center>[% Translate("Start Date") | html %]</th>
+            <th><center>[% Translate("End Date") | html %]</th>
+			<th><center>[% Translate("Action") | html %]</th>
+        </tr>
+    </thead>
+[% RenderBlockStart("ContentLargeUOListRowAdmin") %]
+	<tbody>
+
+        <tr class="TR_[% Data.TR_ID | html %]">
+             <td><center>
+                <input type="text" style="text-align:center" id="Caff_[% Data.TR_ID | html %]" size="17" maxlength="13" Value="[% Data.TR_Caff | html %]">
+            </td>
+			<td><center>
+                <select style="font-size:10px" id="Typepack_[% Data.TR_ID | html %]">
+				[% IF  Data.TR_Type == 'INFRA' %]
+					<option value="SO_COG-UO-1" selected> BdUO INFRA </option>
+					<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE </option>
+					<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>
+					<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>
+					<option value="SO_COG-UO-5"> BdUO GO4COLLAB </option>
+					<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>
+				[% ELSIF Data.TR_Type == 'ASSISTANCE TECHNIQUE' %]
+					<option value="SO_COG-UO-1"> BdUO INFRA </option>
+					<option value="SO_COG-UO-2" selected> BdUO ASSISTANCE TECHNIQUE </option>
+					<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>
+					<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>
+					<option value="SO_COG-UO-5"> BdUO GO4COLLAB </option>
+					<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>
+				[% ELSIF Data.TR_Type == 'MAJ SECU' %]
+					<option value="SO_COG-UO-1"> BdUO INFRA </option>
+					<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE </option>
+					<option value="SO_COG-UO-3" selected> BdUO MAJ SECU </option>
+					<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>
+					<option value="SO_COG-UO-5"> BdUO GO4COLLAB </option>
+					<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>
+				[% ELSIF Data.TR_Type == 'EVOL LOGICIELLES' %]
+					<option value="SO_COG-UO-1"> BdUO INFRA </option>
+					<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE </option>
+					<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>
+					<option value="SO_COG-UO-4" selected> BdUO EVOL LOGICIELLES </option>
+					<option value="SO_COG-UO-5"> BdUO GO4COLLAB </option>
+					<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>
+				[% ELSIF Data.TR_Type == 'GO4COLLAB' %]
+					<option value="SO_COG-UO-1"> BdUO INFRA </option>
+					<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE </option>
+					<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>
+					<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>
+					<option value="SO_COG-UO-5" selected> BdUO GO4COLLAB </option>
+					<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>
+				[% ELSIF Data.TR_Type == 'CONCIERGERIE' %]
+					<option value="SO_COG-UO-1"> BdUO INFRA </option>
+					<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE </option>
+					<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>
+					<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>
+					<option value="SO_COG-UO-5"> BdUO GO4COLLAB </option>
+					<option value="SO_COG-UO-6" selected> BdUO CONCIERGERIE </option>
+				[% END %]
+				</select>
+            </td>
+			<td><center>
+                <textarea id="Perimeter_[% Data.TR_ID | html %]" cols="27" rows="8" maxlength="3000">[% Data.TR_Perimetre | html %]</textarea>
+            </td>
+			<td><center>
+                <textarea id="Description_[% Data.TR_ID | html %]" cols="27" rows="8" maxlength="3000">[% Data.TR_Description | html %]</textarea>
+            </td>
+			<td><center>
+				<input type="hidden" id="Typeoption1_[% Data.TR_ID | html %]" value="[% Data.TR_Option1 | html %]">
+                [% Data.TR_Option1 | html %]
+            </td> 
+			<td><center>
+				<input type="hidden" id="Typeoption2_[% Data.TR_ID | html %]" value="[% Data.TR_Option2 | html %]">
+                [% Data.TR_Option2 | html %]
+            </td>
+			 <td><center>
+                <input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_[% Data.TR_ID | html %]" maxlength="10" size="10" value="[% Data.TR_DateDebut | Localize("Date") | html %]">
+            </td>
+			 <td><center>
+                <input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_[% Data.TR_ID | html %]" maxlength="10" size="10" value="[% Data.TR_DateFin | Localize("Date") | html %]">
+            </td>
+				<td ROWSPAN=2 style="text-align:center"><input type="button" class="buttonapply" value="[% Translate("Apply") | html %]" id="BApp_[% Data.TR_ID | html %]"><br><input type="button" class="buttondisable" value="[% Translate("Disable") | html %]" id="BDis_[% Data.TR_ID | html %]"></td>
+        </tr>
+		<tr class="TR_[% Data.TR_ID | html %]">
+			<td COLSPAN=8><textarea id="Commentaire_[% Data.TR_ID | html %]" cols="160" rows="2" maxlength="3000">[% Data.TR_Commentaire | html %]</textarea></td>
+		</tr>
+	</tbody>
+[% RenderBlockEnd("ContentLargeUOListRowAdmin") %]
+[% RenderBlockStart("ContentLargeUOListRowAgent") %]
+	<tbody>
+
+        <tr class="TR_[% Data.TR_ID | html %]" title="[% Data.TR_Commentaire | html %]">
+             <td><center>
+                [% Data.TR_Caff | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Type | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Perimetre | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Description | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Option1 | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Option2 | html %]
+            </td>
+			 <td><center>
+                [% Data.TR_DateDebut | Localize("Date") | html %]
+            </td>
+			 <td><center>
+                [% Data.TR_DateFin | Localize("Date") | html %]
+            </td>
+			<td> </td>
+        </tr>
+	</tbody>
+[% RenderBlockEnd("ContentLargeUOListRowAgent") %]
+	</table>
+	</BR>
+[% RenderBlockStart("ContentLargeUOListNone") %]
+    <table class="DataTable">
+	<tbody>
+		<tr>
+            <td>
+                [% Translate("none") | html %]
+            </td>
+        </tr>
+	 </tbody>
+	</table>
+</BR>
+[% RenderBlockEnd("ContentLargeUOListNone") %]
+<table class="DataTable">
+	<thead>
+		<tr>
+			<th class="thservice" COLSPAN=9><center>[% Translate("RTC") | html %]</th>
+		</tr>
+        <tr class="RTC">
+			<th><center>[% Translate("Affaire Code") | html %]</th>
+            <th><center>[% Translate("Contract Type") | html %]</th>
+            <th><center>[% Translate("Perimeter") | html %]</th>
+			<th><center>[% Translate("Description") | html %]</th>
+			<th><center>[% Translate("RTC") | html %]</th>
+			<th><center>[% Translate("Nbr of days") | html %]</th>
+            <th><center>[% Translate("Start Date") | html %]</th>
+            <th><center>[% Translate("End Date") | html %]</th>
+			<th><center>[% Translate("Action") | html %]</th>
+        </tr>
+    </thead>
+[% RenderBlockStart("ContentLargeRTCListRowAdmin") %]
+	<tbody>
+
+        <tr class="TR_[% Data.TR_ID | html %]">
+             <td><center>
+                <input type="text" style="text-align:center" id="Caff_[% Data.TR_ID | html %]" size="17" maxlength="13" Value="[% Data.TR_Caff | html %]">
+            </td>
+			<td><center>
+                <select style="font-size:10px" id="Typepack_[% Data.TR_ID | html %]">
+				[% IF  Data.TR_Type == 'Comitologie et Veille Techno' %]
+					<option value="SO_RTC-JOUR-1" selected> Comitologie et Veille Techno </option>
+					<option value="SO_RTC-JOUR-2"> Expertise Technique </option>
+					<option value="SO_RTC-PAR"> RTC sous traité </option>
+				[% ELSIF Data.TR_Type == 'Expertise Technique' %]
+					<option value="SO_RTC-JOUR-1"> Comitologie et Veille Techno </option>
+					<option value="SO_RTC-JOUR-2" selected> Expertise Technique </option>
+					<option value="SO_RTC-PAR"> RTC sous traité </option>
+				[% ELSIF Data.TR_Type == 'RTC sous traité' %]
+					<option value="SO_RTC-JOUR-1"> Comitologie et Veille Techno </option>
+					<option value="SO_RTC-JOUR-2"> Expertise Technique </option>
+					<option value="SO_RTC-PAR" selected> RTC sous traité </option>
+				[% END %]
+				</select>
+            </td>
+			<td><center>
+                <textarea id="Perimeter_[% Data.TR_ID | html %]" cols="20" rows="8" maxlength="3000">[% Data.TR_Perimetre | html %]</textarea>
+            </td>
+			<td><center>
+                <textarea id="Description_[% Data.TR_ID | html %]" cols="20" rows="8" maxlength="3000">[% Data.TR_Description | html %]</textarea>
+            </td>
+			<td><center>
+				<input type="text" style="text-align:center" size="20" maxlength="50" id="Typeoption1_[% Data.TR_ID | html %]" value="[% Data.TR_Option1 | html %]">
+            </td> 
+			<td><center>
+				<input type="text" style="text-align:center" size="4" id="Typeoption2_[% Data.TR_ID | html %]" value="[% Data.TR_Option2 | html %]">
+            </td>
+			 <td><center>
+                <input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_[% Data.TR_ID | html %]" maxlength="10" size="10" value="[% Data.TR_DateDebut | Localize("Date") | html %]">
+            </td>
+			 <td><center>
+                <input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_[% Data.TR_ID | html %]" maxlength="10" size="10" value="[% Data.TR_DateFin | Localize("Date") | html %]">
+            </td>
+				<td ROWSPAN=2 style="text-align:center"><input type="button" class="buttonapply" value="[% Translate("Apply") | html %]" id="BApp_[% Data.TR_ID | html %]"><br><input type="button" class="buttondel" value="[% Translate("Delete") | html %]" id="BDel_[% Data.TR_ID | html %]"></td>
+        </tr>
+		<tr class="TR_[% Data.TR_ID | html %]">
+			<td COLSPAN=8><textarea id="Commentaire_[% Data.TR_ID | html %]" cols="160" rows="2" maxlength="3000">[% Data.TR_Commentaire | html %]</textarea></td>
+		</tr>
+	</tbody>
+[% RenderBlockEnd("ContentLargeRTCListRowAdmin") %]
+[% RenderBlockStart("ContentLargeRTCListRowAgent") %]
+	<tbody>
+
+        <tr class="TR_[% Data.TR_ID | html %]" title="[% Data.TR_Commentaire | html %]">
+             <td><center>
+                [% Data.TR_Caff | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Type | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Perimetre | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Description | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Option1 | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Option2 | html %]
+            </td>
+			 <td><center>
+                [% Data.TR_DateDebut | Localize("Date") | html %]
+            </td>
+			 <td><center>
+                [% Data.TR_DateFin | Localize("Date") | html %]
+            </td>
+			<td> </td>
+        </tr>
+	</tbody>
+[% RenderBlockEnd("ContentLargeRTCListRowAgent") %]
+	</table>
+	</BR>
+[% RenderBlockStart("ContentLargeRTCListNone") %]
+    <table class="DataTable">
+	<tbody>
+		<tr>
+            <td>
+                [% Translate("none") | html %]
+            </td>
+        </tr>
+	 </tbody>
+	</table>
+</BR>
+[% RenderBlockEnd("ContentLargeRTCListNone") %]
+    <table class="DataTable">
+	<thead>
+		<tr>
+			<th class="thservice" COLSPAN=8><center>[% Translate("Supervision") | html %]</th>
+		</tr>
+        <tr class="SUP">
+			<th><center>[% Translate("Affaire Code") | html %]</th>
+            <th><center>[% Translate("Contract Type") | html %]</th>
+			<th><center>[% Translate("Nbr of Devices /") | html %]<BR>[% Translate("Nbr of Indicators") | html %]</th>
+			<th><center>[% Translate("Metrology") | html %]</th>
+			<th><center>[% Translate("Report") | html %]</th>
+            <th><center>[% Translate("Start Date") | html %]</th>
+            <th><center>[% Translate("End Date") | html %]</th>
+			<th><center>[% Translate("Action") | html %]</th>
+        </tr>
+    </thead>
+	
+[% RenderBlockStart("ContentLargeSUPListRowAdmin") %]
+    <tbody>
+        <tr class="TR_[% Data.TR_ID | html %]">
+             <td><center>
+                <input type="text" style="text-align:center" id="Caff_[% Data.TR_ID | html %]" size="17" maxlength="13" Value="[% Data.TR_Caff | html %]">
+            </td>
+			<td><center>
+                [% IF  Data.TR_Type == 'SO_SUP-HO' %]
+					<select class="selectsup" id="Typepack_[% Data.TR_ID | html %]">
+						<option value="SO_SUP-HO" selected>Sup HO</option>
+						<option value="SO_SUP-HNO">Sup HNO</option>
+					</select>
+				[% ELSIF Data.TR_Type == 'SO_SUP-HNO' %]
+					<select class="selectsup" id="Typepack_[% Data.TR_ID | html %]">
+						<option value="SO_SUP-HO">Sup HO</option>
+						<option value="SO_SUP-HNO" selected>Sup HNO</option>
+					</select>
+				[% END %]
+            </td>
+			<td><center>
+				<input type="text" style="text-align:center" id="Typeoption12_[% Data.TR_ID | html %]" size="12" maxlength="12" Value="[% Data.TR_Option1 | html %]/[% Data.TR_Option2 | html %]">
+             </td>
+			<td><center>
+				[% IF  Data.TR_Option3 == 'NON' %]
+					<select class="selectoption3" id="Typeoption3_[% Data.TR_ID | html %]">
+						<option value="NON" selected> NON </option>
+						<option value="OUI"> OUI </option>
+					</select>
+				[% ELSIF  Data.TR_Option3 == 'OUI' %]
+					<select class="selectoption3" id="Typeoption3_[% Data.TR_ID | html %]">
+						<option value="NON"> NON </option>
+						<option value="OUI" selected> OUI </option>
+					</select>
+				[% END %]
+            </td>
+			<td><center>
+				[% IF  Data.TR_Option4 == 'NON' %]
+					<select class="selectoption4" id="Typeoption4_[% Data.TR_ID | html %]">
+						<option value="NON" selected> NON </option>
+						<option value="OUI"> OUI </option>
+					</select>
+				[% ELSIF  Data.TR_Option4 == 'OUI' %]
+					<select class="selectoption4" id="Typeoption4_[% Data.TR_ID | html %]">
+						<option value="NON"> NON </option>
+						<option value="OUI" selected> OUI </option>
+					</select>
+				[% END %]
+            </td>
+			 <td><center>
+                <input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_[% Data.TR_ID | html %]" maxlength="10" size="10" value="[% Data.TR_DateDebut | Localize("Date") | html %]">
+            </td>
+			 <td><center>
+                <input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_[% Data.TR_ID | html %]" maxlength="10" size="10" value="[% Data.TR_DateFin | Localize("Date") | html %]">
+            </td>
+				<td ROWSPAN=3 style="text-align:center"><input type="button" class="buttonapply" value="[% Translate("Apply") | html %]" id="BApp_[% Data.TR_ID | html %]"><br><input type="button" class="buttondel" value="[% Translate("Delete") | html %]" id="BDel_[% Data.TR_ID | html %]"></td>
+		</tr>
+		<tr class="TR_[% Data.TR_ID | html %]">
+			<td COLSPAN=3><center>
+                <textarea title="[% Translate("Perimeter") %]" id="Perimeter_[% Data.TR_ID | html %]" cols="92" rows="4" maxlength="3000">[% Data.TR_Perimetre | html %]</textarea>
+            </td>
+			<td COLSPAN=4><center>
+                <textarea title="[% Translate("Description") %]"  id="Description_[% Data.TR_ID | html %]" cols="61" rows="4" maxlength="3000">[% Data.TR_Description | html %]</textarea>
+            </td>
+		</tr>
+		<tr class="TR_[% Data.TR_ID | html %]">
+			<td COLSPAN=7><textarea title="[% Translate("Comment") %]" id="Commentaire_[% Data.TR_ID | html %]" cols="160" rows="2" maxlength="3000">[% Data.TR_Commentaire | html %]</textarea></td>
+		</tr>
+		
+	</tbody>
+[% RenderBlockEnd("ContentLargeSUPListRowAdmin") %]
+[% RenderBlockStart("ContentLargeSUPListRowAgent") %]
+    <tbody>
+        <tr class="TR_[% Data.TR_ID | html %]" title="[% Data.TR_Commentaire | html %]">
+             <td><center>
+                [% Data.TR_Caff | html %]
+            </td>
+			<td><center>
+			[% IF  Data.TR_Type == 'SO_SUP-HNO' %]
+					Supervision HNO
+			[% ELSIF Data.TR_Type == 'SO_SUP-HO' %]
+				Supervision HO
+			[% END %]
+            </td>
+			<td><center>
+                [% Data.TR_Option1 | html %]/[% Data.TR_Option2 | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Option3 | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Option4 | html %]
+            </td>
+			 <td><center>
+                [% Data.TR_DateDebut | Localize("Date") | html %]
+            </td>
+			 <td><center>
+                [% Data.TR_DateFin | Localize("Date") | html %]
+            </td>
+			<td> </td>
+        </tr>
+		<tr>
+		<td title="[% Translate("Perimeter") | html %]" COLSPAN=3><center>
+                [% Data.TR_Perimetre | Localize("Date") | html %]
+            </td>
+			 <td title="[% Translate("Description") | html %]" COLSPAN=4><center>
+                [% Data.TR_Description | Localize("Date") | html %]
+            </td>
+		</tr>
+		 </tbody>
+[% RenderBlockEnd("ContentLargeSUPListRowAgent") %]
+	</table>
+	</BR>
+
+[% RenderBlockStart("ContentLargeSUPListNone") %]
+    <table class="DataTable">
+	<tbody>
+		<tr>
+            <td>
+                [% Translate("none") | html %]
+            </td>
+        </tr>
+	 </tbody>
+	</table>
+</BR>
+[% RenderBlockEnd("ContentLargeSUPListNone") %]
+<table class="DataTable">
+	<thead>
+		<tr>
+			<th class="thservice" COLSPAN=8><center>[% Translate("Backup") | html %]</th>
+		</tr>
+        <tr class="BACK">
+			<th><center>[% Translate("Affaire Code") | html %]</th>
+            <th><center>[% Translate("Perimeter") | html %]</th>
+			<th><center>[% Translate("Description") | html %]</th>
+			<th><center>[% Translate("Nbr of Devices") | html %]</th>
+			<th><center>[% Translate("Nbr of Versions") | html %]</th>
+            <th><center>[% Translate("Start Date") | html %]</th>
+            <th><center>[% Translate("End Date") | html %]</th>
+			<th><center>[% Translate("Action") | html %]</th>
+        </tr>
+    </thead>
+[% RenderBlockStart("ContentLargeBACKListRowAdmin") %]
+	<tbody>
+
+        <tr class="TR_[% Data.TR_ID | html %]">
+			
+			<input type="hidden" id="Typepack_[% Data.TR_ID | html %]" value="SO_BACKUP-DEVICES">
+             <td><center>
+                <input type="text" style="text-align:center" id="Caff_[% Data.TR_ID | html %]" size="17" maxlength="13" Value="[% Data.TR_Caff | html %]">
+            </td>
+			<td><center>
+                <textarea id="Perimeter_[% Data.TR_ID | html %]" cols="23" rows="8" maxlength="3000">[% Data.TR_Perimetre | html %]</textarea>
+            </td>
+			<td><center>
+                <textarea id="Description_[% Data.TR_ID | html %]" cols="23" rows="8" maxlength="3000">[% Data.TR_Description | html %]</textarea>
+            </td>
+			<td><center>
+				<input type="text" style="text-align:center" size="6" id="Typeoption1_[% Data.TR_ID | html %]" value="[% Data.TR_Option1 | html %]">
+            </td> 
+			<td><center>
+				<input type="text" style="text-align:center" size="6" id="Typeoption2_[% Data.TR_ID | html %]" value="[% Data.TR_Option2 | html %]">
+            </td>
+			 <td><center>
+                <input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_[% Data.TR_ID | html %]" maxlength="10" size="10" value="[% Data.TR_DateDebut | Localize("Date") | html %]">
+            </td>
+			 <td><center>
+                <input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_[% Data.TR_ID | html %]" maxlength="10" size="10" value="[% Data.TR_DateFin | Localize("Date") | html %]">
+            </td>
+				<td ROWSPAN=2 style="text-align:center"><input type="button" class="buttonapply" value="[% Translate("Apply") | html %]" id="BApp_[% Data.TR_ID | html %]"><br><input type="button" class="buttondel" value="[% Translate("Delete") | html %]" id="BDel_[% Data.TR_ID | html %]"></td>
+        </tr>
+		<tr class="TR_[% Data.TR_ID | html %]">
+			<td COLSPAN=8><textarea id="Commentaire_[% Data.TR_ID | html %]" cols="160" rows="2" maxlength="3000">[% Data.TR_Commentaire | html %]</textarea></td>
+		</tr>
+	</tbody>
+[% RenderBlockEnd("ContentLargeBACKListRowAdmin") %]
+[% RenderBlockStart("ContentLargeBACKListRowAgent") %]
+	<tbody>
+
+        <tr class="TR_[% Data.TR_ID | html %]" title="[% Data.TR_Commentaire | html %]">
+             <td><center>
+                [% Data.TR_Caff | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Perimetre | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Description | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Option1 | html %]
+            </td>
+			<td><center>
+                [% Data.TR_Option2 | html %]
+            </td>
+			 <td><center>
+                [% Data.TR_DateDebut | Localize("Date") | html %]
+            </td>
+			 <td><center>
+                [% Data.TR_DateFin | Localize("Date") | html %]
+            </td>
+			<td> </td>
+        </tr>
+	</tbody>
+[% RenderBlockEnd("ContentLargeBACKListRowAgent") %]
+	</table>
+	</BR>
+[% RenderBlockStart("ContentLargeBACKListNone") %]
+    <table class="DataTable">
+	<tbody>
+		<tr>
+            <td>
+                [% Translate("none") | html %]
+            </td>
+        </tr>
+	 </tbody>
+	</table>
+</BR>
+[% RenderBlockEnd("ContentLargeBACKListNone") %]
+
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">//<![CDATA[
+
+
+$(document).on('change', '.selecttype', function(Event) {
+	
+	var Data = {
+		Action:	'APA_AdminTR',
+		Subaction:    'AJAXSelectType',
+		Type:     this.value
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+			$('.AddTR').hide();
+			var ID = Math.floor((Math.random() * 10000) + 1);
+			if ( data.TypeTR == 'PRO_SUP-HO') {
+				var trm = '<table class="DataTable AddTR">';
+				trm += '<thead>';
+				trm += '<tr>';
+				trm += '<th class="thservice" COLSPAN=9><center>[% Translate("Supervision") | html %]</th>';
+				trm += '</tr>';
+				trm += '<tr>';
+				trm += '<th><center>[% Translate("Affaire Code") | html %]</th>';
+				trm += '<th><center>[% Translate("Contract Type") | html %]</th>';
+				trm += '<th><center>[% Translate("Nbr of Devices /") | html %]<BR>[% Translate("Nbr of Indicators") | html %]]</th>';
+				trm += '<th><center>[% Translate("Metrology") | html %]</th>';
+				trm += '<th><center>[% Translate("Report") | html %]</th>';
+				trm += '<th><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th><center>[% Translate("End Date") | html %]</th>';
+				trm += '<th><center>[% Translate("Perimeter") | html %]</th>';
+				trm += '<th><center>[% Translate("Action") | html %]</th>';
+				trm += '</tr>';
+				trm += '</thead>';
+				trm += '<tbody>';
+				trm += '<tr class="TR_'+ID+'">';
+				trm += '<td><center><input type="text" style="text-align:center" id="Caff_'+ID+'" size="13" maxlength="13"></td>';
+				trm += '<td><center><select class="selectsup" id="Typepack_'+ID+'">';
+				trm += '<option value="SO_SUP-HO" selected>Sup HO</option>';
+				trm += '<option value="SO_SUP-HNO">Sup HNO</option>';
+				trm += '</select></td>';
+				trm += '<td><center><input type="text" style="text-align:center" id="Typeoption12_'+ID+'" size="12" maxlength="12" Value="/"></td>';
+				trm += '<td><select id="Typeoption3_'+ID+'">';
+				trm += '<option value="NON"> NON </option>';
+				trm += '<option value="OUI"> OUI </option>';
+				trm += '</select></td>';
+				trm += '<td><select id="Typeoption4_'+ID+'">';
+				trm += '<option value="NON"> NON </option>';
+				trm += '<option value="OUI"> OUI </option>';
+				trm += '</select></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateDebut_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateFin_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><textarea id="Perimeter_'+ID+'" cols="55" rows="7" maxlength="3000"></textarea></td>';
+				trm += '<td ROWSPAN=3><center><input type="button" class="buttonsave" value="[% Translate("Save") | html %]" id="BSave_'+ID+'"><br></td>';
+				trm += '</tr>';
+				trm += '<tr>';
+				trm += '<td COLSPAN=5><center><textarea title="[% Translate("Comment") | html %]" id="Commentaire_'+ID+'" cols="65" rows="7" maxlength="3000"></textarea></td>';
+				trm += '<td COLSPAN=3><center><textarea title="[% Translate("Description") | html %]" id="Description_'+ID+'" cols="90" rows="7" maxlength="3000"></textarea></td>';
+				trm += '</tr>';
+				trm += '</tbody>';
+			}
+
+			else if ( data.TypeTR == 'MCO_P-BAS') {
+				var trm = '<table class="DataTable AddTR">';
+				trm += '<thead>';
+				trm += '<tr>';
+				trm += '<th class="thservice" COLSPAN=9><center>[% Translate("MCO") | html %]</th>';
+				trm += '</tr>';
+				trm += '<tr>';
+				trm += '<th><center>[% Translate("Affaire Code") | html %]</th>';
+				trm += '<th><center>[% Translate("Perimeter") | html %]</th>';
+				trm += '<th><center>[% Translate("Description") | html %]</th>';
+				trm += '<th><center>[% Translate("GTR") | html %]</th>';
+				trm += '<th><center>[% Translate("HNO") | html %]</th>';
+				trm += '<th><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th><center>[% Translate("End Date") | html %]</th>';
+				trm += '<th><center>[% Translate("Comment") | html %]</th>';
+				trm += '<th><center>[% Translate("Action") | html %]</th>';
+				trm += '</thead>';
+				trm += '<tbody>';
+				trm += '<tr class="TR_'+ID+'">';
+				trm += '<td><center><input style="text-align:center" type="text" id="Caff_'+ID+'" size="13" maxlength="13"></td>';
+				trm += '<input type="hidden" id="Typepack_'+ID+'" readonly value="MCO_P-BAS">';
+				trm += '<td><center><textarea id="Perimeter_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><textarea id="Description_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><select id="Typeoption1_'+ID+'">';
+				trm += '<option value="Aucune"> Aucune </option>';
+				trm += '</select></td>';
+				trm += '<td><select id="Typeoption2_'+ID+'">';
+				trm += '<option value="NON"> NON </option>';
+				trm += '<option value="OUI"> OUI </option>';
+				trm += '</select></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateDebut_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateFin_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><textarea id="Commentaire_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><input type="button" class="buttonsave" value="[% Translate("Save") | html %]" id="BSave_'+ID+'"><br></td>';
+				trm += '</tr>';
+				trm += '</tbody>';
+			}
+			
+			else if ( data.TypeTR == 'MCO_P-ESS') {
+				var trm = '<table class="DataTable AddTR">';
+				trm += '<thead>';
+				trm += '<tr>';
+				trm += '<th class="thservice" COLSPAN=9><center>[% Translate("MCO") | html %]</th>';
+				trm += '</tr>';
+				trm += '<tr>';
+				trm += '<th><center>[% Translate("Affaire Code") | html %]</th>';
+				trm += '<th><center>[% Translate("Perimeter") | html %]</th>';
+				trm += '<th><center>[% Translate("Description") | html %]</th>';
+				trm += '<th><center>[% Translate("GTR") | html %]</th>';
+				trm += '<th><center>[% Translate("HNO") | html %]</th>';
+				trm += '<th><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th><center>[% Translate("End Date") | html %]</th>';
+				trm += '<th><center>[% Translate("Comment") | html %]</th>';
+				trm += '<th><center>[% Translate("Action") | html %]</th>';
+				trm += '</thead>';
+				trm += '<tbody>';
+				trm += '<tr class="TR_'+ID+'">';
+				trm += '<td><center><input style="text-align:center" type="text" id="Caff_'+ID+'" size="13" maxlength="13"></td>';
+				trm += '<input type="hidden" id="Typepack_'+ID+'" readonly value="MCO_P-ESS">';
+				trm += '<td><center><textarea id="Perimeter_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><textarea id="Description_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><select id="Typeoption1_'+ID+'">';
+				trm += '<option value="Aucune"> Aucune </option>';
+				trm += '</select></td>';
+				trm += '<td><select id="Typeoption2_'+ID+'">';
+				trm += '<option value="NON"> NON </option>';
+				trm += '<option value="OUI"> OUI </option>';
+				trm += '</select></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateDebut_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateFin_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><textarea id="Commentaire_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><input type="button" class="buttonsave" value="[% Translate("Save") | html %]" id="BSave_'+ID+'"><br></td>';
+				trm += '</tr>';
+				trm += '</tbody>';
+			}
+			
+			else if ( data.TypeTR == 'MCO_P-PRE') {
+				var trm = '<table class="DataTable AddTR">';
+				trm += '<thead>';
+				trm += '<tr>';
+				trm += '<th class="thservice" COLSPAN=9><center>[% Translate("MCO") | html %]</th>';
+				trm += '</tr>';
+				trm += '<tr>';
+				trm += '<th><center>[% Translate("Affaire Code") | html %]</th>';
+				trm += '<th><center>[% Translate("Perimeter") | html %]</th>';
+				trm += '<th><center>[% Translate("Description") | html %]</th>';
+				trm += '<th><center>[% Translate("GTR") | html %]</th>';
+				trm += '<th><center>[% Translate("HNO") | html %]</th>';
+				trm += '<th><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th><center>[% Translate("End Date") | html %]</th>';
+				trm += '<th><center>[% Translate("Comment") | html %]</th>';
+				trm += '<th><center>[% Translate("Action") | html %]</th>';
+				trm += '</thead>';
+				trm += '<tbody>';
+				trm += '<tr class="TR_'+ID+'">';
+				trm += '<td><center><input style="text-align:center" type="text" id="Caff_'+ID+'" size="13" maxlength="13"></td>';
+				trm += '<input type="hidden" id="Typepack_'+ID+'" readonly value="MCO_P-PRE">';
+				trm += '<td><center><textarea id="Perimeter_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><textarea id="Description_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><select id="Typeoption1_'+ID+'">';
+				trm += '<option value="Aucune"> Aucune </option>';
+				trm += '<option value="GTR J+1"> GTR J+1 </option>';
+				trm += '<option value="GTR J+3"> GTR J+3 </option>';
+				trm += '</select></td>';
+				trm += '<td><select id="Typeoption2_'+ID+'">';
+				trm += '<option value="NON"> NON </option>';
+				trm += '<option value="OUI"> OUI </option>';
+				trm += '</select></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateDebut_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateFin_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><textarea id="Commentaire_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><input type="button" class="buttonsave" value="[% Translate("Save") | html %]" id="BSave_'+ID+'"><br></td>';
+				trm += '</tr>';
+				trm += '</tbody>';
+			}
+			
+			else if ( data.TypeTR == 'MCO_P-GLD') {
+				var trm = '<table class="DataTable AddTR">';
+				trm += '<thead>';
+				trm += '<tr>';
+				trm += '<th class="thservice" COLSPAN=9><center>[% Translate("MCO") | html %]</th>';
+				trm += '</tr>';
+				trm += '<tr>';
+				trm += '<th><center>[% Translate("Affaire Code") | html %]</th>';
+				trm += '<th><center>[% Translate("Perimeter") | html %]</th>';
+				trm += '<th><center>[% Translate("Description") | html %]</th>';
+				trm += '<th><center>[% Translate("GTR") | html %]</th>';
+				trm += '<th><center>[% Translate("HNO") | html %]</th>';
+				trm += '<th><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th><center>[% Translate("End Date") | html %]</th>';
+				trm += '<th><center>[% Translate("Comment") | html %]</th>';
+				trm += '<th><center>[% Translate("Action") | html %]</th>';
+				trm += '</thead>';
+				trm += '<tbody>';
+				trm += '<tr class="TR_'+ID+'">';
+				trm += '<td><center><input style="text-align:center" type="text" id="Caff_'+ID+'" size="13" maxlength="13"></td>';
+				trm += '<input type="hidden" id="Typepack_'+ID+'" readonly value="MCO_P-GLD">';
+				trm += '<td><center><textarea id="Perimeter_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><textarea id="Description_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><select id="Typeoption1_'+ID+'">';
+				trm += '<option value="Aucune"> Aucune </option>';
+				trm += '<option value="GTR 4H"> GTR 4H </option>';
+				trm += '<option value="GTR J+1"> GTR J+1 </option>';
+				trm += '</select></td>';
+				trm += '<td><select id="Typeoption2_'+ID+'">';
+				trm += '<option value="NON"> NON </option>';
+				trm += '<option value="OUI"> OUI </option>';
+				trm += '</select></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateDebut_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateFin_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><textarea id="Commentaire_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><input type="button" class="buttonsave" value="[% Translate("Save") | html %]" id="BSave_'+ID+'"><br></td>';
+				trm += '</tr>';
+				trm += '</tbody>';
+			} else if ( data.TypeTR == 'SO_COG-UO-1'  || data.TypeTR == 'SO_COG-UO-2'  || data.TypeTR == 'SO_COG-UO-3'  || data.TypeTR == 'SO_COG-UO-4'  || data.TypeTR == 'SO_COG-UO-5'  || data.TypeTR == 'SO_COG-UO-6') {
+				var trm = '<table class="DataTable AddTR">';
+				trm += '<thead>';
+				trm += '<tr>';
+				trm += '<th class="thservice" COLSPAN=9><center>[% Translate("BANQUE UO") | html %]</th>';
+				trm += '</tr>';
+				trm += '<tr>';
+				trm += '<th><center>[% Translate("Affaire Code") | html %]</th>';
+				trm += '<th><center>[% Translate("Perimeter") | html %]</th>';
+				trm += '<th><center>[% Translate("Description") | html %]</th>';
+				trm += '<th><center>[% Translate("UO") | html %]</th>';
+				trm += '<th><center>[% Translate("Solde") | html %]</th>';
+				trm += '<th><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th><center>[% Translate("End Date") | html %]</th>';
+				trm += '<th><center>[% Translate("Comment") | html %]</th>';
+				trm += '<th><center>[% Translate("Action") | html %]</th>';
+				trm += '</thead>';
+				trm += '<tbody>';
+				trm += '<tr class="TR_'+ID+'">';
+				trm += '<td><center><input style="text-align:center" type="text" id="Caff_'+ID+'" size="13" maxlength="13"></td>';
+				if (data.TypeTR== 'SO_COG-UO-1') {
+					trm += '<input type="hidden" id="Typepack_'+ID+'" value="SO_COG-UO-1">';
+				} else if (data.TypeTR == 'SO_COG-UO-2') {
+					trm += '<input type="hidden" id="Typepack_'+ID+'" value="SO_COG-UO-2">';
+				} else if (data.TypeTR == 'SO_COG-UO-3') {
+					trm += '<input type="hidden" id="Typepack_'+ID+'" value="SO_COG-UO-3">';
+				} else if (data.TypeTR == 'SO_COG-UO-4') {
+					trm += '<input type="hidden" id="Typepack_'+ID+'" value="SO_COG-UO-4">';
+				} else if (data.TypeTR == 'SO_COG-UO-5') {
+					trm += '<input type="hidden" id="Typepack_'+ID+'" value="SO_COG-UO-5">';
+				} else if (data.TypeTR == 'SO_COG-UO-6') {
+					trm += '<input type="hidden" id="Typepack_'+ID+'" value="SO_COG-UO-6">';
+				}
+				trm += '<td><center><textarea id="Perimeter_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><textarea id="Description_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				if ( data.TypeTR == 'SO_COG-UO-1'  || data.TypeTR == 'SO_COG-UO-2'  || data.TypeTR == 'SO_COG-UO-3'  || data.TypeTR == 'SO_COG-UO-4'  || data.TypeTR == 'SO_COG-UO-5'  || data.TypeTR == 'SO_COG-UO-6') {
+					trm += '<td><input class="AddUO"  style="text-align:center" type="text" id="Typeoption1_'+ID+'" size="5" maxlength="5"></td>';
+					trm += '<td><input style="text-align:center" type="text" readonly id="Typeoption2_'+ID+'" size="5" maxlength="5"></td>';
+				} else {
+					trm += '<td><input class="AddUO"  style="text-align:center" type="text" id="Typeoption1_'+ID+'" size="5" maxlength="5"></td>';
+					trm += '<td><input style="text-align:center" type="text" id="Typeoption2_'+ID+'" size="5" maxlength="5"></td>';
+				}
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateDebut_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateFin_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><textarea id="Commentaire_'+ID+'" cols="25" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><input type="button" class="buttonsave" value="[% Translate("Save") | html %]" id="BSave_'+ID+'"><br></td>';
+				trm += '</tr>';
+				trm += '</tbody>';
+			} else if ( data.TypeTR == 'SO_BACKUP-DEVICES') {
+				var trm = '<table class="DataTable AddTR">';
+				trm += '<thead>';
+				trm += '<tr>';
+				trm += '<th class="thservice" COLSPAN=8><center>[% Translate("BACKUP") | html %]</th>';
+				trm += '</tr>';
+				trm += '<tr>';
+				trm += '<th><center>[% Translate("Affaire Code") | html %]</th>';
+				trm += '<th><center>[% Translate("Perimeter") | html %]</th>';
+				trm += '<th><center>[% Translate("Description") | html %]</th>';
+				trm += '<th><center>[% Translate("Nbr of Devices") | html %]</th>';
+				trm += '<th><center>[% Translate("Nbr of Versions") | html %]</th>';
+				trm += '<th><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th><center>[% Translate("End Date") | html %]</th>';
+				trm += '<th><center>[% Translate("Action") | html %]</th>';
+				trm += '</thead>';
+				trm += '<tbody>';
+				trm += '<tr class="TR_'+ID+'">';
+				trm += '<td><center><input style="text-align:center" type="text" id="Caff_'+ID+'" size="13" maxlength="13"></td>';
+				trm += '<input type="hidden" id="Typepack_'+ID+'" value="SO_BACKUP-DEVICES">';
+				trm += '<td><center><textarea id="Perimeter_'+ID+'" cols="30" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><textarea id="Description_'+ID+'" cols="30" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><input style="text-align:center" type="text" id="Typeoption1_'+ID+'" size="5" maxlength="5"></td>';
+				trm += '<td><center><input style="text-align:center" type="text" id="Typeoption2_'+ID+'" size="5" maxlength="5"></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateDebut_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateFin_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td ROWSPAN=2><center><input type="button" class="buttonsave" value="[% Translate("Save") | html %]" id="BSave_'+ID+'"><br></td>';
+				trm += '</tr>';
+				trm += '<tr>';
+				trm += '<td COLSPAN=7><center><textarea title="[% Translate("Comment") | html %]" id="Commentaire_'+ID+'" cols="160" rows="2" maxlength="3000"></textarea></td>';
+				trm += '</tr>';
+				trm += '</tbody>';
+			} else if ( data.TypeTR == 'SO_RTC-JOUR-1' || data.TypeTR == 'SO_RTC-JOUR-2' || data.TypeTR == 'SO_RTC-PAR' ) {
+				var trm = '<table class="DataTable AddTR">';
+				trm += '<thead>';
+				trm += '<tr>';
+				trm += '<th class="thservice" COLSPAN=9><center>[% Translate("RTC") | html %]</th>';
+				trm += '</tr>';
+				trm += '<tr>';
+				trm += '<th><center>[% Translate("Affaire Code") | html %]</th>';
+				trm += '<th><center>[% Translate("Perimeter") | html %]</th>';
+				trm += '<th><center>[% Translate("Description") | html %]</th>';
+				trm += '<th><center>[% Translate("RTC") | html %]</th>';
+				trm += '<th><center>[% Translate("Nbr of days") | html %]</th>';
+				trm += '<th><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th><center>[% Translate("End Date") | html %]</th>';
+				trm += '<th><center>[% Translate("Comment") | html %]</th>';
+				trm += '<th><center>[% Translate("Action") | html %]</th>';
+				trm += '</thead>';
+				trm += '<tbody>';
+				trm += '<tr class="TR_'+ID+'">';
+				trm += '<td><center><input style="text-align:center" type="text" id="Caff_'+ID+'" size="13" maxlength="13"></td>';
+				if (data.TypeTR== 'SO_RTC-JOUR-1') {
+					trm += '<input type="hidden" id="Typepack_'+ID+'" value="SO_RTC-JOUR-1">';
+				} else if (data.TypeTR == 'SO_RTC-JOUR-2') {
+					trm += '<input type="hidden" id="Typepack_'+ID+'" value="SO_RTC-JOUR-2">';
+				} else if (data.TypeTR == 'SO_RTC-PAR') {
+					trm += '<input type="hidden" id="Typepack_'+ID+'" value="SO_RTC-PAR">';
+				} 
+				trm += '<td><center><textarea id="Perimeter_'+ID+'" cols="21" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><textarea id="Description_'+ID+'" cols="21" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><input style="text-align:center" type="text" id="Typeoption1_'+ID+'" size="20" maxlength="50"></td>';
+				trm += '<td><center><input style="text-align:center" type="text" id="Typeoption2_'+ID+'" size="5" maxlength="5"></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateDebut_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><input style="text-align:center" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" type="datetime" id="DateFin_'+ID+'" maxlength="10" size="10"></td>';
+				trm += '<td><center><textarea id="Commentaire_'+ID+'" cols="21" rows="10" maxlength="3000"></textarea></td>';
+				trm += '<td><center><input type="button" class="buttonsave" value="[% Translate("Save") | html %]" id="BSave_'+ID+'"><br></td>';
+				trm += '</tr>';
+				trm += '</tbody>';
+			}
+				
+			$(trm).insertBefore( ".insertcontrat" );		
+			
+		},
+		'json'
+		);
+	
+});
+$(document).on('click', '.buttonadd', function(Event) {
+	var Data = {
+		Action:	'APA_AdminTR',
+		Subaction:    'AJAXClickBoutonAdd',
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+			var trm = '<tr>';
+			trm += '<td>';
+			trm += '<select class="selecttype" name="TypeList">';
+			trm += '<option value="0"> - </option>';
+			trm += '<option value="MCO_P-BAS"> PACK_BASIC </option>';
+			trm += '<option value="MCO_P-ESS"> PACK_ESSENTIEL </option>';
+			trm += '<option value="MCO_P-PRE"> PACK_PREMIER </option>';
+			trm += '<option value="MCO_P-GLD"> PACK_GOLD </option>';
+			trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+			trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+			trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+			trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+			trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+			trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+			trm += '<option value="SO_RTC-JOUR-1"> RTC COPIL </option>';
+			trm += '<option value="SO_RTC-JOUR-2"> RTC EXPERTISE TECHNIQUE </option>';
+			trm += '<option value="SO_RTC-PAR"> RTC SOUS TRAITE </option>';
+			trm += '<option value="PRO_SUP-HO"> SUPERVISION </option>';
+			trm += '<option value="SO_BACKUP-DEVICES"> BACKUP </option>';
+			trm += '</select>';
+			trm += '</td>';
+			trm += '</tr>';
+			trm += '<tr>';
+			trm += '</tr>';
+			$(trm).insertBefore( ".insertcontrat" );		
+		},
+		'json'
+	);
+});
+$(document).on('click', '.buttondel', function(Event) {
+	var Id = this.id.split("_");
+	$('.TR_'+Id[1]).hide();
+	var Data = {
+		Action:	'APA_AdminTR',
+		Subaction:    'AJAXClickBoutonDel',
+		Button:	Id[0],
+		TRID:     Id[1]
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+		},
+		'json'
+		);
+});
+$(document).on('click', '.buttonsave', function(Event) {
+	var Id = this.id.split("_");
+	var DevInd = $("#Typeoption12_"+Id[1]).val();
+	if (DevInd) {
+		var Opt12 = DevInd.split("/");
+		var Opt1 = Opt12[0];
+		var Opt2 = Opt12[1];
+	} else {
+		var Opt1 = $("#Typeoption1_"+Id[1]).val();
+		var Opt2 = $("#Typeoption2_"+Id[1]).val();
+	}
+	$('.AddTR').hide();
+	$('.selecttype').hide();
+	var Data = {
+		Action:	'APA_AdminTR',
+		Subaction:    'AJAXClickBoutonSave',
+		Caff:  $("#Caff_"+Id[1]).val(),
+		Type: $("#Typepack_"+Id[1]).val(),
+		Option1: Opt1,
+		Option2: Opt2,
+		Option3: $("#Typeoption3_"+Id[1]).val(),
+		Option4: $("#Typeoption4_"+Id[1]).val(),
+		Perimeter: $("#Perimeter_"+Id[1]).val(),
+		Description: $("#Description_"+Id[1]).val(),
+		DateDebut: $("#DateDebut_"+Id[1]).val(),
+		DateFin: $("#DateFin_"+Id[1]).val(),
+		Commentaire: $("#Commentaire_"+Id[1]).val(),
+		Customer: $("#CustomerID").val(),
+		TR_ID: Id[1]
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+			var trm = '<tr class="TR_'+data.InsertID+'">';
+			trm += '<td><center>'
+			trm += '<input type="text" id="Caff_'+data.InsertID+'" size="17" maxlength="13" Value="'+data.Caff+'">';
+			trm += '</td>';
+			
+			if (data.Type == 'PACK_BASIC') {
+				trm += '<td><center>';
+				trm += '<select class="selectpack" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="MCO_P-BAS" selected> PACK_BASIC </option>';
+				trm += '<option value="MCO_P-ESS"> PACK_ESSENTIEL </option>';
+				trm += '<option value="MCO_P-PRE"> PACK_PREMIER </option>';
+				trm += '<option value="MCO_P-GLD"> PACK_GOLD </option>';
+				trm += '</select>';
+				trm += '</td>';
+			}
+			else if (data.Type == 'PACK_ESSENTIEL') {
+				trm += '<td><center>';
+				trm += '<select class="selectpack" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="MCO_P-BAS"> PACK_BASIC </option>';
+				trm += '<option value="MCO_P-ESS" selected> PACK_ESSENTIEL </option>';
+				trm += '<option value="MCO_P-PRE"> PACK_PREMIER </option>';
+				trm += '<option value="MCO_P-GLD"> PACK_GOLD </option>';
+				trm += '</select>';
+				trm += '</td>';
+			}
+			else if (data.Type == 'PACK_PREMIER') {
+				trm += '<td><center>';
+				trm += '<select class="selectpack" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="MCO_P-BAS"> PACK_BASIC </option>';
+				trm += '<option value="MCO_P-ESS"> PACK_ESSENTIEL </option>';
+				trm += '<option value="MCO_P-PRE" selected> PACK_PREMIER </option>';
+				trm += '<option value="MCO_P-GLD"> PACK_GOLD </option>';
+				trm += '</select>';
+				trm += '</td>';
+			}
+			else if (data.Type == 'PACK_GOLD') {
+				trm += '<td><center>';
+				trm += '<select class="selectpack" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="MCO_P-BAS"> PACK_BASIC </option>';
+				trm += '<option value="MCO_P-ESS"> PACK_ESSENTIEL </option>';
+				trm += '<option value="MCO_P-PRE"> PACK_PREMIER </option>';
+				trm += '<option value="MCO_P-GLD" selected> PACK_GOLD </option>';
+				trm += '</select>';
+				trm += '</td>';
+			} else if (data.Type == 'SO_SUP-HO') {
+				trm += '<td><center>';
+				trm += '<select class="selectpack" id="Typepack_'+data.InsertID+'">';
+					trm += '<option value="SO_SUP-HO" selected>Sup HO</option>';
+					trm += '<option value="SO_SUP-HNO">Sup HNO</option>';
+				trm += '</select>';
+				trm += '</td>';
+			} else if (data.Type == 'SO_SUP-HNO') {
+					trm += '<td><center>';
+					trm += '<select class="selectpack" id="Typepack_'+data.InsertID+'">';
+						trm += '<option value="SO_SUP-HO" >Sup HO</option>';
+						trm += '<option value="SO_SUP-HNO" selected>Sup HNO</option>';
+					trm += '</select>';
+					trm += '</td>';
+			} else if (data.Type== 'INFRA') {
+				trm += '<td><center>';
+				trm += '<select style="font-size:10px" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="SO_COG-UO-1" selected> BdUO INFRA</option>';
+				trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+				trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+				trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+				trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+				trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				trm += '</select>';
+				trm += '</td>';
+			} else if (data.Type== 'ASSISTANCE TECHNIQUE') {
+				trm += '<td><center>';
+				trm += '<select style="font-size:10px" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+				trm += '<option value="SO_COG-UO-2" selected> BdUO ASSISTANCE TECHNIQUE</option>';
+				trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+				trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+				trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+				trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				trm += '</select>';
+				trm += '</td>';
+			} else if (data.Type == 'MAJ SECU') {
+				trm += '<td><center>';
+				trm += '<select style="font-size:10px" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+				trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+				trm += '<option value="SO_COG-UO-3" selected> BdUO MAJ SECU </option>';
+				trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+				trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+				trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				trm += '</select>';
+				trm += '</td>';
+			} else if (data.Type == 'EVOL LOGICIELLES') {
+				trm += '<td><center>';
+				trm += '<select style="font-size:10px" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+				trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+				trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+				trm += '<option value="SO_COG-UO-4" selected> BdUO EVOL LOGICIELLES </option>';
+				trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+				trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				trm += '</select>';
+				trm += '</td>';
+			} else if (data.Type == 'GO4COLLAB') {
+				trm += '<td><center>';
+				trm += '<select style="font-size:10px" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+				trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+				trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+				trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+				trm += '<option value="SO_COG-UO-5" selected> BdUO GO4COLLAB</option>';
+				trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				trm += '</select>';
+				trm += '</td>';
+			} else if (data.Type == 'CONCIERGERIE') {
+				trm += '<td><center>';
+				trm += '<select style="font-size:10px" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+				trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+				trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+				trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+				trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+				trm += '<option value="SO_COG-UO-6" selected> BdUO CONCIERGERIE </option>';
+				trm += '</select>';
+				trm += '</td>';
+			} else if (data.Type == 'SO_RTC-JOUR-1') {
+				trm += '<td><center>';
+				trm += '<select style="font-size:10px" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="SO_RTC-JOUR-1" selected> Comitologie et Veille Techno </option>';
+				trm += '<option value="SO_RTC-JOUR-2"> Expertise Technique </option>';
+				trm += '<option value="SO_RTC-PAR"> RTC sous traité </option>';
+				trm += '</select>';
+				trm += '</td>';
+			} else if (data.Type == 'SO_RTC-JOUR-2') {
+				trm += '<td><center>';
+				trm += '<select style="font-size:10px" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="SO_RTC-JOUR-1"> Comitologie et Veille Techno </option>';
+				trm += '<option value="SO_RTC-JOUR-2" selected> Expertise Technique </option>';
+				trm += '<option value="SO_RTC-PAR"> RTC sous traité </option>';
+				trm += '</select>';
+				trm += '</td>';
+			} else if (data.Type == 'SO_RTC-PAR') {
+				trm += '<td><center>';
+				trm += '<select style="font-size:10px" id="Typepack_'+data.InsertID+'">';
+				trm += '<option value="SO_RTC-JOUR-1"> Comitologie et Veille Techno </option>';
+				trm += '<option value="SO_RTC-JOUR-2"> Expertise Technique </option>';
+				trm += '<option value="SO_RTC-PAR" selected> RTC sous traité </option>';
+				trm += '</select>';
+				trm += '</td>';
+			} else if (data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<input type="hidden" id="Typepack_'+data.InsertID+'" value="SO_BACKUP-DEVICES">';
+			}
+			
+			if (data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<td><center>';
+				trm += '<input type="text" style="text-align:center" id="Typeoption12_'+data.InsertID+'" size="12" maxlength="12" Value="'+data.Option1+'/'+data.Option2+'">';
+				trm += '</td>';
+				trm += '<td><center>';
+				if (data.Option3 == 'NON') {
+					trm += '<select class="selectoption3" id="Typeoption3_'+data.InsertID+'">';
+					trm += '<option value="NON" selected> NON </option>';
+					trm += '<option value="OUI"> OUI </option>';
+					trm += '</select>';
+				} else if (data.Option3 == 'OUI') {
+					trm += '<select class="selectoption3" id="Typeoption3_'+data.InsertID+'">';
+					trm += '<option value="NON"> NON </option>';
+					trm += '<option value="OUI" selected> OUI </option>';
+					trm += '</select>';
+				}
+				trm += '</td>';
+				trm += '<td><center>';
+				if (data.Option4 == 'NON') {
+					trm += '<select class="selectoption4" id="Typeoption4_'+data.InsertID+'">';
+					trm += '<option value="NON" selected> NON </option>';
+					trm += '<option value="OUI"> OUI </option>';
+					trm += '</select>';
+				} else if (data.Option4 == 'OUI') {
+					trm += '<select class="selectoption4" id="Typeoption4_'+data.InsertID+'">';
+					trm += '<option value="NON"> NON </option>';
+					trm += '<option value="OUI" selected> OUI </option>';
+					trm += '</select>';
+				}
+				trm += '</td>';
+			} else {
+				trm += '<td><center>'; 
+				trm += '<textarea id="Perimeter_'+data.InsertID+'" cols="23" rows="8" maxlength="3000">'+data.Perimeter+'</textarea>';
+				trm += '</td>';
+				trm += '<td><center>';
+				trm += '<textarea id="Description_'+data.InsertID+'" cols="23" rows="8" maxlength="3000">'+data.Description+'</textarea>';
+				trm += '</td>';
+				
+			}
+			
+			if (data.Type == 'PACK_BASIC' || data.Type == 'PACK_ESSENTIEL' || data.Type == 'PACK_PREMIER' || data.Type == 'PACK_GOLD'){
+				trm += '<td><center>';
+				trm += '<select class="selectoption1_'+data.InsertID+'" id="Typeoption1_'+data.InsertID+'">';
+					if (data.Type == 'PACK_BASIC' || data.Type == 'PACK_ESSENTIEL') {
+						trm += '<option value="Aucune" selected> Aucune </option>';
+					} else if (data.Type == 'PACK_PREMIER') {
+						if (data.Option1 == 'GTR J+1') {
+								trm += '<option value="Aucune"> Aucune </option>';
+								trm += '<option value="GTR J+1" selected> GTR J+1 </option>';
+								trm += '<option value="GTR J+3"> GTR J+3 </option>';
+						} else if (data.Option1 == 'GTR J+3') {
+								trm += '<option value="Aucune"> Aucune </option>';
+								trm += '<option value="GTR J+1"> GTR J+1 </option>';
+								trm += '<option value="GTR J+3" selected> GTR J+3 </option>';
+						} else if (data.Option1 == 'Aucune') {
+								trm += '<option value="Aucune" selected> Aucune </option>';
+								trm += '<option value="GTR J+1"> GTR J+1 </option>';
+								trm += '<option value="GTR J+3"> GTR J+3 </option>';
+						}
+					} else if (data.Type == 'PACK_GOLD') {
+						if (data.Option1 == 'GTR 4H') {
+								trm += '<option value="Aucune"> Aucune </option>';
+								trm += '<option value="GTR 4H" selected> GTR 4H </option>';
+								trm += '<option value="GTR J+1"> GTR J+1 </option>';
+						} else if (data.Option1 == 'GTR J+1') {
+								trm += '<option value="Aucune"> Aucune </option>';
+								trm += '<option value="GTR 4H"> GTR 4H </option>';
+								trm += '<option value="GTR J+1" selected> GTR J+1 </option>';
+						} else if (data.Option1 == 'Aucune') {
+								trm += '<option value="Aucune" selected> Aucune </option>';
+								trm += '<option value="GTR 4H"> GTR 4H </option>';
+								trm += '<option value="GTR J+1"> GTR J+1 </option>';
+						}
+					}
+				trm += '</select>';
+				trm += '</td>';
+				trm += '<td><center>';
+				if (data.Option2 == 'NON') {
+					trm += '<select class="selectoption2" id="Typeoption2_'+data.InsertID+'">';
+						trm += '<option value="NON" selected> NON </option>';
+						trm += '<option value="OUI"> OUI </option>';
+					trm += '</select>';
+				} else if (data.Option2 == 'OUI') {
+					trm += '<select class="selectoption2" id="Typeoption2_'+data.InsertID+'">';
+						trm += '<option value="NON"> NON </option>';
+						trm += '<option value="OUI" selected> OUI </option>';
+					trm += '</select>';
+				trm += '</td>';
+				}	
+			} else if (data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<td><center>';
+				trm += '<input style="text-align:center" type="text" id="Typeoption1_'+data.InsertID+'" size="6" Value="'+data.Option1+'">';
+				trm += '</td> ';
+				trm += '<td><center>';
+					trm += '<input style="text-align:center" type="text" id="Typeoption2_'+data.InsertID+'" size="6" Value="'+data.Option2+'">';
+				trm += '</td>';
+			} else if (data.Type == 'INFRA'  || data.Type == 'CONCIERGERIE'  || data.Type == 'GO4COLLAB'  || data.Type == 'ASSISTANCE TECHNIQUE'  || data.Type == 'MAJ SECU'  || data.Type == 'EVOL LOGICIELLES') {
+				trm += '<td><center>';
+				trm += '<input style="text-align:center" type="text" id="Typeoption1_'+data.InsertID+'" size="5" maxlength="5" Value="'+data.Option1+'">';
+				trm += '</td> ';
+				trm += '<td><center>';
+					trm += '<input style="text-align:center" type="text" id="Typeoption2_'+data.InsertID+'" size="5" maxlength="5" Value="'+data.Option2+'">';
+				trm += '</td>';
+			}  else if (data.Type == 'SO_RTC-JOUR-1'  || data.Type == 'SO_RTC-JOUR-2'  || data.Type == 'SO_RTC-PAR') {
+				trm += '<td><center>';
+				trm += '<input style="text-align:center" type="text" id="Typeoption1_'+data.InsertID+'" size="20" maxlength="50" Value="'+data.Option1+'">';
+				trm += '</td> ';
+				trm += '<td><center>';
+					trm += '<input style="text-align:center" type="text" id="Typeoption2_'+data.InsertID+'" size="5" maxlength="5" Value="'+data.Option2+'">';
+				trm += '</td>';
+			}
+			
+			
+			trm += '<td><center>';
+			trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_'+data.InsertID+'" maxlength="10" size="10" value="'+data.DateDebut+'">';
+			trm += '</td>';
+			trm += '<td style="text-align:center">';
+			trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_'+data.InsertID+'" maxlength="10" size="10" value="'+data.DateFin+'">';
+			trm += '</td>';
+			if (data.Type == 'INFRA'  || data.Type == 'CONCIERGERIE'  || data.Type == 'GO4COLLAB'  || data.Type == 'ASSISTANCE TECHNIQUE'  || data.Type == 'MAJ SECU'  || data.Type == 'EVOL LOGICIELLES') {
+				trm += '<td ROWSPAN=2 style="text-align:center"><input type="button" class="buttonapply" value="[% Translate("Apply") | html %]" id="BApp_'+data.InsertID+'"><br><input type="button" class="buttondisable" value="[% Translate("Disable") | html %]" id="BDis_'+data.InsertID+'"></td>';
+			} else if (data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<td ROWSPAN=3 style="text-align:center"><input type="button" class="buttonapply" value="[% Translate("Apply") | html %]" id="BApp_'+data.InsertID+'"><br><input type="button" class="buttondel" value="[% Translate("Delete") | html %]" id="BDel_'+data.InsertID+'"></td>';
+			} else {
+				trm += '<td ROWSPAN=2 style="text-align:center"><input type="button" class="buttonapply" value="[% Translate("Apply") | html %]" id="BApp_'+data.InsertID+'"><br><input type="button" class="buttondel" value="[% Translate("Delete") | html %]" id="BDel_'+data.InsertID+'"></td>';
+			}
+			trm += '</tr>';
+			if (data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<tr class="TR_'+data.InsertID+'">';
+					trm += '<td COLSPAN=3><center>';
+						trm += '<textarea title="[% Translate("Perimeter") %]" id="Perimeter_'+data.InsertID+'" cols="92" rows="4" maxlength="3000">'+data.Perimeter+'</textarea>';
+					trm += '</td>';
+					trm += '<td COLSPAN=4><center>';
+						trm += '<textarea title="[% Translate("Description") %]"  id="Description_'+data.InsertID+'" cols="61" rows="4" maxlength="3000">'+data.Description+'</textarea>';
+					trm += '</td>';
+				trm += '<tr class="TR_'+data.InsertID+'">';
+					trm += '<td COLSPAN=7><textarea title="[% Translate("Comment") %]" id="Commentaire_'+data.InsertID+'" cols="160" rows="2" maxlength="3000">'+data.Commentaire+'</textarea></td>';
+				trm += '</tr>';
+			} else {
+				trm += '<tr class="TR_'+data.InsertID+'">';
+				trm += '<td COLSPAN=8><textarea id="Commentaire_'+data.InsertID+'" cols="160" rows="2" maxlength="3000">'+data.Commentaire+'</textarea></td>';
+				trm += '</tr>';
+			}
+			if (data.Type == 'PACK_BASIC' || data.Type == 'PACK_ESSENTIEL' || data.Type == 'PACK_PREMIER' || data.Type == 'PACK_GOLD') {
+				$(trm).insertAfter('.MCO');
+			} else if (data.Type == 'INFRA'  || data.Type == 'CONCIERGERIE'  || data.Type == 'GO4COLLAB'  || data.Type == 'ASSISTANCE TECHNIQUE'  || data.Type == 'MAJ SECU'  || data.Type == 'EVOL LOGICIELLES') {
+				$(trm).insertAfter('.UO');
+			} else if (data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				$(trm).insertAfter('.SUP');
+			} else if (data.Type == 'SO_BACKUP-DEVICES' ) {
+				$(trm).insertAfter('.BACK');
+			} else if (data.Type == 'SO_RTC-JOUR-1' || data.Type == 'SO_RTC-JOUR-2' || data.Type == 'SO_RTC-PAR') {
+				$(trm).insertAfter('.RTC');
+			}
+		
+		},
+		'json'
+	);
+});
+$(document).on('change', '.selectpack', function(Event) {
+	var Id = this.id.split("_");
+	var Data = {
+		Action:	'APA_AdminTR',
+		Subaction:    'AJAXSelectPack',
+		Pack:     $("#Typepack_"+Id[1]).val(),
+		TR_ID: Id[1]
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+			var Obj = 'Typeoption1_'+data.TR_ID;
+			$('#Typeoption1_'+data.TR_ID).empty();
+			if ( data.Pack == 'MCO_P-BAS' || data.Pack == 'MCO_P-ESS') {
+				document.getElementById(Obj).options.add( new Option('Aucune', 'Aucune'));
+			} else if ( data.Pack == 'MCO_P-PRE') {
+				document.getElementById(Obj).options.add( new Option('Aucune', 'Aucune'));
+				document.getElementById(Obj).options.add( new Option('GTR J+1', 'GTR J+1'));	
+				document.getElementById(Obj).options.add( new Option('GTR J+3', 'GTR J+3'));
+			} else if ( data.Pack == 'MCO_P-GLD') {
+				document.getElementById(Obj).options.add( new Option('Aucune', 'Aucune'));
+				document.getElementById(Obj).options.add( new Option('GTR 4H', 'GTR 4H'));
+				document.getElementById(Obj).options.add( new Option('GTR J+1', 'GTR J+1'));
+			}
+			
+		},
+		'json'
+		);
+	
+});
+$(document).on('click', '.buttonapply', function(Event) {
+	var Id = this.id.split("_");
+	var DevInd = $("#Typeoption12_"+Id[1]).val();
+	if (DevInd) {
+		var Opt12 = DevInd.split("/");
+		var Opt1 = Opt12[0];
+		var Opt2 = Opt12[1];
+	} else {
+		var Opt1 = $("#Typeoption1_"+Id[1]).val();
+		var Opt2 = $("#Typeoption2_"+Id[1]).val();
+	}
+	var Data = {
+		Action:	'APA_AdminTR',
+		Subaction:    'AJAXClickBoutonApply',
+		Caff:  $("#Caff_"+Id[1]).val(),
+		Type: $("#Typepack_"+Id[1]).val(),
+		Option1: Opt1,
+		Option2: Opt2,
+		Option3: $("#Typeoption3_"+Id[1]).val(),
+		Option4: $("#Typeoption4_"+Id[1]).val(),
+		Perimeter: $("#Perimeter_"+Id[1]).val(),
+		Description: $("#Description_"+Id[1]).val(),
+		DateDebut: $("#DateDebut_"+Id[1]).val(),
+		DateFin: $("#DateFin_"+Id[1]).val(),
+		Commentaire: $("#Commentaire_"+Id[1]).val(),
+		TR_ID: Id[1]
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+		},
+		'json'
+	);
+});
+$(document).on('click', '.buttondisable', function(Event) {
+	var Id = this.id.split("_");
+	var Data = {
+		Action:	'APA_AdminTR',
+		Subaction:    'AJAXDisableBdUO',
+		TR_ID: Id[1]
+	};
+	$('.TR_'+Id[1]).hide();
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function () {
+		},
+		'json'
+	);
+});
+$(document).on('change', '.AddUO', function(Event) {
+	var Id = this.id.split("_");
+	var NewSolde=$("#Typeoption1_"+Id[1]).val();
+	$("#Typeoption2_"+Id[1]).val(NewSolde);
+		
+});
+//]]></script>
+[% END %]

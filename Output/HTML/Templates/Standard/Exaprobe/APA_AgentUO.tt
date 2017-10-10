@@ -1,0 +1,52 @@
+# --
+# Kernel/Output/HTML/Templates/Standard/Exaprobe/APA_AgentUO.tt - overview
+# Copyright (C) (2017) (Aurelien PAGES) (apages2@free.fr)
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+<div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
+    <h1>[% Translate("Preview") | html %]: [% Translate("UO Pool") %]</h1>
+
+    <div class="ContentColumn">
+		<div class="WidgetSimple">
+			<div class="Header">
+				<h2>[% Translate("List") | html %]</h2>
+            </div>
+
+	        <div class="Content">
+                    <table class="DataTable">
+                        <thead>
+                            <tr align="center">
+                                <th class="W20pc" style="text-align:center">[% Translate("Customer") | html %]</th>
+                                <th class="W10pc"style="text-align:center">[% Translate("Commercial") | html %]</th>
+                                <th class="W5pc" style="text-align:center">[% Translate("Balance") | html %]</th> 
+                                <th class="W10pc" style="text-align:center">[% Translate("Deadline") | html %]</th>
+								<th class="W10pc" style="text-align:center">[% Translate("Contract N°") | html %]</th>
+								<th class="W10pc" style="text-align:center">[% Translate("Selling Price") | html %]</th>
+								<th class="W10pc" style="text-align:center">[% Translate("Customer mail") | html %]</th>
+							</tr>
+						</thead>
+                        <tbody> 
+							[% RenderBlockStart("LineUO") %]
+							<tr>
+								<td style="text-align:center"><a href="[% Env("Baselink") %]Action=APA_AgentUOZoom;TRID=[% Data.TR_ID | html %]">[% Data.TR_Customer | html %]</a></td>
+								<td style="text-align:center"> [% Data.TR_IC | html %]</td> 
+								<td style="text-align:center"> [% Data.TR_Option2 | html %]</td>
+								<td style="text-align:center"> [% Data.TR_DateFin | Localize("Date") | html %] </td>
+								<td style="text-align:center"> [% Data.TR_Caff | html %] </td>
+								[% IF Data.TR_Montant %]
+									<td style="text-align:center"> [% Data.TR_Montant | html %] €</td>
+								[% ELSE %]
+									<td></td>
+								[% END %]
+								<td style="text-align:center"> [% Data.UO_CustomerMail | html %] </td>
+							</tr>
+							[% RenderBlockEnd("LineUO") %]                        
+                        </tbody>
+                    </table>
+            </div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<otrs_config version="1.0" init="Config">
+	<ConfigItem Name="Frontend::Module###APA_AgentContractManagement" Required="1" Valid="1">
+        	<Description Translatable="1">Frontend module registration for the agent interface.</Description>
+        	<Group>APA Contract Management</Group>
+        	<SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+	        <Setting>
+	            <FrontendModuleReg>
+	                <GroupRo>APA-ContractManagement</GroupRo>
+					<Description Translatable="1">MEP Area.</Description>	                
+	                <NavBarName>MEP Management</NavBarName>
+					<Title Translatable="1">MEP Management</Title>
+					<NavBar>
+						<GroupRo>APA-ContractManagement</GroupRo>
+						<Description Translatable="1">MEP Management</Description>
+						<Type>Menu</Type>
+						<Block>ItemArea</Block>
+						<Name Translatable="1">MEP Management</Name>
+						<Link>Action=APA_AgentContractManagement</Link>
+						<NavBar>MEP Management</NavBar>
+						<AccessKey>M</AccessKey>
+						<Prio>200</Prio>
+					</NavBar>
+					<NavBar>
+						<GroupRo>APA-ContractManagement</GroupRo>
+						<Description Translatable="1">MEP Information Center</Description>
+						<Name Translatable="1">MEP Information Center</Name>
+						<Link>Action=APA_AgentContractManagement</Link>
+						<Type></Type>
+						<Block></Block>
+						<NavBar>MEP Management</NavBar>
+						<Prio>200</Prio>
+                </NavBar>
+				<Loader>
+					<CSS>thirdparty/bootstrap-3.3.7/apa-bootstrap.css</CSS>
+					<JavaScript>thirdparty/bootstrap-3.3.7/bootstrap.min.js</JavaScript>
+					<CSS>thirdparty/bootstrap-switch/bootstrap-switch.css</CSS>
+					<JavaScript>thirdparty/bootstrap-switch/bootstrap-switch.js</JavaScript>
+				</Loader>
+	            </FrontendModuleReg>
+        	</Setting>
+	</ConfigItem>
+	<ConfigItem Name="Frontend::Module###APA_AdminContractManagement" Required="1" Valid="1">
+        	<Description Translatable="1">Frontend module registration for the admin interface.</Description>
+        	<Group>APA Contract Management</Group>
+        	<SubGroup>Frontend::Admin::ModuleRegistration</SubGroup>
+	        <Setting>
+	            <FrontendModuleReg>
+	                <Group>APA-ContractManagement</Group>
+	                <Description Translatable="1">MEP Admin</Description>
+	                <Title Translatable="1">MEP Admin</Title>
+	                <NavBarName>MEP Management</NavBarName>
+					<NavBar>
+						<Description Translatable="1">MEP Admin</Description>
+						<Name Translatable="1">MEP Admin</Name>
+						<Link>Action=APA_AdminContractManagement</Link>
+						<LinkOption></LinkOption>
+						<NavBar>MEP Management</NavBar>
+						<Type></Type>
+						<Block></Block>
+						<Prio>105</Prio>
+					</NavBar>
+				<Loader>
+					<CSS>thirdparty/bootstrap-3.3.7/apa-bootstrap.css</CSS>
+					<JavaScript>thirdparty/bootstrap-3.3.7/bootstrap.min.js</JavaScript>
+					<CSS>thirdparty/bootstrap-switch/bootstrap-switch.css</CSS>
+					<JavaScript>thirdparty/bootstrap-switch/bootstrap-switch.js</JavaScript>
+				</Loader>
+	            </FrontendModuleReg>
+        	</Setting>
+	</ConfigItem>
+	<ConfigItem Name="Frontend::Module###APA_AboZoom" Required="1" Valid="1">
+        	<Description Translatable="1">Frontend module registration for the AdminAboZoom object in the agent/Admin interface.</Description>
+	        <Group>APA Contract Management</Group>
+	        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+			<Setting>
+				<FrontendModuleReg>
+					<GroupRo>APA-ContractManagement</GroupRo>
+					<Description Translatable="1">Abo Zoom.</Description>
+					<Title Translatable="1">Zoom</Title>
+					<NavBarName>MEP Management</NavBarName>
+				</FrontendModuleReg>
+			</Setting>
+	</ConfigItem>
+	<ConfigItem Name="ContractManagement::Config::Agent###RowNumber" Required="1" Valid="1">
+        <Description Translatable="1">Limits the number of lines displayed in module Agent.</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config::Agent</SubGroup>
+        <Setting>
+			<String Translatable="0">35</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config::Admin###RowNumber" Required="1" Valid="1">
+        <Description Translatable="1">Limits the number of lines displayed in module Admin.</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config::Admin</SubGroup>
+        <Setting>
+			<String Translatable="0">35</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config###Group" Required="1" Valid="1">
+        <Description Translatable="1">Group allowing access to the module Contract Management.</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config</SubGroup>
+        <Setting>
+			<String Translatable="0">APA-ContractManagement</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config###UserDBSage" Required="1" Valid="1">
+        <Description Translatable="1">User used for connection to Sage database.</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config</SubGroup>
+        <Setting>
+			<String Translatable="0"></String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config###PasswordDBSage" Required="1" Valid="1">
+        <Description Translatable="1">Password used for connection to Sage database.</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config</SubGroup>
+        <Setting>
+			<String Translatable="0"></String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config###UserDBOTRS" Required="1" Valid="1">
+        <Description Translatable="1">User used for connection to OTRS database.</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config</SubGroup>
+        <Setting>
+			<String Translatable="0"></String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config###PasswordDBOTRS" Required="1" Valid="1">
+        <Description Translatable="1">Password used for connection to OTRS database.</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config</SubGroup>
+        <Setting>
+			<String Translatable="0"></String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config###MailExpediteur" Required="1" Valid="1">
+        <Description Translatable="1">Mail used by OTRS to notify a user.</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config</SubGroup>
+        <Setting>
+			<String Translatable="0"></String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config###MailBodyFR" Required="1" Valid="1">
+        <Description Translatable="1">Mail template used for notification.Used $MEP for the Task Name, $Abo_Intitule for the description of the contract, $Client for the name of the client</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config</SubGroup>
+        <Setting>
+			<TextArea Translatable="0">Nous sommes en attente du document : $MEP pour l'affaire citée en objet.</TextArea>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config###MailSubjectFR" Required="1" Valid="1">
+        <Description Translatable="1">Subject of mail used for notification.</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config</SubGroup>
+        <Setting>
+			<String Translatable="1">Document en Attente pour la Mise en Production de l'affaire : $Abo_Intitule (Client : $Client )</String>
+        </Setting>
+    </ConfigItem>
+</otrs_config>

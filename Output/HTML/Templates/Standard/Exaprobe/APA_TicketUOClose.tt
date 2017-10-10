@@ -1,0 +1,137 @@
+# --
+# Kernel/Output/HTML/Templates/Standard/Exaprobe/APA_TicketUOClose.tt - overview
+# Copyright (C) (2017) (Aurelien PAGES) (apages2@free.fr)
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+[% RenderBlockStart("PoolExist") %]
+			<div class="WidgetSimple">
+                <div class="Header">
+                    <div class="WidgetAction Toggle">
+                        <a href="#" title="[% Translate("Toggle this widget") | html %]"><i class="fa fa-caret-right"></i><i class="fa fa-caret-down"></i></a>
+                    </div>
+					<h2>[% Translate("Deduct UO") | html %]</h2>
+                </div>
+                <div class="Content">
+                    <fieldset class="TableLike FixedLabel">
+[% RenderBlockStart("TRCreateDecompte") %]
+						<div class="Row Row_CreateDecompte">
+							<label for="CreateDecompte">[% Translate("Deduct UO") %]:
+							</label>
+							<div class="Field">
+								<input id="CreateDecompte" name="CreateDecompte" type="checkbox" checked>
+							</div>
+							<div class="Clear"></div>
+						</div>
+[% RenderBlockEnd("TRCreateDecompte") %]
+[% RenderBlockStart("TRListSelect") %]	
+					[% IDSelect = Data.ID %]
+					[% UOSelect = Data.UO %]
+						<div class="Row Row_Pool">
+                            <label class="Mandatory"  id="LabelPool" for="Pool">
+								<span class="Marker">*</span>
+								[% Translate("UO Pool") %]:
+							</label>
+                            <div class="Field">
+
+								<select id="Pool" title="[% Translate("UO Pool") %]" class="DynamicFieldText Modernize Validate_Required" name="Pool" aria-required="true" size="1">
+								[% IF Data.ID !=NULL %]
+									<option value=""> - </option>
+								[% ELSE %]
+									<option value="" selected> - </option>
+								[% END %]
+[% RenderBlockStart("TRList") %]
+								[% IF IDSelect != NULL && IDSelect == Data.TR_ID %]
+									<option value="[% Data.TR_ID | html %]" selected> [% Data.TR_Caff| html %] </option>
+								[% ELSE %]
+									<option value="[% Data.TR_ID | html %]"> [% Data.TR_Caff| html %]</option>
+								[% END %]
+[% RenderBlockEnd("TRList") %]
+								</select>
+								<div id="PoolError" class="TooltipErrorMessage"><p>[% Translate("This field is required.") | html %]</p>
+								</div>
+                            </div>
+                            <div class="Clear"></div>
+                        </div>
+[% RenderBlockEnd("TRListSelect") %]
+[% RenderBlockStart("TRListAlone") %]
+								<input type="hidden" name="Pool" value="[% Data.TR_ID | html %]">
+[% RenderBlockEnd("TRListAlone") %]
+[% RenderBlockStart("DecompteUO") %]
+						<div class="Row Row_DecompteUO">
+                            <label id="LabelDecompteUO" class="Mandatory" for="DecompteUO">
+								<span class="Marker">*</span>
+								[% Translate("Number of UO deduct") %]:
+							</label>
+                            <div class="Field">
+								<input type="text" id="DecompteUO" name="DecompteUO" title="[% Translate('Number of UO deduct') %]" value="[% Data.UO %]" class="DynamicFieldText W10pc Validate_Required" aria-required="true">
+[% RenderBlockEnd("DecompteUO") %]
+[% RenderBlockStart("UOConseil") %]
+								[% Translate(" (Recommended Deduct : ") %][% Data.UOConseil %] )
+								<div id="DecompteUOError" class="TooltipErrorMessage"><p>[% Translate("This field is required.") | html %]</p>
+								</div>
+                            </div>
+                            <div class="Clear"></div>
+                        </div>
+
+[% RenderBlockEnd("UOConseil") %]
+                    </fieldset>
+                </div>
+            </div>
+[% RenderBlockEnd("PoolExist") %]			
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">//<![CDATA[
+$('#DecompteUO').bind('change', function (Event) {
+var checkPool=document.getElementsByName('Pool')[0].value;
+	if ( checkPool !== "") {
+		var Data = {
+			Action:	'APA_UpdateUO',
+			Subaction:    'UOUpdate',
+			TicketID:    document.getElementsByName('TicketID')[0].value,
+			DecompteUO:    document.getElementsByName('DecompteUO')[0].value,
+			TR_ID:    document.getElementsByName('Pool')[0].value,
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function () {
+			},
+			'json'
+			);
+	} else {
+		alert("Vous devez selectionner une banque d\'UO/jour");
+		$("#DecompteUO").val("");
+	}
+});
+$('#CreateDecompte').click(function() {
+  if ($(this).is(':checked')) {
+    $('.Row_Pool').show();
+	$('.Row_DecompteUO').show();
+	$("#DecompteUO").val("");
+  } else {
+	$("#DecompteUO").val("0");
+	$('.Row_Pool').hide();
+	$('.Row_DecompteUO').hide();
+  }
+});
+$('#Pool').bind('change', function (Event) {
+		$('.Row_CreateDecompte').hide();
+		var Data = {
+			Action:	'APA_UpdateUO',
+			Subaction:    'UOUpdate',
+			TicketID:    document.getElementsByName('TicketID')[0].value,
+			DecompteUO:    document.getElementsByName('DecompteUO')[0].value,
+			TR_ID:    document.getElementsByName('Pool')[0].value,
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function () {
+			},
+			'json'
+			);
+});
+//]]></script>
+[% END %]		

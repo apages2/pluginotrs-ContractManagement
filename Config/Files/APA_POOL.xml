@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<otrs_config version="1.0" init="Config">
+	<ConfigItem Name="Frontend::Module###APA_AgentUO" Required="1" Valid="1">
+		<Description Translatable="1">FrontendModuleRegistration for UO Pool module.</Description>
+		<Group>APA POOL</Group>
+		<SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+		<Setting>
+			<FrontendModuleReg>
+				<GroupRo>APA-PoolManagement</GroupRo>
+				<Description Translatable="1">Pool Area.</Description>
+				<NavBarName>UO Pool</NavBarName>
+				<Title Translatable="1">UO Pool</Title>
+				<NavBar>
+					<GroupRo>APA-PoolManagement</GroupRo>
+                    <Description Translatable="1">UO Pool</Description>
+                    <Type>Menu</Type>
+                    <Block>ItemArea</Block>
+                    <Name Translatable="1">UO Pool</Name>
+                    <Link>Action=APA_AgentUO</Link>
+                    <NavBar>UO Pool</NavBar>
+                    <AccessKey>P</AccessKey>
+                    <Prio>100</Prio>
+                </NavBar>
+				<NavBar>
+					<GroupRo>APA-PoolManagement</GroupRo>
+					<Description Translatable="1">UO Pool</Description>
+					<Name Translatable="1">UO Pool</Name>
+					<Link>Action=APA_AgentUO</Link>
+					<Type></Type>
+					<Block></Block>
+					<NavBar>UO Pool</NavBar>
+					<Prio>200</Prio>
+				</NavBar>
+				<Loader>
+					<CSS>thirdparty/bootstrap-3.3.7/apa-bootstrap.css</CSS>
+					<JavaScript>thirdparty/bootstrap-3.3.7/bootstrap.min.js</JavaScript>
+					<CSS>thirdparty/bootstrap-switch/bootstrap-switch.css</CSS>
+					<JavaScript>thirdparty/bootstrap-switch/bootstrap-switch.js</JavaScript>
+				</Loader>
+			</FrontendModuleReg>
+		</Setting>
+	</ConfigItem>
+	<ConfigItem Name="Pool::Config###Group" Required="1" Valid="1">
+        <Description Translatable="1">Group allowing access to the module Pool Management.</Description>
+        <Group>APA POOL</Group>
+        <SubGroup>Pool::Config</SubGroup>
+        <Setting>
+			<String Translatable="0">APA-PoolManagement</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="Frontend::Output::FilterElementPost###APA_TicketUO" Required="1" Valid="1">
+        <Description Translatable="1">Shows the customer support UO widget in the ticket zoom view.</Description>
+        <Group>APA POOL</Group>
+        <SubGroup>Frontend::Agent::Ticket::ViewZoom</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::Output::HTML::Exaprobe::APA_TicketUO</Item>
+				<Item Key="Templates">
+                    <Hash>
+                        <Item Key="AgentTicketZoom">1</Item>
+						<Item Key="AgentTicketClose">1</Item>
+                    </Hash>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="Pool::Preferences::EmptyContractDisplay" Required="1" Valid="1">
+        <Description Translatable="1">Display Customer UO POOL widget even if no POOL is set to a customer.</Description>
+        <Group>APA POOL</Group>
+        <SubGroup>Pool::Preferences</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="Pool::Preferences::Position" Required="1" Valid="1">
+        <Description Translatable="1">Placement of UO POOL widget in TicketZoom sidebar.</Description>
+        <Group>APA POOL</Group>
+        <SubGroup>Pool::Preferences</SubGroup>
+        <Setting>
+            <Option SelectedID="top">
+                <Item Key="top" Translatable="1">Top</Item>
+                <Item Key="bottom" Translatable="1">Bottom</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="Frontend::Output::FilterElementPost###APA_TicketUOClose" Required="1" Valid="1">
+        <Description Translatable="1">Shows the UO deduct in the ticket close view.</Description>
+        <Group>APA POOL</Group>
+        <SubGroup>Frontend::Agent::Ticket::ViewClose</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::Output::HTML::Exaprobe::APA_TicketUOClose</Item>
+				<Item Key="Templates">
+                    <Hash>
+                        <Item Key="AgentTicketClose">1</Item>
+                    </Hash>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="Frontend::Module###APA_AgentUOZoom" Required="1" Valid="1">
+        	<Description Translatable="1">Frontend module registration for the AgentUOZoom object in the agent interface.</Description>
+	        <Group>APA POOL</Group>
+	        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+		        <Setting>
+		            <FrontendModuleReg>
+						<GroupRo>APA-PoolManagement</GroupRo>
+						<Description Translatable="1">UO Zoom</Description>
+						<Title Translatable="1">UO Zoom</Title>
+						<NavBarName>UO Pool</NavBarName>
+	            </FrontendModuleReg>
+	        </Setting>
+	</ConfigItem>
+	<ConfigItem Name="Frontend::Module###APA_UpdateUO" Required="1" Valid="1">
+        	<Description Translatable="1">Frontend module registration for the Update UO Pool object in the agent interface.</Description>
+	        <Group>APA POOL</Group>
+	        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+		        <Setting>
+		            <FrontendModuleReg>
+						<GroupRo>APA-PoolManagement</GroupRo>
+						<Description Translatable="1">UO Update</Description>
+						<Title Translatable="1">UO Update</Title>
+						<NavBarName>UO Pool</NavBarName>
+	            </FrontendModuleReg>
+	        </Setting>
+	</ConfigItem>
+	<ConfigItem Name="Stats::DynamicObjectRegistration###APA_UOList" Required="0" Valid="1">
+        <Description Translatable="1">Module to generate ticket statistics.</Description>
+        <Group>APA POOL</Group>
+        <SubGroup>Core::Stats</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Stats::Dynamic::APA_UOList</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="Stats::DynamicObjectRegistration###APA_UODetail" Required="0" Valid="1">
+        <Description Translatable="1">Module to generate ticket statistics.</Description>
+        <Group>APA POOL</Group>
+        <SubGroup>Core::Stats</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Stats::Dynamic::APA_UODetail</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</otrs_config>

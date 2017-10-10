@@ -1,0 +1,332 @@
+# --
+# Kernel/Output/HTML/Templates/Standard/Exaprobe/APA_AdminContractManagement.tt - overview
+# Copyright (C) (2016) (Aurelien PAGES) (apages2@free.fr)
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+<style>
+
+.SearchSelect {   
+    display: inline-block; !important;		
+}
+
+.thzoom {
+background-color: #285566 !important;
+color: #ccc !important;
+vertical-align: middle !important;
+} 
+
+.thzoomfirst {
+background-color: #fdfdfd !important;
+border: 0px !important;
+}  
+
+.tdzoom {
+background-color: #f2f2f2 !important;
+}  
+
+</style>
+<form action="[% Env("CGIHandle") %]"  method="post" enctype="multipart/form-data" name="search" class="Validate PreventMultipleSubmits" id="search">
+<div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
+    <h1>[% Translate("Overview") | html %]: [% Translate("Admin MEP Management") %]</h1>
+[% RenderBlockStart("ActionList") %]
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("Actions") | html %]</h2>
+            </div>
+            <div class="Content">
+                <ul class="ActionList">
+[% RenderBlockStart("ActionSearch") %]
+					[% Search = Data.Search  %]
+					[% SearchList = Data.SearchList  %]
+					[% StartWindow=Data.StartWindow %]
+					[% StartHit=Data.StartHit %]
+					[% IsTreated = Data.IsTreated %]
+					[% Expired = Data.Expired %]
+                    <li>						
+                            
+							<input type="hidden" name="Action" value="[% Env("Action") %]"/>
+                            <input type="hidden" name="Subaction" value=""/>
+                            <input type="hidden" name="Nav" value="[% Data.Nav | html %]"/>
+							[% IF Data.IsTreated=='on' %]
+							    <input type="checkbox" name="IsTreated" class="FieldExplanation" id="IsTreated" checked>[% Translate(" Search in all contracts") | html %]
+							[% ELSE %]
+								<input type="checkbox" name="IsTreated" class="FieldExplanation"  id="IsTreated">[% Translate(" Search in all contracts") | html %]
+							[% END %]
+							[% IF Data.Expired=='on' %]
+							    <input type="checkbox" name="Expired" class="FieldExplanation" id="Expired" checked>[% Translate(" Search in expired contracts") | html %]
+							[% ELSE %]
+								<input type="checkbox" name="Expired" class="FieldExplanation"  id="Expired">[% Translate(" Search in expired contracts") | html %]
+							[% END %]
+							<br><p class="SearchSelect ">    
+							<select name="SearchList" id="SearchList" style="width: 200px ">
+								[% IF Data.SearchList == 0 %]
+									<option value="0" selected> [% Translate("SAGE Customers") | html %] </option>
+								[% ELSE %]
+									<option value="0"> [% Translate("SAGE Customers") | html %] </option>
+								[% END %]
+								[% IF Data.SearchList == 1 %]
+									<option value="1" selected> [% Translate("Entitled") | html %] </option>
+								[% ELSE %]
+									<option value="1"> [% Translate("Entitled") | html %] </option>
+								[% END %]
+								[% IF Data.SearchList == 2 %]
+									<option value="2" selected> [% Translate("Starting Date =") | html %] </option>
+								[% ELSE %]
+									<option value="2"> [% Translate("Starting Date =") | html %] </option>
+								[% END %]
+								[% IF Data.SearchList == 3 %]
+									<option value="3" selected> [% Translate("Starting Date >=") | html %] </option>
+								[% ELSE %]
+									<option value="3"> [% Translate("Starting Date >=") | html %] </option>
+								[% END %]
+								[% IF Data.SearchList == 4 %]
+									<option value="4" selected> [% Translate("Starting Date <=") | html %] </option>
+								[% ELSE %]
+									<option value="4"> [% Translate("Starting Date <=") | html %] </option>
+								[% END %]
+							</select>
+						</p>
+						<p class="SearchSelect ">  
+							<input type="text" name="Search" value="[% Data.Search | html %]" id="Search" title="[% Translate("Search") | html %]"/>
+							<button type="submit" value="[% Translate("Search") | html %]" title="[% Translate("Search") | html %]"><i class="fa fa-search"></i></button>
+						</p>
+						<p class="FieldExplanation">    
+                            [% Translate("Wildcards like '*' are allowed. Date Format is YYYY-MM-DD") | html %]
+						</p>
+							
+                    </li>
+
+				</ul>
+            </div>
+        </div>
+
+    <div class="ContentColumn">
+        <div class="WidgetSimple">
+	        <div class="Header">
+                <h2>
+				[% RenderBlockStart("Abocount") %]
+					[% Translate("List") | html %]([% Data | html %] [% Translate("items") | html %])
+				[% RenderBlockEnd("Abocount") %]
+				<span class="Pagination">
+				[% RenderBlockStart("OverviewNavBarPageNavBar") %]
+                    [% Data.ResultLong %]
+                    [% Data.SiteNavBarLong %]
+				[% RenderBlockEnd("OverviewNavBarPageNavBar") %]
+				</span>
+				</h2>
+            </div>
+	        <div class="Content">
+                    <table class="DataTable">
+                        <thead>
+                            <tr align="center">
+                                <th class="W10pc" rowspan="2" style="text-align:center">[% Translate("SAGE Customers") | html %]</th>
+								<th class="W10pc" rowspan="2" style="text-align:center">[% Translate("OTRS Customers") | html %]</th>
+                                <th rowspan="2" style="text-align:center">[% Translate("Entitled") | html %]</th>
+								<th class="W10pc" rowspan="2" style="text-align:center">[% Translate("IC") | html %]</th>
+                                <th class="W5pc" rowspan="2" style="text-align:center">[% Translate("Duration") | html %]</th> 
+                                <th class="W5pc" rowspan="2" style="text-align:center">[% Translate("Start Date") | html %]</th>
+                                <th class="W5pc" rowspan="2" style="text-align:center">[% Translate("End Date") | html %]</th>
+                                <th class="W10pc" colspan="2" style="text-align:center">[% Translate("Transfer to MSC") | html %]</th>
+								<th class="W5pc" rowspan="2" style="text-align:center">[% Translate("Renew") | html %]</th>
+                            </tr>
+							<tr>
+                                <th style="text-align:center">[% Translate("Yes") | html %]</th> 
+								<th style="text-align:center">[% Translate("No") | html %]</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+[% RenderBlockStart("AboRow") %]
+							[% AboIDSage =Data.AboIDSage %]
+							
+							<tr>
+								<td style="text-align:center"> 
+								[% IF Data.etat == Data.AboIDSage && Data.AboIDSage != NULL%]
+									<a href="[% Env("Baselink") %]Action=APA_AdminContractManagement;IsTreated=[% IsTreated %];Expired=[% Expired %];Search=[% Search %];SearchList=[% SearchList %];StartWindow=[% StartWindow %];StartHit=[% StartHit %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-down"></i>[% Data.CustomerID | html %]</a>
+								[% ELSIF Data.AboIDSage != NULL %]
+									<a href="[% Env("Baselink") %]Action=APA_AdminContractManagement;Subaction=Zoom;IsTreated=[% IsTreated %];Expired=[% Expired %];Search=[% Search %];SearchList=[% SearchList %];AboID=[% Data.AboIDSage | uri %];StartWindow=[% StartWindow %];StartHit=[% StartHit %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-right"></i>[% Data.CustomerID | html %]</a>
+								[% END %]
+								</td>
+								<td>
+									<select class="updateselect" name="CustomerIDOtrs" form="search" id="CustomerIDOtrs_[% Data.AboIDSage | html %]">
+										<option value="0"> - </option>
+									[% RenderBlockStart("Customer") %]
+												
+											[% IF Data.CustomerIDOtrs && Data.CustomerIDOtrs!='0' %]
+												[% IF Data.CustomerIDOtrs == Data.CustID %]
+													<option value="[% Data.CustID %]" selected >[% Data.CustName %]</option>
+												[% ELSE %]
+													<option value="[% Data.CustID %]">[% Data.CustName %]</option>
+												[% END %]	
+											[% ELSIF Data.LinkOtrs %]
+												[% IF Data.LinkOtrs == Data.CustID %]
+													<option value="[% Data.CustID %]" selected >[% Data.CustName %]</option>
+												[% ELSE %]
+													<option value="[% Data.CustID %]">[% Data.CustName %]</option>
+												[% END %]
+											[% ELSE %]
+												[% IF Data.CustID == Data.Sage %]
+													<option value="[% Data.CustID %]" selected >[% Data.CustName %]</option>										
+												[% ELSE %]
+													<option value="[% Data.CustID %]">[% Data.CustName %]</option>
+												[% END %]
+											[% END %]
+									[% RenderBlockEnd("Customer") %]
+									
+									</select>
+								</td>
+								<td style="text-align:center">[% Data.AboIntitule | html %]</td>
+								<td style="text-align:center">[% Data.IC | html %]</td>
+								[% IF Data.AboDuree > 1 %]
+									<td style="text-align:center"> [% Data.AboDuree | html %] [% IF Data.AboTypeDuree == 3 %]Années[% ELSIF Data.AboTypeDuree == 2 %]Mois[% ELSIF Data.AboTypeDuree == 1 %]Semaines[% ELSIF Data.AboTypeDuree == 0 %]Jours[% END %]</td> 	
+								[% ELSE %]
+									<td style="text-align:center"> [% Data.AboDuree | html %] [% IF Data.AboTypeDuree == 3 %]Année[% ELSIF Data.AboTypeDuree == 2 %]Mois[% ELSIF Data.AboTypeDuree == 1 %]Semaine[% ELSIF Data.AboTypeDuree == 0 %]Jour[% END %]</td> 
+								[% END %]
+								<td style="text-align:center"> [% Data.AboDateDebut | Localize("Date") | html %]</td>
+								<td style="text-align:center"> [% Data.AboDateFin | Localize("Date") | html %]</td>
+								
+									[% IF Data.Follow==1 %]
+									<td class="Field" style="text-align:center">
+										<input class="radio" type="radio" name="AboFollowed_[% Data.AboIDSage | html %]" id="AboFollowed_[% Data.AboIDSage | html %]" 	value="1" checked/>
+									</td>
+									<td class="Field" style="text-align:center">
+										<input class="radio" type="radio" name="AboFollowed_[% Data.AboIDSage | html %]" id="AboFollowed_[% Data.AboIDSage | html %]" value="0"/>
+									</td>
+									[% ELSIF Data.Follow==0 %]
+									<td class="Field" style="text-align:center">
+										<input class="radio" type="radio" name="AboFollowed_[% Data.AboIDSage | html %]" id="AboFollowed_[% Data.AboIDSage | html %]" 	value="1"/>
+									</td>
+									<td class="Field" style="text-align:center">
+										<input class="radio" type="radio" name="AboFollowed_[% Data.AboIDSage | html %]" id="AboFollowed_[% Data.AboIDSage | html %]" value="0" checked/>
+									</td>
+									[% ELSE %]
+									<td class="Field" style="text-align:center">
+										<input class="radio" type="radio" name="AboFollowed_[% Data.AboIDSage | html %]" id="AboFollowed_[% Data.AboIDSage | html %]" 	value="1" />
+									</td>
+									<td class="Field" style="text-align:center">
+										<input class="radio" type="radio" name="AboFollowed_[% Data.AboIDSage | html %]" id="AboFollowed_[% Data.AboIDSage | html %]" value="0"/>
+									</td>
+									[% END %]
+                                
+								 [% IF Data.Renew == '1' %]
+								<td class="Field" style="text-align:center">
+										<input title="[% Translate("Old End Date") | html %] : [% Data.AboAncDateFin | Localize("Date") | html %]&#10;[% Translate("New End Date") | html %] : [% Data.AboDateFin | Localize("Date") | html %]" class="Renew" type="checkbox" name="AboRenew" id="AboRenew_[% Data.AboIDSage | html %]" value="2" />
+                                </td>
+								[% ELSE %]
+								<td>
+								</td>
+								[% END %]
+
+							</tr>
+
+[% RenderBlockStart("ZoomTR") %]
+										<thead>
+											<tr>
+												<th class="thzoomfirst"></th>
+												<th class="thzoom" style="text-align:center">[% Translate("Article") | html %]</th>
+												<th class="thzoom" colspan="3" style="text-align:center">[% Translate("Entitled") | html %]</th>
+												<th class="thzoom" style="text-align:center">[% Translate("Amount") | html %]</th>
+												<th class="thzoom" colspan="2" style="text-align:center">[% Translate("Unit Price HT") | html %]</th>
+												<th class="thzoom" colspan="2" style="text-align:center">[% Translate("Total Price HT") | html %]</th>
+											</tr>
+										</thead>
+[% RenderBlockEnd("ZoomTR") %]
+[% RenderBlockStart("Zoom") %]
+										<tbody>
+											<tr class="trzoom_[% Data.AboID | html %]">
+													<td> </td>
+													<td class="tdzoom" style="text-align:center"> [% Data.AR_Ref | html %]</td>
+													<td class="tdzoom" colspan="3" style="text-align:center"> [% Data.AL_Design | html %]</td>
+													<td class="tdzoom" style="text-align:center"> [% Data.AL_Qte | html %]</td>
+													<td class="tdzoom" colspan="2" style="text-align:center">[% Data.AL_PrixUnitaire | html %] €</td>
+													<td class="tdzoom" colspan="2" style="text-align:center">[% Data.AL_PrixTotal | html %] €</td>
+											</tr>
+											
+[% RenderBlockEnd("Zoom") %]
+[% RenderBlockStart("ZoomLast") %]
+											<tr class="lastzoom">
+												<td></td>
+												<td class="tdzoom" style="text-align:center"> </td>
+												<td class="tdzoom" style="text-align:center"> </td>
+												<td class="tdzoom" style="text-align:center"> </td>
+												<td class="tdzoom" style="text-align:center"> </td>
+												<td class="tdzoom" colspan="2" style="text-align:center"> </td>
+												<td class="tdzoom" colspan="2" style="text-align:center"> </td>
+											</tr>
+											
+										</tbody>
+[% RenderBlockEnd("ZoomLast") %]
+
+							
+							
+							
+							
+[% RenderBlockEnd("AboRow") %]
+[% RenderBlockEnd("ActionSearch") %] 
+[% RenderBlockEnd("ActionList") %]            
+							[% WRAPPER JSOnDocumentComplete %]
+							<script type="text/javascript">//<![CDATA[
+							$(document).on('change', '.updateselect', function(Event) {
+								var Id = this.id.split("_");
+								var Data = {
+									Action:	'APA_AdminContractManagement',
+									Subaction:    'AJAXUpdateSelect',
+									AboIDSage:     Id[1],
+									Value:	this.value
+								};
+								Core.AJAX.FunctionCall(
+									Core.Config.Get('Baselink'),
+									Data,
+									function () {
+									},
+									'json'
+									);
+							});
+							$(document).on('change', '.radio', function(Event) {
+								var Id = this.id.split("_");
+								var CustomerIDOtrs = $('#CustomerIDOtrs_'+Id[1]).val();
+								var Data = {
+									Action:	'APA_AdminContractManagement',
+									Subaction:    'AJAXUpdate',
+									AboIDSage:     Id[1],
+									Value:	this.value,
+									CustomerIDOtrs: CustomerIDOtrs
+								};
+								Core.AJAX.FunctionCall(
+									Core.Config.Get('Baselink'),
+									Data,
+									function () {
+									},
+									'json'
+								);
+							});
+							$(document).on('change', '.Renew', function(Event) {
+								var Id = this.id.split("_");
+								if (Id[1] != 'All') {
+									var Data = {
+										Action:	'APA_AdminContractManagement',
+										Subaction:    'AJAXUpdate',
+										AboIDSage:     Id[1],
+										Value:	this.value
+									};
+									Core.AJAX.FunctionCall(
+										Core.Config.Get('Baselink'),
+										Data,
+										function () {
+										},
+										'json'
+									);
+								}
+							});
+							//]]></script>
+							[% END %]
+                        </tbody>
+                    </table>
+            </div>
+		</div>
+	</div>
+</div>
+</form>

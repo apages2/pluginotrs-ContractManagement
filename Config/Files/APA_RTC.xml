@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<otrs_config version="1.0" init="Config">
+	<ConfigItem Name="Frontend::Module###APA_AgentRTC" Required="1" Valid="1">
+		<Description Translatable="1">FrontendModuleRegistration for UO Pool module.</Description>
+		<Group>APA RTC</Group>
+		<SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+		<Setting>
+			<FrontendModuleReg>
+				<GroupRo>APA-PoolManagement</GroupRo>
+				<Description Translatable="1">RTC Area.</Description>
+				<NavBarName>RTC</NavBarName>
+				<Title Translatable="1">RTC</Title>
+				<NavBar>
+					<GroupRo>APA-PoolManagement</GroupRo>
+                    <Description Translatable="1">RTC</Description>
+                    <Type>Menu</Type>
+                    <Block>ItemArea</Block>
+                    <Name Translatable="1">RTC</Name>
+                    <Link>Action=APA_AgentRTC</Link>
+                    <NavBar>RTC</NavBar>
+                    <AccessKey>P</AccessKey>
+                    <Prio>100</Prio>
+                </NavBar>
+				<NavBar>
+					<GroupRo>APA-PoolManagement</GroupRo>
+					<Description Translatable="1">RTC Pool</Description>
+					<Name Translatable="1">RTC Pool</Name>
+					<Link>Action=APA_AgentRTC</Link>
+					<Type></Type>
+					<Block></Block>
+					<NavBar>RTC</NavBar>
+					<Prio>200</Prio>
+				</NavBar>
+				<Loader>
+					<CSS>thirdparty/bootstrap-3.3.7/apa-bootstrap.css</CSS>
+					<JavaScript>thirdparty/bootstrap-3.3.7/bootstrap.min.js</JavaScript>
+					<CSS>thirdparty/bootstrap-switch/bootstrap-switch.css</CSS>
+					<JavaScript>thirdparty/bootstrap-switch/bootstrap-switch.js</JavaScript>
+				</Loader>
+			</FrontendModuleReg>
+		</Setting>
+	</ConfigItem>
+	<ConfigItem Name="Pool::Config###Group" Required="1" Valid="1">
+        <Description Translatable="1">Group allowing access to the module Pool Management.</Description>
+        <Group>APA RTC</Group>
+        <SubGroup>Pool::Config</SubGroup>
+        <Setting>
+			<String Translatable="0">APA-PoolManagement</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="Frontend::Module###APA_AgentRTCZoom" Required="1" Valid="1">
+        	<Description Translatable="1">Frontend module registration for the AgentRTCZoom object in the agent interface.</Description>
+	        <Group>APA RTC</Group>
+	        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+		        <Setting>
+		            <FrontendModuleReg>
+						<GroupRo>APA-PoolManagement</GroupRo>
+						<Description Translatable="1">RTC Zoom</Description>
+						<Title Translatable="1">RTC Zoom</Title>
+						<NavBarName>RTC</NavBarName>
+	            </FrontendModuleReg>
+	        </Setting>
+	</ConfigItem>
+	<ConfigItem Name="Frontend::Module###APA_UpdateRTC" Required="1" Valid="1">
+        	<Description Translatable="1">Frontend module registration for the Update Pool RTC object in the agent interface.</Description>
+	        <Group>APA RTC</Group>
+	        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+		        <Setting>
+		            <FrontendModuleReg>
+						<GroupRo>APA-PoolManagement</GroupRo>
+						<Description Translatable="1">RTC Update</Description>
+						<Title Translatable="1">RTC Update</Title>
+						<NavBarName>RTC</NavBarName>
+	            </FrontendModuleReg>
+	        </Setting>
+	</ConfigItem>
+	<ConfigItem Name="Stats::DynamicObjectRegistration###APA_RTCList" Required="0" Valid="1">
+        <Description Translatable="1">Module to generate ticket statistics.</Description>
+        <Group>APA RTC</Group>
+        <SubGroup>Core::Stats</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Stats::Dynamic::APA_RTCList</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="Stats::DynamicObjectRegistration###APA_RTCDetail" Required="0" Valid="1">
+        <Description Translatable="1">Module to generate ticket statistics.</Description>
+        <Group>APA RTC</Group>
+        <SubGroup>Core::Stats</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Stats::Dynamic::APA_RTCDetail</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</otrs_config>

@@ -1,0 +1,414 @@
+# --
+# Kernel/Output/HTML/Templates/Standard/Exaprobe/APA_AgentUOZoom.tt - overview
+# Copyright (C) (2017) (Aurelien PAGES) (apages2@free.fr)
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+<div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
+    <h1>[% Translate("Preview") | html %]: [% Translate("UO Pool") %]</h1>
+
+    <div class="ContentColumn">
+		<div class="WidgetSimple">
+			<div class="Header">
+			[% RenderBlockStart("BoutonAdmin") %]
+				<h2><button class="CallForAction buttonadd" ><span><i class="fa fa-plus-square"></i> [% Translate("Add Deduct") | html %]</span></button>
+				<button class="CallForAction buttonRenew" ><span><i class="fa fa-refresh"></i> [% Translate("Renew") | html %]</span></button></h2>
+			[% RenderBlockEnd("BoutonAdmin") %]
+            </div>
+
+	        <div class="Content">
+                    <table class="DataTable">
+                        <thead>
+                            <tr align="center">
+                                <th class="W20pc" style="text-align:center">[% Translate("Customer") | html %]</th>
+                                <th class="W10pc"style="text-align:center">[% Translate("Commercial") | html %]</th>
+                                <th class="W5pc" style="text-align:center">[% Translate("Balance") | html %]</th> 
+								<th class="W10pc" style="text-align:center">[% Translate("Start Date") | html %]</th>
+								<th class="W10pc" style="text-align:center">[% Translate("End Date") | html %]</th>
+								<th class="W10pc" style="text-align:center">[% Translate("Contract N°") | html %]</th>
+								<th class="W10pc" style="text-align:center">[% Translate("Selling Price") | html %]</th>
+								<th class="W10pc" style="text-align:center">[% Translate("Customer mail") | html %]</th>
+							</tr>
+						</thead>
+                        <tbody> 
+							[% RenderBlockStart("LineUOAgent") %]
+							<tr>
+								<td style="text-align:center"> [% Data.TR_Customer | html %]</td>
+								<td style="text-align:center"> [% Data.TR_IC | html %]</td> 
+								<td style="text-align:center"> [% Data.TR_Option2 | html %]</td>
+								<td style="text-align:center"> [% Data.TR_DateDebut | Localize("Date") | html %] </td>
+								<td style="text-align:center"> [% Data.TR_DateFin | Localize("Date") | html %] </td>
+								<td style="text-align:center" title="[% Data.TR_Log | html %]"> [% Data.TR_Caff | html %] </td>
+								[% IF Data.TR_Montant %]
+									<td style="text-align:center"> [% Data.TR_Montant | html %] €</td>
+								[% ELSE %]
+									<td></td>
+								[% END %]
+								</tr>
+							[% RenderBlockEnd("LineUOAgent") %]    
+							[% RenderBlockStart("LineUOAdmin") %]
+							<tr>
+								<input type="hidden" id="ID" Value="[% Data.TR_ID %]">
+								<td style="text-align:center"> [% Data.TR_Customer | html %]</td>
+								<td style="text-align:center"> <input style="text-align:center" type="text" id="TRIC_[% Data.TR_ID %]" name="TRIC" value="[% Data.TR_IC | html %]" class="TRIC W40pc"/></td> 
+								<td style="text-align:center"> <input style="text-align:center" type="text" id="TRSolde_[% Data.TR_ID %]" name="TRSolde" value="[% Data.TR_Option2 | html %]" class="TRSolde W40pc"/></td>
+								<td style="text-align:center"> <input style="text-align:center" type="datetime" id="TRDateDebut_[% Data.TR_ID %]" name="TRDateDebut" value="[% Data.TR_DateDebut | Localize("Date") | html %]" maxlength="10" size="10" class="TRDateDebut W40pc"/></td>
+								<td style="text-align:center"> <input style="text-align:center" type="datetime" id="TRDateFin_[% Data.TR_ID %]" name="TRDateFin" value="[% Data.TR_DateFin | Localize("Date") | html %]" maxlength="10" size="10" class="TRDateFin W40pc"/></td>
+								<td style="text-align:center"> <input style="text-align:center" type="text" id="TRCaff_[% Data.TR_ID %]" name="TRCaff" value="[% Data.TR_Caff | html %]" class="TRCaff W40pc"/></td> 
+								<td style="text-align:center"> <input style="text-align:center" type="text" id="TRmontant_[% Data.TR_ID %]" name="TRMontant" value="[% Data.TR_Montant | html %] €" class="TRmontant W40pc"/></td>
+								<td style="text-align:center"> <input style="text-align:center" type="text" id="TRCustomerMail_[% Data.TR_ID %]" name="TRCustomerMail" value="[% Data.UO_CustomerMail | html %]" class="TRCustomerMail W40pc"/></td>
+							</tr>
+							</tbody>
+                    </table>
+					<table class="DataTable">
+                        <thead>
+							<tr align="center">
+								<th COLSPAN=11 style="text-align:center">[% Translate("Log") | html %]</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr align="center">
+								<td COLSPAN=11 style="text-align:center"><textarea id="TRLog_[% Data.TR_ID %]" cols="213" rows="8" maxlength="3000" name="TRLog" class="TRLog"/>[% Data.TR_Log | html %]</textarea></td>
+							</tr>
+							
+							[% RenderBlockEnd("LineUOAdmin") %]    
+                        </tbody>
+                    </table>
+            </div>
+			<div class="Content">
+                    <table class="DataTable">
+                        <thead>
+                            <tr align="center"  class="insertdecompte">
+                                <th class="W5pc" style="text-align:center">[% Translate("Date") | html %]</th>
+                                <th class="W5pc"style="text-align:center">[% Translate("Responsible") | html %]</th>
+                                <th class="W5pc" style="text-align:center">[% Translate("Ticket#") | html %]</th> 
+                                <th class="W5pc" style="text-align:center">[% Translate("Number of UO deduct") | html %]</th>
+								<th class="W30pc" style="text-align:center">[% Translate("Subject") | html %]</th>
+							</tr>
+						</thead>
+                        <tbody> 
+							[% RenderBlockStart("LineUOZoomAgent") %]
+							<tr>
+								<td style="text-align:center"> [% Data.date | Localize("Date") | html %]</td>
+								<td style="text-align:center"> [% Data.owner | html %]</td> 
+								<td style="text-align:center"><a href="[% Env("Baselink") %]Action=AgentTicketZoom;TicketID=[% Data.ticket_id | html %]">[% Data.ticket_number | html %]</a></td>
+								<td style="text-align:center"> [% Data.UO_unit  | html %] </td>
+								<td style="text-align:center"> <input style="text-align:center" type="text" id="UOSubject_[% Data.ID | html %]" name="UOSubject" value="[% Data.Subject | html %]" class="UOSubject W90pc"/></td>
+							</tr>
+							[% RenderBlockEnd("LineUOZoomAgent") %]   
+							[% RenderBlockStart("LineUOZoomAdmin") %]
+								[% OwnerID = Data.OwnerID %]
+							<tr class="TR_[% Data.ID | html %]">
+								<td style="text-align:center"> <input style="text-align:center" type="datetime" id="UODateFin_[% Data.ID | html %]" name="UODateFin" value="[% Data.date | Localize("Date") | html %]" maxlength="10" size="10" class="UODateFin W40pc"/></td>
+								<td style="text-align:center"> 
+									<select class="Respselect" name="ResponsibleID" id="Responsible_[% Data.ID | html %]">
+										<option value="0"> - </option>
+										[% RenderBlockStart("Responsible") %]
+											[% IF Data.RespID == OwnerID %]
+												<option value="[% Data.RespID %]"  selected>[% Data.RespFullName %]</option>
+											[% ELSE %]
+												<option value="[% Data.RespID %]">[% Data.RespFullName %]</option>
+											[% END %]	
+										[% RenderBlockEnd("Responsible") %]
+									</select>
+								</td> 
+								<td style="text-align:center"><a href="[% Env("Baselink") %]Action=AgentTicketZoom;TicketID=[% Data.ticket_id | html %]">[% Data.ticket_number | html %]</a></td>
+								<td style="text-align:center"> <input style="text-align:center" type="text" id="UOUnit_[% Data.ID | html %]" name="UOUnit" value="[% Data.UO_unit  | html %]" class="UOUnit W20pc"/> </td>
+								<td style="text-align:center"> <input style="text-align:center" type="text" id="UOSubject_[% Data.ID | html %]" name="UOSubject" value="[% Data.Subject | html %]" class="UOSubject W90pc"/><input type="button" class="buttondelete" value="[% Translate("Delete") | html %]" id="BDel_[% Data.ID | html %]"></td>
+							</tr>
+							[% RenderBlockEnd("LineUOZoomAdmin") %]							
+                        </tbody>
+                    </table>
+            </div>
+		</div>
+	</div>
+</div>
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">//<![CDATA[
+$(document).on('click', '.buttonadd', function(Event) {
+	var Data = {
+		Action:	'APA_AgentUO',
+		Subaction:    'AJAXAddDecompte',
+		TR_ID:  $("#ID").val(),
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+			var trm = '<tr class="TR_'+data.InsertID+'">';
+			trm += '<td style="text-align:center"> <input style="text-align:center" type="datetime" id="UODateFin_'+data.InsertID+'" name="UODateFin" value="" maxlength="10" size="10" class="UODateFin"/></td>';
+			trm += '<td style="text-align:center"> ';
+			trm += '<select class="Respselect" name="ResponsibleID" id="Responsible_'+data.InsertID+'">';
+			trm += '<option value="0"> - </option>';
+			for (var i=0; i < data.Responsable.length; i++) {
+				trm += '<option value="'+data.Responsable[i].RespID+'" >'+data.Responsable[i].RespFullName+'</option>';
+			}
+			trm += '</select>';
+			trm += '</td> ';
+			trm += '<td style="text-align:center"></td>';
+			trm += '<td style="text-align:center"> <input style="text-align:center" type="text" id="UOUnit_'+data.InsertID+'" name="UOUnit" value="" size="2" class="UOUnit"/> </td>';
+			trm += '<td style="text-align:center"> <input style="text-align:center" type="text" id="UOSubject_'+data.InsertID+'" name="UOSubject" value="" size="161" class="UOSubject"/><input type="button" class="buttondelete" value="[% Translate("Delete") | html %]" id="BDel_'+data.InsertID+'"></td>';
+			trm += '</tr>';
+			
+			$(trm).insertAfter( ".insertdecompte" );
+		},
+		'json'
+		);
+});
+$(document).on('click', '.buttonRenew', function(Event) {
+	var Data = {
+		Action:	'APA_AgentUO',
+		Subaction:    'AJAXRenewUO',
+		TR_ID:  $("#ID").val(),
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+			$("#TRLog_"+data.TR_ID).val(data.Message);
+			$("#TRDateDebut_"+data.TR_ID).val(data.TR_DateD);
+			$("#TRDateFin_"+data.TR_ID).val(data.TR_DateF);
+		},
+		'json'
+		);
+});
+$(document).on('change', '.Respselect', function(Event) {
+	var Id = this.id.split("_");
+	var Data = {
+		Action:	'APA_AgentUO',
+		Subaction:    'AJAXUpdateUO',
+		ID:     Id[1],
+		Type : 'Owner',
+		Value:	this.value
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function () {
+		},
+		'json'
+		);
+});
+$(document).on('change', '.UOSubject', function(Event) {
+		var Id = this.id.split("_");
+		var Data = {
+			Action:	'APA_AgentUO',
+			Subaction:    'AJAXUpdateUO',
+			ID:    Id[1],
+			Type : 'Subject',
+			Value:  $("#UOSubject_"+Id[1]).val(),
+			
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function () {
+			},
+			'json'
+			);
+});
+$(document).on('change', '.UOUnit', function(Event) {
+		var Id = this.id.split("_");
+		var Data = {
+			Action:	'APA_AgentUO',
+			Subaction:    'AJAXUpdateUO',
+			ID:    Id[1],
+			Type : 'UOUnit',
+			Value:  $("#UOUnit_"+Id[1]).val(),
+			
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function (data) {
+				$("#TRSolde_"+data.TR_ID).val(data.UOSolde);
+			},
+			'json'
+			);
+});
+$(document).on('change', '.UODateFin', function(Event) {
+		var Id = this.id.split("_");
+		var Data = {
+			Action:	'APA_AgentUO',
+			Subaction:    'AJAXUpdateUO',
+			ID:    Id[1],
+			Type : 'UODateFin',
+			Date:  $("#UODateFin_"+Id[1]).val(),
+			
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function () {
+			},
+			'json'
+			);
+});
+$(document).on('change', '.TRIC', function(Event) {
+		var Id = this.id.split("_");
+		var Data = {
+			Action:	'APA_AgentUO',
+			Subaction:    'AJAXUpdateUO',
+			ID:    Id[1],
+			Type : 'TRIC',
+			Value:  $("#TRIC_"+Id[1]).val(),
+			
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function () {
+			},
+			'json'
+			);
+});
+$(document).on('change', '.TRCaff', function(Event) {
+		var Id = this.id.split("_");
+		var Data = {
+			Action:	'APA_AgentUO',
+			Subaction:    'AJAXUpdateUO',
+			ID:    Id[1],
+			Type : 'TRCaff',
+			Value:  $("#TRCaff_"+Id[1]).val(),
+			
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function () {
+			},
+			'json'
+			);
+});
+$(document).on('change', '.TRSolde', function(Event) {
+		var Id = this.id.split("_");
+		var Data = {
+			Action:	'APA_AgentUO',
+			Subaction:    'AJAXUpdateUO',
+			ID:    Id[1],
+			Type : 'TRSolde',
+			Value:  $("#TRSolde_"+Id[1]).val(),
+			
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function () {
+			},
+			'json'
+			);
+});
+$(document).on('change', '.TRDateDebut', function(Event) {
+		var Id = this.id.split("_");
+		var Data = {
+			Action:	'APA_AgentUO',
+			Subaction:    'AJAXUpdateUO',
+			ID:    Id[1],
+			Type : 'TRDateDebut',
+			Date:  $("#TRDateDebut_"+Id[1]).val(),
+			
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function () {
+			},
+			'json'
+			);
+});
+$(document).on('change', '.TRDateFin', function(Event) {
+		var Id = this.id.split("_");
+		var Data = {
+			Action:	'APA_AgentUO',
+			Subaction:    'AJAXUpdateUO',
+			ID:    Id[1],
+			Type : 'TRDateFin',
+			Date:  $("#TRDateFin_"+Id[1]).val(),
+			
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function (data) {
+				$("#TRLog_"+Id[1]).val(data.Message);
+			},
+			'json'
+			);
+});
+$(document).on('change', '.TRmontant', function(Event) {
+		var Id = this.id.split("_");
+		var Data = {
+			Action:	'APA_AgentUO',
+			Subaction:    'AJAXUpdateUO',
+			ID:    Id[1],
+			Type : 'TRmontant',
+			Value:  $("#TRmontant_"+Id[1]).val(),
+			
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function () {
+			},
+			'json'
+			);
+});
+$(document).on('change', '.TRCustomerMail', function(Event) {
+		var Id = this.id.split("_");
+		var Data = {
+			Action:	'APA_AgentUO',
+			Subaction:    'AJAXUpdateUO',
+			ID:    Id[1],
+			Type : 'TRCustomerMail',
+			Value:  $("#TRCustomerMail_"+Id[1]).val(),
+			
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function () {
+			},
+			'json'
+			);
+});
+$(document).on('change', '.TRLog', function(Event) {
+		var Id = this.id.split("_");
+		var Data = {
+			Action:	'APA_AgentUO',
+			Subaction:    'AJAXUpdateUO',
+			ID:    Id[1],
+			Type : 'TRLog',
+			Value:  $("#TRLog_"+Id[1]).val(),
+			
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function () {
+			},
+			'json'
+			);
+});
+$(document).on('click', '.buttondelete', function(Event) {
+	var Id = this.id.split("_");
+	$('.TR_'+Id[1]).hide();
+	var Data = {
+		Action:	'APA_AgentUO',
+		Subaction:    'AJAXUpdateUO',
+		ID:    Id[1],
+		Type : 'UODelete',
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+			$("#TRSolde_"+data.TR_ID).val(data.UOSolde);
+		},
+		'json'
+		);
+});
+
+//]]></script>
+[% END %]
