@@ -63,6 +63,7 @@ background-color: #f2f2f2 !important;
 					[% SearchList = Data.SearchList  %]
 					[% StartWindow=Data.StartWindow %]
 					[% StartHit=Data.StartHit %]
+					[% SageTable = Data.SageTable %]
                     <li>						
                           
 							<input type="hidden" name="Action" value="[% Env("Action") %]"/>
@@ -70,30 +71,58 @@ background-color: #f2f2f2 !important;
                             <input type="hidden" name="Nav" value="[% Data.Nav | html %]"/>
                         <p class="SearchSelect ">    
 							<select name="SearchList" id="SearchList" style="width: 200px ">
-								[% IF Data.SearchList == 0 %]
-									<option value="0" selected> [% Translate("OTRS Customers") | html %] </option>
-								[% ELSE %]
-									<option value="0"> [% Translate("OTRS Customers") | html %] </option>
-								[% END %]
-								[% IF Data.SearchList == 1 %]
-									<option value="1" selected> [% Translate("Entitled") | html %] </option>
-								[% ELSE %]
-									<option value="1"> [% Translate("Entitled") | html %] </option>
-								[% END %]
-								[% IF Data.SearchList == 2 %]
-									<option value="2" selected> [% Translate("Starting Date =") | html %] </option>
-								[% ELSE %]
-									<option value="2"> [% Translate("Starting Date =") | html %] </option>
-								[% END %]
-								[% IF Data.SearchList == 3 %]
-									<option value="3" selected> [% Translate("Starting Date >=") | html %] </option>
-								[% ELSE %]
-									<option value="3"> [% Translate("Starting Date >=") | html %] </option>
-								[% END %]
-								[% IF Data.SearchList == 4 %]
-									<option value="4" selected> [% Translate("Starting Date <=") | html %] </option>
-								[% ELSE %]
-									<option value="4"> [% Translate("Starting Date <=") | html %] </option>
+								[% IF Data.SageTable=='Doc' %]
+									[% IF Data.SearchList == 0 %]
+										<option value="0" selected> [% Translate("OTRS Customers") | html %] </option>
+									[% ELSE %]
+										<option value="0"> [% Translate("OTRS Customers") | html %] </option>
+									[% END %]
+									[% IF Data.SearchList == 1 %]
+										<option value="1" selected> [% Translate("Business Code") | html %] </option>
+									[% ELSE %]
+										<option value="1"> [% Translate("Business Code") | html %] </option>
+									[% END %]
+									[% IF Data.SearchList == 2 %]
+										<option value="2" selected> [% Translate("Starting Date =") | html %] </option>
+									[% ELSE %]
+										<option value="2"> [% Translate("Starting Date =") | html %] </option>
+									[% END %]
+									[% IF Data.SearchList == 3 %]
+										<option value="3" selected> [% Translate("Starting Date >=") | html %] </option>
+									[% ELSE %]
+										<option value="3"> [% Translate("Starting Date >=") | html %] </option>
+									[% END %]
+									[% IF Data.SearchList == 4 %]
+										<option value="4" selected> [% Translate("Starting Date <=") | html %] </option>
+									[% ELSE %]
+										<option value="4"> [% Translate("Starting Date <=") | html %] </option>
+									[% END %]
+								[% ELSIF Data.SageTable=='Abo' %]	
+									[% IF Data.SearchList == 0 %]
+										<option value="0" selected> [% Translate("OTRS Customers") | html %] </option>
+									[% ELSE %]
+										<option value="0"> [% Translate("OTRS Customers") | html %] </option>
+									[% END %]
+									[% IF Data.SearchList == 1 %]
+										<option value="1" selected> [% Translate("Entitled") | html %] </option>
+									[% ELSE %]
+										<option value="1"> [% Translate("Entitled") | html %] </option>
+									[% END %]
+									[% IF Data.SearchList == 2 %]
+										<option value="2" selected> [% Translate("Starting Date =") | html %] </option>
+									[% ELSE %]
+										<option value="2"> [% Translate("Starting Date =") | html %] </option>
+									[% END %]
+									[% IF Data.SearchList == 3 %]
+										<option value="3" selected> [% Translate("Starting Date >=") | html %] </option>
+									[% ELSE %]
+										<option value="3"> [% Translate("Starting Date >=") | html %] </option>
+									[% END %]
+									[% IF Data.SearchList == 4 %]
+										<option value="4" selected> [% Translate("Starting Date <=") | html %] </option>
+									[% ELSE %]
+										<option value="4"> [% Translate("Starting Date <=") | html %] </option>
+									[% END %]
 								[% END %]
 							</select>
 						</p>
@@ -124,51 +153,70 @@ background-color: #f2f2f2 !important;
 					<table class="TableSmall tablemep">
 						<thead>
 							<tr align="center">
-								
-								<th class="W10pc" rowspan="2" style="text-align:center">[% Translate("SAGE Customers") | html %]</th>
-								<th class="W15pc" rowspan="2" style="text-align:center">[% Translate("OTRS Customers") | html %]</th>
-								<th rowspan="2" style="text-align:center">[% Translate("Entitled") | html %]</th>
-								<th class="W10pc" rowspan="2" style="text-align:center">[% Translate("Duration") | html %]</th> 
-								<th class="W10pc" rowspan="2" style="text-align:center">[% Translate("Start Date") | html %]</th>
-								<th class="W10pc" rowspan="2" style="text-align:center">[% Translate("End Date") | html %]</th>
-								<th class="W10pc" rowspan="2" style="text-align:center">[% Translate("MEP") | html %]</th>
+								[% IF SageTable=='Abo' %]
+									<th class="W10pc" rowspan="2" style="text-align:center">[% Translate("SAGE Customers") | html %]</th>
+									<th class="W15pc" rowspan="2" style="text-align:center">[% Translate("OTRS Customers") | html %]</th>
+									<th rowspan="2" style="text-align:center">[% Translate("Entitled") | html %]</th>
+									<th class="W10pc" rowspan="2" style="text-align:center">[% Translate("Duration") | html %]</th> 
+									<th class="W10pc" rowspan="2" style="text-align:center">[% Translate("Start Date") | html %]</th>
+									<th class="W10pc" rowspan="2" style="text-align:center">[% Translate("End Date") | html %]</th>
+									<th class="W10pc" rowspan="2" style="text-align:center">[% Translate("MEP") | html %]</th>
+								[% ELSIF SageTable=='Doc' %]
+									<th class="W15pc" rowspan="2" style="text-align:center">[% Translate("SAGE Customers") | html %]</th>
+									<th class="W15pc" rowspan="2" style="text-align:center">[% Translate("OTRS Customers") | html %]</th>
+									<th rowspan="2" style="text-align:center">[% Translate("Business Code") | html %]</th>
+									<th class="W15pc" rowspan="2" style="text-align:center">[% Translate("Start Date") | html %]</th>
+									<th class="W15pc" rowspan="2" style="text-align:center">[% Translate("End Date") | html %]</th>
+									<th class="W20pc" rowspan="2" style="text-align:center">[% Translate("MEP") | html %]</th>
+								[% END %]
 							</tr>
 						</thead>
 						<tbody>
-[% RenderBlockStart("AboOtrsRow") %]					
-							[% AboIDSage =Data.AboIDSage %]
+[% RenderBlockStart("OtrsRow") %]					
+							[% EnrIDSage =Data.EnrIDSage %]
 							<tr>
 								<div class="Header">
 									<td style="text-align:center">
 									[% IF Data.Search!="*" %]
-										[% IF Data.etat == Data.AboIDSage && Data.AboIDSage != NULL%]
+										[% IF Data.etat == Data.EnrIDSage && Data.EnrIDSage != NULL%]
 											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement;Search=[% Search %];SearchList=[% SearchList %];StartWindow=[% StartWindow %];StartHit=[% StartHit %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-down"></i>[% Data.CustIDSage | html %]</a>
-										[% ELSIF Data.AboIDSage != NULL %]
-											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement;Subaction=MEP;Search=[% Search %];SearchList=[% SearchList %];AboID=[% Data.AboIDSage | uri %];StartWindow=[% StartWindow %];StartHit=[% StartHit %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-right"></i>[% Data.CustIDSage | html %]</a>
+										[% ELSIF Data.EnrIDSage != NULL %]
+											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement;Subaction=MEP;Search=[% Search %];SearchList=[% SearchList %];EnrID=[% Data.EnrIDSage | uri %];StartWindow=[% StartWindow %];StartHit=[% StartHit %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-right"></i>[% Data.CustIDSage | html %]</a>
 										[% END %]	
 									[% ELSE %]
-										[% IF Data.etat == Data.AboIDSage && Data.AboIDSage != NULL%]
+										[% IF Data.etat == Data.EnrIDSage && Data.EnrIDSage != NULL%]
 											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-down"></i>[% Data.CustIDSage | html %]</a>
-										[% ELSIF Data.AboIDSage != NULL %]
-											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement;Subaction=MEP;AboID=[% Data.AboIDSage | uri %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-right"></i>[% Data.CustIDSage | html %]</a>
+										[% ELSIF Data.EnrIDSage != NULL %]
+											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement;Subaction=MEP;EnrID=[% Data.EnrIDSage | uri %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-right"></i>[% Data.CustIDSage | html %]</a>
 										[% END %]	
 									[% END %]
 										
 									</td>
 								</div>
 								<td style="text-align:center"> [% Data.CustIDOtrs | html %]</td>
-								<td style="text-align:center"><a class="MasterActionLink" href="[% Env("Baselink") %]Action=APA_AboZoom;AboID=[% Data.AboIDSage | uri %]">[% Data.AboIntitule | html %]</a></td>
-								[% IF Data.AboDuree > 1 %]
-									<td style="text-align:center"> [% Data.AboDuree | html %] [% IF Data.AboTypeDuree == 3 %]Années[% ELSIF Data.AboTypeDuree == 2 %]Mois[% ELSIF Data.AboTypeDuree == 1 %]Semaines[% ELSIF Data.AboTypeDuree == 0 %]Jours[% END %]</td> 	
-								[% ELSE %]
-									<td style="text-align:center"> [% Data.AboDuree | html %] [% IF Data.AboTypeDuree == 3 %]Année[% ELSIF Data.AboTypeDuree == 2 %]Mois[% ELSIF Data.AboTypeDuree == 1 %]Semaine[% ELSIF Data.AboTypeDuree == 0 %]Jour[% END %]</td> 
+								[% IF SageTable=='Abo' %]
+									<td style="text-align:center"><a class="MasterActionLink" href="[% Env("Baselink") %]Action=APA_AboZoom;EnrID=[% Data.EnrIDSage | uri %]">[% Data.AboIntitule | html %]</a></td>
+									[% IF Data.AboDuree > 1 %]
+										<td style="text-align:center"> [% Data.AboDuree | html %] [% IF Data.AboTypeDuree == 3 %]Années[% ELSIF Data.AboTypeDuree == 2 %]Mois[% ELSIF Data.AboTypeDuree == 1 %]Semaines[% ELSIF Data.AboTypeDuree == 0 %]Jours[% END %]</td> 	
+									[% ELSE %]
+										<td style="text-align:center"> [% Data.AboDuree | html %] [% IF Data.AboTypeDuree == 3 %]Année[% ELSIF Data.AboTypeDuree == 2 %]Mois[% ELSIF Data.AboTypeDuree == 1 %]Semaine[% ELSIF Data.AboTypeDuree == 0 %]Jour[% END %]</td> 
+									[% END %]
+									<td style="text-align:center"> [% Data.AboDateDebut | Localize("Date") | html %]</td>
+									<td style="text-align:center"> [% Data.AboDateFin | Localize("Date") | html %]</td>
+								[% ELSIF SageTable=='Doc' %]
+										<td style="text-align:center"><a class="MasterActionLink" href="[% Env("Baselink") %]Action=APA_DocZoom;EnrID=[% Data.EnrIDSage | uri %]">[% Data.Caff | html %]</a></td>
+										[% IF Data.IsAdmin==1 %]
+											<td style="text-align:center"><input class="updatedate" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_[% Data.EnrIDSage %]" maxlength="10" size="10" value="[% Data.AboDateDebut | Localize("Date") | html %]">
+											<td style="text-align:center"><input class="updatedate"  title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_[% Data.EnrIDSage %]" maxlength="10" size="10" value="[% Data.AboDateFin | Localize("Date") | html %]">
+										[% ELSE %]
+											<td style="text-align:center"> [% Data.AboDateDebut | Localize("Date") | html %]</td>
+											<td style="text-align:center"> [% Data.AboDateFin | Localize("Date") | html %]</td>
+										[% END %]
 								[% END %]
-								<td style="text-align:center"> [% Data.AboDateDebut | Localize("Date") | html %]</td>
-								<td style="text-align:center"> [% Data.AboDateFin | Localize("Date") | html %]</td>
 								<td style="text-align:center"> 
 									[% IF Data.AvancementG == 0 %]
 										<div class="progress" >
-												<div title="[% Data.AvancementG %]%" id="progress_[% Data.AboIDSage %]" class="progress-bar progress-bar-danger progress-bar-striped" role="progressbar" 
+												<div title="[% Data.AvancementG %]%" id="progress_[% Data.EnrIDSage %]" class="progress-bar progress-bar-danger progress-bar-striped" role="progressbar" 
 												  aria-valuenow="[% Data.AvancementG %]" aria-valuemin="3" aria-valuemax="100" style="width:[% Data.AvancementG %]%">
 												[% Data.AvancementG %]%
 												</div>
@@ -176,14 +224,14 @@ background-color: #f2f2f2 !important;
 										</div>
 									[% ELSIF Data.AvancementG == 100 %]
 										<div class="progress" >
-												<div title="[% Data.AvancementG %]%" id="progress_[% Data.AboIDSage %]" class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" 
+												<div title="[% Data.AvancementG %]%" id="progress_[% Data.EnrIDSage %]" class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" 
 												  aria-valuenow="[% Data.AvancementG %]" aria-valuemin="3" aria-valuemax="100" style="width:[% Data.AvancementG %]%">
 												[% Data.AvancementG %]%
 												</div>
 										</div>
 									[% ELSE %]
 										<div class="progress" >
-												<div title="[% Data.AvancementG %]%" id="progress_[% Data.AboIDSage %]" class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar" 
+												<div title="[% Data.AvancementG %]%" id="progress_[% Data.EnrIDSage %]" class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar" 
 												  aria-valuenow="[% Data.AvancementG %]" aria-valuemin="3" aria-valuemax="100" style="width:[% Data.AvancementG %]%">
 													[% Data.AvancementG %]%
 													</div>
@@ -192,7 +240,7 @@ background-color: #f2f2f2 !important;
 								</td>	
 							</tr>
 
-[% RenderBlockStart("AboMEPTR") %]
+[% RenderBlockStart("MEPTR") %]
 										<thead>
 											<tr>
 												<th class="thmepfirst"></th>
@@ -203,8 +251,8 @@ background-color: #f2f2f2 !important;
 												<th class="thmep" style="text-align:center">[% Translate("Progress") | html %]</th>
 											</tr>
 										</thead>
-[% RenderBlockEnd("AboMEPTR") %]
-[% RenderBlockStart("AboMEP") %]
+[% RenderBlockEnd("MEPTR") %]
+[% RenderBlockStart("MEP") %]
 										<tbody>
 											<tr class="trmep_[% Data.MEPID | html %]">
 												[% ProprioID = Data.ProprietaireID %]
@@ -234,8 +282,8 @@ background-color: #f2f2f2 !important;
 														</td>
 											</tr>
 											
-[% RenderBlockEnd("AboMEP") %]
-[% RenderBlockStart("AboMEPAdmin") %]
+[% RenderBlockEnd("MEP") %]
+[% RenderBlockStart("MEPAdmin") %]
 										<tbody>
 											<tr class="trmep_[% Data.MEPID | html %]">
 												[% ProprioID = Data.ProprietaireID %]
@@ -246,9 +294,9 @@ background-color: #f2f2f2 !important;
 														<td class="tdmep" style="text-align:center">
 															<select class="updateselect" name="MEPList" form="update" id="MEPList_[% Data.MEPID | html %]">
 																<option value="0"> - </option>
-																[% RenderBlockStart("AboMEPSelect") %]															
+																[% RenderBlockStart("MEPSelect") %]															
 																<option value="[% Data.Name %]" >[% Data.Name %]</option>
-																[% RenderBlockEnd("AboMEPSelect") %]
+																[% RenderBlockEnd("MEPSelect") %]
 															</select>
 														</td>
 													[% END %]
@@ -286,9 +334,9 @@ background-color: #f2f2f2 !important;
 														</td>
 											</tr>
 											
-[% RenderBlockEnd("AboMEPAdmin") %]
+[% RenderBlockEnd("MEPAdmin") %]
 
-[% RenderBlockStart("AboMEPLast") %]
+[% RenderBlockStart("MEPLast") %]
 											<tr class="lastmep">
 												<td></td>
 												<td class="tdmep" style="text-align:center"> </td>
@@ -299,20 +347,20 @@ background-color: #f2f2f2 !important;
 											</tr>
 											
 										</tbody>
-[% RenderBlockEnd("AboMEPLast") %]
-[% RenderBlockStart("AboMEPLastAdmin") %]
+[% RenderBlockEnd("MEPLast") %]
+[% RenderBlockStart("MEPLastAdmin") %]
 											<tr class="lastmep">
 												<td></td>
 												<td class="tdmep" style="text-align:center"> </td>
 												<td class="tdmep" colspan="2" style="text-align:center"> </td>
 												<td class="tdmep" style="text-align:center"> </td>
-												<td class="tdmep" style="text-align:center"><input type="button" class="buttonadd" value="[% Translate("Add") | html %]" id="[% AboIDSage | html %]"> </td>
+												<td class="tdmep" style="text-align:center"><input type="button" class="buttonadd" value="[% Translate("Add") | html %]" id="[% EnrIDSage | html %]"> </td>
 											<td class="tdmep" style="text-align:center"> </td>
 											</tr>
 											
 										</tbody>
-[% RenderBlockEnd("AboMEPLastAdmin") %]
-[% RenderBlockEnd("AboOtrsRow") %]
+[% RenderBlockEnd("MEPLastAdmin") %]
+[% RenderBlockEnd("OtrsRow") %]
 [% RenderBlockEnd("ActionSearch") %]
 [% RenderBlockEnd("ActionList") %]
 [% WRAPPER JSOnDocumentComplete %]
@@ -354,7 +402,7 @@ $(document).on('click', '.buttondel', function(Event) {
 		Data,
 		function (data) {
 		
-		var progress = 'progress_'+data.AboIDSage;
+		var progress = 'progress_'+data.EnrIDSage;
 			var progressBar = document.getElementById(progress);
 			$(progressBar).css("width", data.Avancement + "%").attr("aria-valuenow", data.Avancement);
 			
@@ -378,7 +426,7 @@ $(document).on('click', '.buttonadd', function(Event) {
 	var Data = {
 		Action:	'APA_AgentContractManagement',
 		Subaction:    'AJAXClickBoutonAdd',
-		AboIDSage:     this.id
+		EnrIDSage:     this.id
 	};
 	Core.AJAX.FunctionCall(
 		Core.Config.Get('Baselink'),
@@ -414,7 +462,7 @@ $(document).on('click', '.buttonadd', function(Event) {
 			$('.AvancAdd').bootstrapSwitch();
 			
 			
-			var progress = 'progress_'+data.AboIDSage;
+			var progress = 'progress_'+data.EnrIDSage;
 			var progressBar = document.getElementById(progress);
 			$(progressBar).css("width", data.Avancement + "%").attr("aria-valuenow", data.Avancement);
 			
@@ -470,7 +518,7 @@ $('.Avanc').on('switchChange.bootstrapSwitch', function(Event,State) {
 		Data,
 		function (data) {
 		
-		var progress = 'progress_'+data.AboIDSage;
+		var progress = 'progress_'+data.EnrIDSage;
 		var progressBar = document.getElementById(progress);
 		$(progressBar).css("width", data.Avancement + "%").attr("aria-valuenow", data.Avancement);
 		
@@ -492,6 +540,25 @@ $('.Avanc').on('switchChange.bootstrapSwitch', function(Event,State) {
 	);
 });
 
+$(document).on('change', '.updatedate', function(Event) {
+	var Id = this.id.split("_");
+	var Data = {
+		Action:	'APA_AgentContractManagement',
+		Subaction:    'AJAXUpdateDate',
+		Date:     this.value,
+		Type: Id[0],
+		MEPID: Id[1],
+		
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {		
+		},
+		'json'
+		);
+	
+});
 
 
 //]]></script>

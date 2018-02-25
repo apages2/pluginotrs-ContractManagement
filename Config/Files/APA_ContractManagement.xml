@@ -82,6 +82,19 @@
 				</FrontendModuleReg>
 			</Setting>
 	</ConfigItem>
+	<ConfigItem Name="Frontend::Module###APA_DocZoom" Required="1" Valid="1">
+        	<Description Translatable="1">Frontend module registration for the AdminDocZoom object in the agent/Admin interface.</Description>
+	        <Group>APA Contract Management</Group>
+	        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+			<Setting>
+				<FrontendModuleReg>
+					<GroupRo>APA-ContractManagement</GroupRo>
+					<Description Translatable="1">Doc Zoom.</Description>
+					<Title Translatable="1">Zoom</Title>
+					<NavBarName>MEP Management</NavBarName>
+				</FrontendModuleReg>
+			</Setting>
+	</ConfigItem>
 	<ConfigItem Name="ContractManagement::Config::Agent###RowNumber" Required="1" Valid="1">
         <Description Translatable="1">Limits the number of lines displayed in module Agent.</Description>
         <Group>APA Contract Management</Group>
@@ -96,6 +109,30 @@
         <SubGroup>ContractManagement::Config::Admin</SubGroup>
         <Setting>
 			<String Translatable="0">35</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config::Admin###EntryDate" Required="1" Valid="1">
+        <Description Translatable="1">Limits the search according to the date of entry. Default : 2 months ago</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config::Admin</SubGroup>
+        <Setting>
+			<String Translatable="0">5274000</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config::Admin###Diff2Date" Required="1" Valid="1">
+        <Description Translatable="1">Minimum number of seconds between OTRS date and Sage date. Default : 2 months</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config::Admin</SubGroup>
+        <Setting>
+			<String Translatable="0">5274000</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config::Admin###DocorAbo" Required="1" Valid="1">
+        <Description Translatable="1">use of the Doc or Abo table in Sage</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config::Admin</SubGroup>
+        <Setting>
+			<String Translatable="0">Doc</String>
         </Setting>
     </ConfigItem>
 	<ConfigItem Name="ContractManagement::Config###Group" Required="1" Valid="1">
@@ -147,7 +184,7 @@
         </Setting>
     </ConfigItem>
 	<ConfigItem Name="ContractManagement::Config###MailBodyFR" Required="1" Valid="1">
-        <Description Translatable="1">Mail template used for notification.Used $MEP for the Task Name, $Abo_Intitule for the description of the contract, $Client for the name of the client</Description>
+        <Description Translatable="1">Mail template used for notification.Used $MEP for the Task Name, $Abo_Intitule for the description of the contract, $Caff for the Business Code, $Client for the name of the client</Description>
         <Group>APA Contract Management</Group>
         <SubGroup>ContractManagement::Config</SubGroup>
         <Setting>
@@ -159,7 +196,7 @@
         <Group>APA Contract Management</Group>
         <SubGroup>ContractManagement::Config</SubGroup>
         <Setting>
-			<String Translatable="1">Document en Attente pour la Mise en Production de l'affaire : $Abo_Intitule (Client : $Client )</String>
+			<String Translatable="1">Document en Attente pour la Mise en Production de l'affaire : $Caff (Client : $Client )</String>
         </Setting>
     </ConfigItem>
 </otrs_config>

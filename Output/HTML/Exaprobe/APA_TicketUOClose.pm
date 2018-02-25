@@ -165,7 +165,7 @@ sub Run {
 	
 	# $Kernel::OM->Get('Kernel::System::Log')->Log(
 				# Priority => 'error',
-				# Message  => $UODecompte
+				# Message  => $Ticket{CustomerID}
 			# );
 	
 	my $SQLTR = "SELECT TR_ID, TR_Caff, TR_Description FROM APA_TR where (TR_Type='COG_GEST-CHGT' OR TR_Type='COG_CHGT-INFRA' OR TR_Type = 'COG_CHGT-CONC' OR TR_Type = 'COG_CHGT-GO4' OR TR_Type = 'SO_COG-UO-1' OR TR_Type = 'SO_COG-UO-2' OR TR_Type = 'SO_COG-UO-3' OR TR_Type = 'SO_COG-UO-4' OR TR_Type = 'SO_COG-UO-5' OR TR_Type = 'SO_COG-UO-6') AND TR_valid_id=1 AND TR_CustID=?";
@@ -263,9 +263,15 @@ sub Run {
 		}
 	);
 
+	# $Kernel::OM->Get('Kernel::System::Log')->Log(
+				# Priority => 'error',
+				# Message  => $IsAuth
+			# );
+			
 	# add information according to the requested position
 	if ( $GroupList{$UOGroupID} || $IsAuth ) {
-		${ $Param{Data} } =~ s{(<div \s+ class="WidgetSimple  \s+ Collapsed" \s+ id="WidgetArticle">)}{ $Snippet $1 }xms;
+		# ${ $Param{Data} } =~ s{(<div \s+ class="WidgetSimple \s+ (Expanded|Collapsed)" \s+ id="WidgetArticle">)}{ $Snippet $1 }xms;
+		${ $Param{Data} } =~ s{(</div> \s+ <div \s+ class="Footer)}{ $Snippet $1 }xms;
 	}
 	
 

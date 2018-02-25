@@ -1,5 +1,5 @@
 # --
-# Kernel/System/Exaprobe/APA_AboZoom.pm - core module
+# Kernel/System/Exaprobe/APA_DocZoom.pm - core module
 # Copyright (C) (2016) (Aurelien PAGES) (apages2@free.fr)
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
@@ -7,7 +7,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Exaprobe::APA_AboZoom;
+package Kernel::System::Exaprobe::APA_DocZoom;
 
 use strict;
 use warnings;
@@ -73,7 +73,7 @@ sub GetLine {
 	my ( $Self, %Param ) = @_;
 	
 	#Get Params
-	my $AboID= $ParamObject->GetParam( Param => 'AboID' );
+	my $EnrID= $ParamObject->GetParam( Param => 'EnrID' );
 	my $UserID = $Param{UserID};
 
 	
@@ -109,12 +109,12 @@ sub GetLine {
 		
 	}
 	
-	my $SQLCustomer = "SELECT CustomerIDOtrs from APA_contract where AboIDSage=?";
+	my $SQLCustomer = "SELECT CustomerIDOtrs from APA_contract where EnrIDSage=?";
 
 	# get data
 	$Self->{DBObjectotrs}->Prepare(
         	SQL   => $SQLCustomer,
-			Bind   => [\$AboID],
+			Bind   => [\$EnrID],
 	);
 	
 	my $Customer;
@@ -122,58 +122,57 @@ sub GetLine {
 		$Customer = $Row[0];
 	}
 	
-	my $SQLAbonnement = "SELECT AB_Debut, AB_Fin,AB_TypePeriod from F_ABONNEMENT where AB_No=?";
+	my $SQLAbonnement = "SELECT AB_Debut, AB_Fin from APA_contract where EnrIDSage=?";
 
 	# get data
-	$Self->{DBObjectsage}->Prepare(
+	$Self->{DBObjectotrs}->Prepare(
         	SQL   => $SQLAbonnement,
-			Bind   => [\$AboID],
+			Bind   => [\$EnrID],
 	);
 	
 	my $AB_Debut;
 	my $AB_Fin;
-	my $Multipl;
-	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
+	while ( my @Row = $Self->{DBObjectotrs}->FetchrowArray() ) {
 		$AB_Debut = $Row[0];
 		$AB_Fin= $Row[1];
-		if ($Row[2]==0) {
-			$Multipl=365;
-		} elsif ($Row[2]==1) {
-			$Multipl=52;
-		} elsif ($Row[2]==2) {
-			$Multipl=12;
-		} elsif ($Row[2]==3) {
-			$Multipl=1;
-		} elsif ($Row[2]==4) {
-			$Multipl=12;
-		} elsif ($Row[2]==5) {
-			$Multipl=1;
-		}
+	}
+	
+	my $SQLCaff = "SELECT CA_Num from F_DOCENTETE where DO_Piece=?";
+
+	# get data
+	$Self->{DBObjectsage}->Prepare(
+        	SQL   => $SQLCaff,
+			Bind   => [\$EnrID],
+	);
+	
+	my $TR_Caff;
+	while ( my @Row3 = $Self->{DBObjectsage}->FetchrowArray() ) {
+		$TR_Caff = $Row3[0];
 	}
 	
 	
 	# build SQL request
-	my $SQL = "SELECT AB_No,AR_Ref,AL_Design,CONVERT(DECIMAL(10,2),AL_Qte),CONVERT(DECIMAL(10,2),AL_MontantHT),AL_Ligne,Debut,Fin from F_ABOLIGNE where AB_No=?";
+	my $SQL = "SELECT DO_Piece,AR_Ref,DL_Design,CONVERT(DECIMAL(10,2),DL_Qte),CONVERT(DECIMAL(10,2),DL_PrixUnitaire),DL_Ligne from F_DOCLIGNE where DO_Piece=? ORDER BY DL_Ligne ASC";
 
 	# get data
 	$Self->{DBObjectsage}->Prepare(
         	SQL   => $SQL,
 			Limit => 1000,
-			Encode => [1,1,0,1,1,1],
-			Bind   => [ \$AboID],
+			Encode => [1,1,0,1,1,1,1],
+			Bind   => [ \$EnrID],
 	);
 	
-	my @LineAbo;
+	my @LineDoc;
 
 	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
 		my %Data;
 		
-		my $SQLAbo_Ligne = "SELECT TR_Sage_Ligne,TR_Type, TR_DateFin, TR_Type_Sage from APA_TR where TR_EnrIDSage=? and TR_Sage_Ligne=?";
+		my $SQLAbo_Ligne = "SELECT TR_Sage_Ligne, TR_Type, TR_DateFin, TR_Type_Sage, TR_EnrIDSage, TR_AboID, TR_ID from APA_TR where TR_Caff=?";
 
 		# get data
 		$Self->{DBObjectotrs}->Prepare(
 				SQL   => $SQLAbo_Ligne,
-				Bind   => [\$Row[0],\$Row[5]],
+				Bind   => [\$TR_Caff],
 		);
 		
 		
@@ -181,34 +180,40 @@ sub GetLine {
 		$Data{TR_Type} = $Row[1];
 		
 		
-		$Data{Exist}=0;
-		$Data{Renew}=0;
+		
+		$Data{Exist}=2;
+		$Data{Renew}=2;
 		while ( my @Row2 = $Self->{DBObjectotrs}->FetchrowArray() ) {
-			if ($Row2[0] && $Row2[3] eq $Data{TR_Type}) {
+		
+			if (($Row2[0] eq $Row[5]) && ($Row2[4] eq $EnrID)) {
 				
 				$Data{Exist} =1;
-				if ($Row2[2] ne $AB_Fin) {
-					$Data{Renew} =1;	
-					
-				}
+				$Data{TR_ID} = $Row2[6];
 			} 
+			
+			if (($Row2[3] eq $Data{TR_Type} || $Row2[1] eq $Data{TR_Type}) && $Data{Exist}==2 ) {
+			
+				$Data{Renew} =1;
+				$Data{TR_ID} = $Row2[6];				
+			}
+		
 		}
-		$Data{AB_No} = $Row[0];
+		$Data{DO_Piece} = $Row[0];
 		$Data{AR_Ref} = $Row[1];
-		$Data{AL_Design} = $Row[2];
-		$Data{AL_Qte} = $Row[3];
-		$Data{AL_PrixUnitaire} = $Row[4];
-		$Data{AL_Ligne} = $Row[5];
+		$Data{DL_Design} = $Row[2];
+		$Data{DL_Qte} = $Row[3];
+		$Data{DL_PrixUnitaire} = $Row[4];
+		$Data{DL_Ligne} = $Row[5];
 		$Data{DateDebut} = $AB_Debut;
 		$Data{DateFin} = $AB_Fin;
 		$Data{Customer} = $Customer;
-		$Data{AL_PrixUnitaire} = $Row[4]*$Multipl;
+		$Data{DL_PrixUnitaire} = $Row[4];
 		
-        push( @LineAbo, \%Data );
+        push( @LineDoc, \%Data );
 	}
 		
 	# no data found...
-    if ( !@LineAbo) {
+    if ( !@LineDoc) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => "Nothing SAGE",
@@ -216,16 +221,16 @@ sub GetLine {
         return;
 	} else {
 		if ( $IsAdminGroup || $IsAdmin) {
-			for my $DataItem (@LineAbo) {
+			for my $DataItem (@LineDoc) {
 				$LayoutObject->Block(
-					Name => 'LineAboAdmin',
+					Name => 'LineDocAdmin',
 					Data => $DataItem,
 				);
 			}
 		} else {
-			for my $DataItem (@LineAbo) {
+			for my $DataItem (@LineDoc) {
 				$LayoutObject->Block(
-					Name => 'LineAbo',
+					Name => 'LineDoc',
 					Data => $DataItem,
 				);
 			}
@@ -246,77 +251,65 @@ sub AddTR {
 	my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 	
 	#Get Params
-	my $AB_No= $ParamObject->GetParam( Param => 'AB_No' );
-	my $AL_Ligne= $ParamObject->GetParam( Param => 'AL_Ligne' );
+	my $DO_Piece= $ParamObject->GetParam( Param => 'DO_Piece' );
+	my $DL_Ligne= $ParamObject->GetParam( Param => 'DL_Ligne' );
 	my $UserID = $Param{UserID};
 	
-	my $SQLAbonnement = "SELECT AB_Intitule,AB_TypePeriod from F_ABONNEMENT where AB_No=?";
+	my $SQLAbonnement = "SELECT AB_Intitule from F_ABONNEMENT where AB_No IN (SELECT AB_No from F_DOCENTETE WHERE DO_Piece=?)";
 
 	# get data
 	$Self->{DBObjectsage}->Prepare(
         	SQL   => $SQLAbonnement,
 			Encode => [0],
-			Bind   => [\$AB_No],
+			Bind   => [\$DO_Piece],
 	);
 	
-	my $AB_Intitule;
-	my $Multipl;
+	my $AB_Intitule="";
 	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
-		$AB_Intitule = $Row[0];
-		if ($Row[1]==0) {
-			$Multipl=365;
-		} elsif ($Row[1]==1) {
-			$Multipl=52;
-		} elsif ($Row[1]==2) {
-			$Multipl=12;
-		} elsif ($Row[1]==3) {
-			$Multipl=1;
-		} elsif ($Row[1]==4) {
-			$Multipl=12;
-		} elsif ($Row[1]==5) {
-			$Multipl=1;
-		}
+		if ($Row[0]) {
+			$AB_Intitule = $Row[0];
+		} 
 	}
 	
-	my $SQLentete = "SELECT Refrence_libre,CO_No from F_ABOENTETE where AB_No=?";
+	my $SQLentete = "SELECT Refrence_libre,CA_Num from F_DOCENTETE where DO_Piece=?";
 
 	# get data
 	$Self->{DBObjectsage}->Prepare(
         	SQL   => $SQLentete,
 			Encode => [0,1],
-			Bind   => [\$AB_No],
+			Bind   => [\$DO_Piece],
 	);
 	
 	my $RefLibre;
-	my $CO_No;
+	my $CA_Num;
 	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
 		$RefLibre = $Row[0];
-		$CO_No		= $Row[1];
+		$CA_Num = $Row[1];
 	}
 	
 	
-	my $SQLIC = "SELECT CO_Prenom, CO_Nom from F_COLLABORATEUR WHERE CO_No=?";
+	my $SQLIC = "SELECT IC from F_COMPTEA where CA_Num=?";
 
 	# get data
 	$Self->{DBObjectsage}->Prepare(
         	SQL   => $SQLIC,
-			Encode => [0,0],
-			Bind   => [\$CO_No],
+			Encode => [0],
+			Bind   => [\$CA_Num],
 	);
 	
 	my $IC;
 	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
-		$IC = $Row[0].' '.$Row[1];
+		$IC = $Row[0];
 	}
-		
+	
 	# build SQL request
-	my $SQLligne = "SELECT AR_Ref,AL_Design,CA_Num,CONVERT(DECIMAL(10,2),AL_Qte),CONVERT(DECIMAL(10,2),AL_MontantHT) from F_ABOLIGNE where AB_No=? AND AL_Ligne=?";
+	my $SQLligne = "SELECT AR_Ref,DL_Design,CA_Num,CONVERT(DECIMAL(10,2),DL_Qte),CONVERT(DECIMAL(10,2),DL_PrixUnitaire) from F_DOCLIGNE where DO_Piece=? AND DL_Ligne=?";
 
 	# get data
 	$Self->{DBObjectsage}->Prepare(
         	SQL   => $SQLligne,
 			Encode => [0,0,1,1,1],
-			Bind   => [\$AB_No,\$AL_Ligne],
+			Bind   => [\$DO_Piece,\$DL_Ligne],
 	);
 	
 	my %Preferences = $UserObject->GetPreferences(
@@ -329,17 +322,17 @@ sub AddTR {
 	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
 		
 			
-		if ($Row[0] eq 'COG_GEST-CHGT'|| $Row[0] eq 'COG_CHGT-INFRA' || $Row[0] eq 'COG_CHGT-CONC' || $Row[0] eq 'COG_CHGT-GO4' || $Row[0] eq 'COG_MAJ-SECU' || $Row[0] eq 'SO_COG-UO-1'  || $Row[0] eq 'SO_COG-UO-2'  || $Row[0] eq 'SO_COG-UO-3'  || $Row[0] eq 'SO_COG-UO-4'  || $Row[0] eq 'SO_COG-UO-5'  || $Row[0] eq 'SO_COG-UO-6') {
+		if ($Row[0] eq 'COG_GEST-CHGT'|| $Row[0] eq 'COG_CHGT-INFRA' || $Row[0] eq 'COG_CHGT-CONC' || $Row[0] eq 'COG_CHGT-GO4' || $Row[0] eq 'COG_MAJ-SECU' || $Row[0] eq 'SO_COG-UO-1'  || $Row[0] eq 'SO_COG-UO-2'  || $Row[0] eq 'SO_COG-UO-3'  || $Row[0] eq 'SO_COG-UO-4'  || $Row[0] eq 'SO_COG-UO-5'  || $Row[0] eq 'SO_COG-UO-6'  || $Row[0] eq 'GESCHG') {
 			$JSONString = $LayoutObject->JSONEncode(
 				Data => {
-					'Caff' => $Row[2],
+					'Caff' => $CA_Num,
 					'Type' => $Row[0],
 					'Perimeter' => $AB_Intitule,
 					'Description' => $Row[1],
-					'Option1' =>$Row[3],
-					'Option2' =>$Row[3],
+					'Option1' =>sprintf("%d",$Row[3]),
+					'Option2' =>sprintf("%d",$Row[3]),
 					'Commentaire' => $RefLibre,
-					'Montant' => $Row[4]*$Multipl,
+					'Montant' => $Row[4]*$Row[3],
 					'IC' => $IC,
 					'Type_Sage' => $Row[0],
 				},
@@ -348,14 +341,14 @@ sub AddTR {
 		} elsif ($Row[0] eq 'PRO_SUP-INFR' || $Row[0] eq 'SO_SUP-HO' || $Row[0] eq 'SO_SUP-HNO') {
 			$JSONString = $LayoutObject->JSONEncode(
 				Data => {
-					'Caff' => $Row[2],
+					'Caff' => $CA_Num,
 					'Type' => $Row[0],
 					'Perimeter' => $AB_Intitule,
 					'Description' => $Row[1],
 					'Option1' =>$Row[3],
 					'Option2' =>$Row[3],
 					'Commentaire' => $RefLibre,
-					'Montant' => $Row[4]*$Multipl,
+					'Montant' => $Row[4]*$Row[3],
 					'IC' => $IC,
 					'Type_Sage' => $Row[0],
 				},
@@ -363,14 +356,14 @@ sub AddTR {
 		} elsif ($Row[0] eq 'COG_GEST-CONF' || $Row[0] eq 'SO_BACKUP-DEVICES') {
 			$JSONString = $LayoutObject->JSONEncode(
 				Data => {
-					'Caff' => $Row[2],
+					'Caff' => $CA_Num,
 					'Type' => $Row[0],
 					'Perimeter' => $AB_Intitule,
 					'Description' => $Row[1],
 					'Option1' =>$Row[3],
 					'Option2' =>$Row[3],
 					'Commentaire' => $RefLibre,
-					'Montant' => $Row[4]*$Multipl,
+					'Montant' => $Row[4]*$Row[3],
 					'IC' => $IC,
 					'Type_Sage' => $Row[0],
 				},
@@ -378,14 +371,14 @@ sub AddTR {
 		} elsif ($Row[0] eq 'RTC_PIL-REP'  || $Row[0] eq 'RTC_EXP-TECH' || $Row[0] eq 'SO_RTC-JOUR-1' || $Row[0] eq 'SO_RTC-JOUR-2' || $Row[0] eq 'SO_RTC-PAR') {
 			$JSONString = $LayoutObject->JSONEncode(
 				Data => {
-					'Caff' => $Row[2],
+					'Caff' => $CA_Num,
 					'Type' => $Row[0],
 					'Perimeter' => $AB_Intitule,
 					'Description' => $Row[1],
 					'Option1' => '',
 					'Option2' =>$Row[3],
 					'Commentaire' => $RefLibre,
-					'Montant' => $Row[4]*$Multipl,
+					'Montant' => $Row[4]*$Row[3],
 					'IC' => $IC,
 					'Type_Sage' => $Row[0],
 				},
@@ -393,12 +386,12 @@ sub AddTR {
 		} else {
 			$JSONString = $LayoutObject->JSONEncode(
 				Data => {
-					'Caff' => $Row[2],
+					'Caff' => $CA_Num,
 					'Type' => $Row[0],
 					'Perimeter' => $AB_Intitule,
 					'Description' => $Row[1],
 					'Commentaire' => $RefLibre,
-					'Montant' => $Row[4]*$Multipl,
+					'Montant' => $Row[4]*$Row[3],
 					'IC' => $IC,
 					'Type_Sage' => $Row[0],
 				},
@@ -473,12 +466,7 @@ sub SaveTR {
 	my $Type_Sage = $ParamObject->GetParam( Param => 'Type_Sage' );
 	
 	my $UserID = $Param{UserID};
-	
-	 # $Kernel::OM->Get('Kernel::System::Log')->Log(
-            # Priority => 'error',
-            # Message  => $Type_Sage,
-        # );
-	
+
 	my %Preferences = $UserObject->GetPreferences(
         UserID => $UserID,
     );
@@ -575,44 +563,18 @@ sub RenewTR {
 	my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 	
 	#Get Params
-	my $AB_No= $ParamObject->GetParam( Param => 'AB_No' );
-	my $AL_Ligne= $ParamObject->GetParam( Param => 'AL_Ligne' );
+	my $DO_Piece= $ParamObject->GetParam( Param => 'DO_Piece' );
+	my $DL_Ligne= $ParamObject->GetParam( Param => 'DL_Ligne' );
+	my $TR_ID= $ParamObject->GetParam( Param => 'TR_ID' );
 	my $Report= $ParamObject->GetParam( Param => 'Report' );
 	my $UserID = $Param{UserID};
-	
-	my $SQLTypePeriod = "SELECT AB_TypePeriod from F_ABONNEMENT where AB_No=?";
-
-	# get data
-	$Self->{DBObjectsage}->Prepare(
-        	SQL   => $SQLTypePeriod,
-			Encode => [0],
-			Bind   => [\$AB_No],
-	);
-	
-	
-	my $Multipl;
-	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
-		if ($Row[0]==0) {
-			$Multipl=365;
-		} elsif ($Row[0]==1) {
-			$Multipl=52;
-		} elsif ($Row[0]==2) {
-			$Multipl=12;
-		} elsif ($Row[0]==3) {
-			$Multipl=1;
-		} elsif ($Row[0]==4) {
-			$Multipl=12;
-		} elsif ($Row[0]==5) {
-			$Multipl=1;
-		}
-	}
-	
-	my $SQLAbonnement = "SELECT TR_Perimetre,TR_Commentaire,TR_Caff,TR_Type,TR_Description,TR_Option1, TR_Option2, TR_Option3, TR_Option4 from APA_TR where TR_EnrIDSage=? AND TR_Sage_Ligne=?";
+		
+	my $SQLAbonnement = "SELECT TR_Perimetre,TR_Commentaire,TR_Caff,TR_Type,TR_Description,TR_Option1, TR_Option2, TR_Option3, TR_Option4 from APA_TR where TR_ID=?";
 
 	# get data
 	$Self->{DBObjectotrs}->Prepare(
         	SQL   => $SQLAbonnement,
-			Bind   => [\$AB_No,\$AL_Ligne],
+			Bind   => [\$TR_ID],
 	);
 	
 	my $AB_Intitule;
@@ -636,41 +598,29 @@ sub RenewTR {
 		$TR_Option4 = $Row[8];
 	}
 	
-	my $SQLentete = "SELECT CO_No from F_ABOENTETE where AB_No=?";
+	my $SQLentete = "SELECT IC from F_COMPTEA where CA_Num=?";
 
 	# get data
 	$Self->{DBObjectsage}->Prepare(
         	SQL   => $SQLentete,
-			Bind   => [\$AB_No],
+			Encode => [0],
+			Bind   => [\$TR_Caff],
 	);
 	
-	
-	my $CO_No;
-	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
-		$CO_No		= $Row[0];
-	}
-	
-	my $SQLIC = "SELECT CO_Prenom, CO_Nom from F_COLLABORATEUR WHERE CO_No=?";
-
-	# get data
-	$Self->{DBObjectsage}->Prepare(
-        	SQL   => $SQLIC,
-			Encode => [0,0],
-			Bind   => [\$CO_No],
-	);
 	
 	my $IC;
 	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
-		$IC = $Row[0].' '.$Row[1];
-	}
+		$IC = $Row[0];
+	}	
+	
 		
 	# build SQL request
-	my $SQLligne = "SELECT AR_Ref,CONVERT(DECIMAL(10,2),AL_Qte),CONVERT(DECIMAL(10,2),AL_MontantHT) from F_ABOLIGNE where AB_No=? AND AL_Ligne=?";
+	my $SQLligne = "SELECT AR_Ref,CONVERT(DECIMAL(10,2),DL_Qte),CONVERT(DECIMAL(10,2),DL_PrixUnitaire) from F_DOCLIGNE where DO_Piece=? AND DL_Ligne=?";
 
 	# get data
 	$Self->{DBObjectsage}->Prepare(
         	SQL   => $SQLligne,
-			Bind   => [\$AB_No,\$AL_Ligne],
+			Bind   => [\$DO_Piece,\$DL_Ligne],
 	);
 	
 	my %Preferences = $UserObject->GetPreferences(
@@ -683,7 +633,7 @@ sub RenewTR {
 	
 	 
 	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
-		if ($Row[0] eq 'COG_GEST-CHGT'|| $Row[0] eq 'COG_CHGT-INFRA' || $Row[0] eq 'COG_MAJ-SECU' || $Row[0] eq 'COG_CHGT-CONC' || $Row[0] eq 'COG_CHGT-GO4' || $Row[0] eq 'SO_COG-UO-1'  || $Row[0] eq 'SO_COG-UO-2'  || $Row[0] eq 'SO_COG-UO-3'  || $Row[0] eq 'SO_COG-UO-4'  || $Row[0] eq 'SO_COG-UO-5'  || $Row[0] eq 'SO_COG-UO-6') {
+		if ($Row[0] eq 'COG_GEST-CHGT'|| $Row[0] eq 'COG_CHGT-INFRA' || $Row[0] eq 'COG_MAJ-SECU' || $Row[0] eq 'COG_CHGT-CONC' || $Row[0] eq 'COG_CHGT-GO4' || $Row[0] eq 'SO_COG-UO-1'  || $Row[0] eq 'SO_COG-UO-2'  || $Row[0] eq 'SO_COG-UO-3'  || $Row[0] eq 'SO_COG-UO-4'  || $Row[0] eq 'SO_COG-UO-5'  || $Row[0] eq 'SO_COG-UO-6' || $Row[0] eq 'GESCHG') {
 			if ($Report==1) {
 				$qte = $Row[1];
 				
@@ -695,10 +645,10 @@ sub RenewTR {
 						'Type_Sage' =>$Row[0],
 						'Perimeter' => $AB_Intitule,
 						'Description' => $TR_Description,
-						'Option1' =>$Row[1],
-						'Option2' =>$New_TR_Option2,
+						'Option1' =>sprintf("%d", $Row[1]),
+						'Option2' =>sprintf("%d", $New_TR_Option2),
 						'Commentaire' => $RefLibre,
-						'Montant' => $Row[2]*$Multipl,
+						'Montant' => $Row[2]*$Row[1],
 						'IC' => $IC,
 						'SoldeActuel' => $TR_Option2,
 						'Report' => $Report,
@@ -712,10 +662,10 @@ sub RenewTR {
 						'Type_Sage' =>$Row[0],
 						'Perimeter' => $AB_Intitule,
 						'Description' => $TR_Description,
-						'Option1' =>$Row[1],
-						'Option2' =>$Row[1],
+						'Option1' =>sprintf("%d", $Row[1]),
+						'Option2' =>sprintf("%d", $Row[1]),
 						'Commentaire' => $RefLibre,
-						'Montant' => $Row[2]*$Multipl,
+						'Montant' => $Row[2]*$Row[1],
 						'IC' => $IC,
 						'SoldeActuel' => $TR_Option2,
 						'Report' => $Report,
@@ -733,7 +683,7 @@ sub RenewTR {
 					'Perimeter' => $AB_Intitule,
 					'Description' => $TR_Description,
 					'Commentaire' => $RefLibre,
-					'Montant' => $Row[2]*$Multipl,
+					'Montant' => $Row[2]*$Row[1],
 					'Option1' =>$TR_Option1,
 					'Option2' =>$TR_Option2,
 					'Option3' =>$TR_Option3,
@@ -784,6 +734,7 @@ sub ApplyTR {
 	my $Customer= $ParamObject->GetParam( Param => 'Customer' );
 	my $TR_ID= $ParamObject->GetParam( Param => 'TR_ID' );
 	my $TR_Ligne= $ParamObject->GetParam( Param => 'TR_Ligne' );
+	my $TR_EnrIDSage= $ParamObject->GetParam( Param => 'TR_EnrIDSage' );
 	my $Montant = $ParamObject->GetParam( Param => 'Montant' );
 	my $IC = $ParamObject->GetParam( Param => 'IC' );
 	my $Report = $ParamObject->GetParam( Param => 'Report' );
@@ -795,24 +746,22 @@ sub ApplyTR {
 	
 	my $Date = strftime "%Y-%m-%d", localtime;
 	my $Solde;
-	my $UO_ID;
 	my $Renew;
 	my $Subject;
 	my $TR_Log;
 	if ($Report== 1 || $Report== 2) {
 		$Renew=$Option1*-1;
-		my $SQLAbonnement = "SELECT TR_Option2,TR_ID,TR_Log from APA_TR WHERE TR_EnrIDSage=? AND TR_Sage_Ligne=?";
+		my $SQLAbonnement = "SELECT TR_Option2,TR_ID,TR_Log from APA_TR WHERE TR_ID=?";
 
 		# get data
 		$Self->{DBObjectotrs}->Prepare(
 				SQL   => $SQLAbonnement,
-				Bind   => [\$TR_ID,\$TR_Ligne],
+				Bind   => [\$TR_ID],
 		);
 	
 		
 		while ( my @Row = $Self->{DBObjectotrs}->FetchrowArray() ) {
 			$Solde = $Row[0];
-			$UO_ID = $Row[1];
 			$TR_Log = $Row[2];
 		}
 	}
@@ -822,7 +771,7 @@ sub ApplyTR {
 		
 		$Self->{DBObjectotrs}->Do(
 			SQL   => $Addrenew,
-			Bind => [\$Renew,\$Date,\$UserID,\$Subject,\$UO_ID],
+			Bind => [\$Renew,\$Date,\$UserID,\$Subject,\$TR_ID],
 		);
 		
 		my %User = $UserObject->GetUserData(
@@ -835,7 +784,7 @@ sub ApplyTR {
 	
 		$Self->{DBObjectotrs}->Do(
 			SQL   => $AddLog,
-			Bind => [\$Message,\$UO_ID],
+			Bind => [\$Message,\$TR_ID],
 		);
 	
 		
@@ -847,7 +796,7 @@ sub ApplyTR {
 		
 		$Self->{DBObjectotrs}->Do(
 			SQL   => $Expire,
-			Bind => [\$Solde,\$Date,\$UserID,\$Subject,\$UO_ID],
+			Bind => [\$Solde,\$Date,\$UserID,\$Subject,\$TR_ID],
 		);	
 		
 		$Subject = "Renew";
@@ -855,7 +804,7 @@ sub ApplyTR {
 		
 		$Self->{DBObjectotrs}->Do(
 			SQL   => $Addrenew,
-			Bind => [\$Renew,\$Date,\$UserID,\$Subject,\$UO_ID],
+			Bind => [\$Renew,\$Date,\$UserID,\$Subject,\$TR_ID],
 		);
 		
 		my %User = $UserObject->GetUserData(
@@ -868,7 +817,7 @@ sub ApplyTR {
 	
 		$Self->{DBObjectotrs}->Do(
 			SQL   => $AddLog,
-			Bind => [\$Message,\$UO_ID],
+			Bind => [\$Message,\$TR_ID],
 		);
 	}
 	
@@ -917,11 +866,11 @@ sub ApplyTR {
 		$Datef = $DateFin;
 	}
 	
-	my $Addrow  = "UPDATE APA_TR set TR_CustID=?, TR_Caff=?, TR_Type=?, TR_Option1=?, TR_Option2=?, TR_Perimetre=?, TR_Description=?, TR_DateDebut=?, TR_DateFin=?, TR_Commentaire=?, TR_IC=?, TR_Montant=?, TR_Type_Sage=?, TR_Option3=?, TR_Option4=?  WHERE TR_EnrIDSage=? AND TR_Sage_Ligne=?";
+	my $Addrow  = "UPDATE APA_TR set TR_CustID=?, TR_Caff=?, TR_Type=?, TR_Option1=?, TR_Option2=?, TR_Perimetre=?, TR_Description=?, TR_DateDebut=?, TR_DateFin=?, TR_Commentaire=?, TR_IC=?, TR_Montant=?, TR_Type_Sage=?, TR_Option3=?, TR_Option4=?, TR_EnrIDSage=?, TR_Sage_Ligne=? WHERE TR_ID=?";
 	
 	$Self->{DBObjectotrs}->Prepare(
 				SQL   => $Addrow,
-				Bind => [\$Customer,\$Caff,\$Type,\$Option1,\$Option2,\$Perimeter,\$Description,\$Dated,\$Datef,\$Commentaire,\$IC,\$Montant,\$Type_Sage,\$Option3,\$Option4,\$TR_ID,\$TR_Ligne],
+				Bind => [\$Customer,\$Caff,\$Type,\$Option1,\$Option2,\$Perimeter,\$Description,\$Dated,\$Datef,\$Commentaire,\$IC,\$Montant,\$Type_Sage,\$Option3,\$Option4,\$TR_EnrIDSage,\$TR_Ligne,\$TR_ID],
 		);
 		
 	

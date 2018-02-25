@@ -23,7 +23,11 @@ sub new {
 	# allocate new hash for object
 	my $Self = {%Param};
 	bless ($Self, $Type);
-
+	
+	# get config object
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+	$Self->{DocorAbo} = $ConfigObject->Get('ContractManagement::Config::Admin')->{DocorAbo};
+	
 	return $Self;
 }
 
@@ -40,32 +44,61 @@ sub Run {
 	
 	my $UserID=$Self->{UserID};
 
-	if ( $Self->{Subaction} eq 'AJAXUpdateSelect' ) {
-		$Output .= $ContractManagement->Updateselect();
-	} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonDel' ) {
-		$Output .= $ContractManagement->ClickDel();
-	}  elsif ( $Self->{Subaction} eq 'AJAXAvancement' ) {
-		$Output .= $ContractManagement->ClickAvancement();
-		
-	} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonAdd' ) {
-		$Output .= $ContractManagement->ClickAdd();
-	} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonNotif' ) {
-		$Output .= $ContractManagement->Sendmail();
-	} else {
-	
-		$Data{contract} = $ContractManagement->GetSubscriptionFollowed(UserID => $UserID);
-	
-	
-		$Output .= $LayoutObject->Header(Title => "Contract Management");
-		$Output .= $LayoutObject->NavigationBar();
-		$Output .= $LayoutObject->Output(
-				Data => \%Data,
-				TemplateFile => 'Exaprobe/APA_AgentContractManagement',
-		);
+	if ($Self->{DocorAbo} eq 'Doc') {
+		if ( $Self->{Subaction} eq 'AJAXUpdateSelect' ) {
+			$Output .= $ContractManagement->Updateselect();
+		} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonDel' ) {
+			$Output .= $ContractManagement->ClickDel();
+		}  elsif ( $Self->{Subaction} eq 'AJAXAvancement' ) {
+			$Output .= $ContractManagement->ClickAvancement();
 			
-		$Output .= $LayoutObject->Footer();
-	
+		} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonAdd' ) {
+			$Output .= $ContractManagement->ClickAdd();
+		} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonNotif') {
+			$Output .= $ContractManagement->SendmailDoc();
+		} elsif ( $Self->{Subaction} eq 'AJAXUpdateDate') {
+			$Output .= $ContractManagement->UpdateDate(UserID => $UserID);
+		} else {
+		
+			$Data{contract} = $ContractManagement->GetSubscriptionFollowedDoc(UserID => $UserID);
+			$Output .= $LayoutObject->Header(Title => "Contract Management");
+			$Output .= $LayoutObject->NavigationBar();
+			$Output .= $LayoutObject->Output(
+					Data => \%Data,
+					TemplateFile => 'Exaprobe/APA_AgentContractManagement',
+			);
+			
+			$Output .= $LayoutObject->Footer();
+		
+		}
+	} elsif ($Self->{DocorAbo} eq 'Abo') {
+		if ( $Self->{Subaction} eq 'AJAXUpdateSelect' ) {
+			$Output .= $ContractManagement->Updateselect();
+		} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonDel' ) {
+			$Output .= $ContractManagement->ClickDel();
+		}  elsif ( $Self->{Subaction} eq 'AJAXAvancement' ) {
+			$Output .= $ContractManagement->ClickAvancement();
+			
+		} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonAdd' ) {
+			$Output .= $ContractManagement->ClickAdd();
+		} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonNotif') {
+			$Output .= $ContractManagement->SendmailAbo();
+		}else {
+		
+			$Data{contract} = $ContractManagement->GetSubscriptionFollowedAbo(UserID => $UserID);
+			$Output .= $LayoutObject->Header(Title => "Contract Management");
+			$Output .= $LayoutObject->NavigationBar();
+			$Output .= $LayoutObject->Output(
+					Data => \%Data,
+					TemplateFile => 'Exaprobe/APA_AgentContractManagement',
+			);
+				
+			$Output .= $LayoutObject->Footer();
+		}
 	}
+		
+	
+	
 	return $Output;
 }
 

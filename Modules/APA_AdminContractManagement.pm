@@ -24,6 +24,10 @@ sub new {
 	my $Self = {%Param};
 	bless ($Self, $Type);
 
+	# get config object
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+	$Self->{DocorAbo} = $ConfigObject->Get('ContractManagement::Config::Admin')->{DocorAbo};
+	
 	return $Self;
 }
 
@@ -35,39 +39,75 @@ sub Run {
 	my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
 	my $Output;
 	
-	
-	if ( $Self->{Subaction} eq 'AJAXUpdate' ) {
-		$Output .= $ContractManagement->Updatefollow();
-	}
-	
-	elsif ( $Self->{Subaction} eq 'AJAXUpdateSelect' ) {
-		$Output .= $ContractManagement->Updateselect();
-	}
-	
-	elsif ( $Self->{Subaction} eq 'ViewAll' ) {
-		$Data{contract} = $ContractManagement->GetSubscription();
-		$Output .= $LayoutObject->Header(Title => "Contract Management");
-		$Output .= $LayoutObject->NavigationBar();
-		$Output .= $LayoutObject->Output(
-                Data => \%Data,
-				TemplateFile => 'Exaprobe/APA_AdminContractManagement',
-        );
-	
-	$Output .= $LayoutObject->Footer();
-	}
-	
-	else {
-		$Data{contract} = $ContractManagement->GetSubscription();
-		$Output .= $LayoutObject->Header(Title => "Contract Management");
-		$Output .= $LayoutObject->NavigationBar();
-		$Output .= $LayoutObject->Output(
-                Data => \%Data,
-				TemplateFile => 'Exaprobe/APA_AdminContractManagement',
-        );
-	
-	$Output .= $LayoutObject->Footer();
+	if ($Self->{DocorAbo} eq 'Doc') {
+		if ( $Self->{Subaction} eq 'AJAXUpdate' ) {
+			$Output .= $ContractManagement->UpdatefollowDoc();
+		}
 		
+		elsif ( $Self->{Subaction} eq 'AJAXUpdateSelect' ) {
+			$Output .= $ContractManagement->UpdateselectDoc();
+		}
+		
+		elsif ( $Self->{Subaction} eq 'ViewAll' ) {
+			$Data{contract} = $ContractManagement->GetSubscriptionDoc();
+			$Output .= $LayoutObject->Header(Title => "Contract Management");
+			$Output .= $LayoutObject->NavigationBar();
+			$Output .= $LayoutObject->Output(
+					Data => \%Data,
+					TemplateFile => 'Exaprobe/APA_AdminContractManagement',
+			);
+		
+		$Output .= $LayoutObject->Footer();
+		}
+		
+		else {
+			$Data{contract} = $ContractManagement->GetSubscriptionDoc();
+			$Output .= $LayoutObject->Header(Title => "Contract Management");
+			$Output .= $LayoutObject->NavigationBar();
+			$Output .= $LayoutObject->Output(
+					Data => \%Data,
+					TemplateFile => 'Exaprobe/APA_AdminContractManagement',
+			);
+		
+		$Output .= $LayoutObject->Footer();
+			
+		}
+	} elsif ($Self->{DocorAbo} eq 'Abo') {
+		
+		if ( $Self->{Subaction} eq 'AJAXUpdate' ) {
+			$Output .= $ContractManagement->UpdatefollowAbo();
+		}
+		
+		elsif ( $Self->{Subaction} eq 'AJAXUpdateSelect' ) {
+			$Output .= $ContractManagement->UpdateselectAbo();
+		}
+		
+		elsif ( $Self->{Subaction} eq 'ViewAll' ) {
+			$Data{contract} = $ContractManagement->GetSubscriptionAbo();
+			$Output .= $LayoutObject->Header(Title => "Contract Management");
+			$Output .= $LayoutObject->NavigationBar();
+			$Output .= $LayoutObject->Output(
+					Data => \%Data,
+					TemplateFile => 'Exaprobe/APA_AdminContractManagement',
+			);
+		
+		$Output .= $LayoutObject->Footer();
+		}
+		
+		else {
+			$Data{contract} = $ContractManagement->GetSubscriptionAbo();
+			$Output .= $LayoutObject->Header(Title => "Contract Management");
+			$Output .= $LayoutObject->NavigationBar();
+			$Output .= $LayoutObject->Output(
+					Data => \%Data,
+					TemplateFile => 'Exaprobe/APA_AdminContractManagement',
+			);
+		
+		$Output .= $LayoutObject->Footer();
+			
+		}
 	}
+	
 	
 	return $Output;
 }

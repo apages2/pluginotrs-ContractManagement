@@ -51,6 +51,24 @@ sub Run {
 	my $DecompteUO = $ParamObject->GetParam( Param => 'DecompteUO' );
 	my $TR_ID = $ParamObject->GetParam( Param => 'TR_ID' );
 	my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+	my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+	my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+	
+	my $DF_DecompteUO_ID = $DynamicFieldObject->DynamicFieldGet(
+        Name => 'DecompteUO',
+    );
+	
+	my $DF_DecompteNbr_ID = $DynamicFieldObject->DynamicFieldGet(
+        Name => 'DecompteNbr',
+    );
+	
+	my $DF_DecompteExpir_ID = $DynamicFieldObject->DynamicFieldGet(
+        Name => 'DecompteExpir',
+    );
+	
+	my $DF_DecompteSolde_ID = $DynamicFieldObject->DynamicFieldGet(
+        Name => 'DecompteSolde',
+    );
 	
 	my %Ticket = $TicketObject->TicketGet(
 		TicketID      => $TicketID,
@@ -84,12 +102,6 @@ sub Run {
 				push( @UOData, \%Data );
 			}
 			
-			# $Kernel::OM->Get('Kernel::System::Log')->Log(
-					# Priority => 'error',
-					# Message  => $DecompteUO
-				# );
-			
-			
 			if ( !@UOData) {
 					
 				my $Addrow  = "INSERT INTO APA_TR_UO_decompte (ticket_id,TR_ID,date,owner,subject,UO_unit) VALUES (?,?,?,?,?,?)";
@@ -98,8 +110,35 @@ sub Run {
 							SQL   => $Addrow,
 							Bind => [\$TicketID,\$TR_ID,\$Date,\$Ticket{OwnerID},\$Ticket{Title},\$DecompteUO],
 					);
+					
+					
+				my $DF_DecompteNbr = $DynamicFieldValueObject->ValueSet(
+					FieldID  => $DF_DecompteNbr_ID,                 # ID of the dynamic field
+					ObjectID => $TicketID,                # ID of the current object that the field
+														  #   must be linked to, e. g. TicketID
+					Value    => [
+						{
+							ValueText           => $DecompteUO,                    
+						},
+					],
+					UserID   => $Ticket{OwnerID},
+				);
 				
-				my $CheckSolde = "SELECT TR_Option2 from APA_TR where TR_ID=?";
+				my $DF_DecompteUO = $DynamicFieldValueObject->ValueSet(
+					FieldID  => $DF_DecompteUO_ID,                 # ID of the dynamic field
+					ObjectID => $TicketID,                # ID of the current object that the field
+														  #   must be linked to, e. g. TicketID
+					Value    => [
+						{
+							ValueInt           => 1,                    
+						},
+					],
+					UserID   => $Ticket{OwnerID},
+				);
+				
+				
+				
+				my $CheckSolde = "SELECT TR_Option2,TR_DateFin from APA_TR where TR_ID=?";
 	
 				$Self->{DBObjectotrs}->Prepare(
 					SQL => $CheckSolde, 
@@ -108,9 +147,23 @@ sub Run {
 				); 
 				
 				my $UOSolde;
+				my $PoolExpire;
 				while ( my @Row = $Self->{DBObjectotrs}->FetchrowArray() ) {
 					$UOSolde = $Row[0];
+					$PoolExpire=$Row[1];
 				}
+				
+				my $DF_DecompteExpir = $DynamicFieldValueObject->ValueSet(
+					FieldID  => $DF_DecompteExpir_ID,                 # ID of the dynamic field
+					ObjectID => $TicketID,                # ID of the current object that the field
+														  #   must be linked to, e. g. TicketID
+					Value    => [
+						{
+							ValueDate           => $PoolExpire,                    
+						},
+					],
+					UserID   => $Ticket{OwnerID},
+				);
 				
 				my $NewSolde = $UOSolde+$OldDecompte-$DecompteUO;
 				
@@ -119,6 +172,18 @@ sub Run {
 				$Self->{DBObjectotrs}->Do(
 					SQL  => $SQLUpdate,
 					Bind => [ \$NewSolde,\$TR_ID]
+				);
+				
+				my $DF_DecompteSolde = $DynamicFieldValueObject->ValueSet(
+					FieldID  => $DF_DecompteSolde_ID,                 # ID of the dynamic field
+					ObjectID => $TicketID,                # ID of the current object that the field
+														  #   must be linked to, e. g. TicketID
+					Value    => [
+						{
+							ValueTexte           => $NewSolde,                    
+						},
+					],
+					UserID   => $Ticket{OwnerID},
 				);
 
 			
@@ -130,9 +195,33 @@ sub Run {
 							Bind => [\$TicketID,\$TR_ID,\$Date,\$Ticket{OwnerID},\$Ticket{Title},\$DecompteUO,\$TicketID],
 					);
 					
+				my $DF_DecompteNbr = $DynamicFieldValueObject->ValueSet(
+					FieldID  => $DF_DecompteNbr_ID,                 # ID of the dynamic field
+					ObjectID => $TicketID,                # ID of the current object that the field
+														  #   must be linked to, e. g. TicketID
+					Value    => [
+						{
+							ValueText           => $DecompteUO,                    
+						},
+					],
+					UserID   => $Ticket{OwnerID},
+				);
+				
+				my $DF_DecompteUO = $DynamicFieldValueObject->ValueSet(
+					FieldID  => $DF_DecompteUO_ID,                 # ID of the dynamic field
+					ObjectID => $TicketID,                # ID of the current object that the field
+														  #   must be linked to, e. g. TicketID
+					Value    => [
+						{
+							ValueInt           => 1,                    
+						},
+					],
+					UserID   => $Ticket{OwnerID},
+				);
+					
 				if ($TR_ID == $OldTRID) {
 					
-					my $CheckSolde = "SELECT TR_Option2 from APA_TR where TR_ID=?";
+					my $CheckSolde = "SELECT TR_Option2,TR_DateFin from APA_TR where TR_ID=?";
 			
 					$Self->{DBObjectotrs}->Prepare(
 						SQL => $CheckSolde, 
@@ -141,11 +230,55 @@ sub Run {
 					); 
 						
 					my $UOSolde;
+					my $PoolExpire;
 					while ( my @Row = $Self->{DBObjectotrs}->FetchrowArray() ) {
 						$UOSolde = $Row[0];
+						$PoolExpire = $Row[1];
 					}
 					
+					my $DF_DecompteExpir = $DynamicFieldValueObject->ValueSet(
+						FieldID  => $DF_DecompteExpir_ID,                 # ID of the dynamic field
+						ObjectID => $TicketID,                # ID of the current object that the field
+															  #   must be linked to, e. g. TicketID
+						Value    => [
+							{
+								ValueDate           => $PoolExpire,                    
+							},
+						],
+						UserID   => $Ticket{OwnerID},
+					);
+				
+					
 					my $NewSolde = $UOSolde+$OldDecompte-$DecompteUO;
+					
+					$Kernel::OM->Get('Kernel::System::Log')->Log(
+				Priority => 'error',
+				Message  => $UOSolde
+			);
+			$Kernel::OM->Get('Kernel::System::Log')->Log(
+				Priority => 'error',
+				Message  => $OldDecompte
+			);
+			$Kernel::OM->Get('Kernel::System::Log')->Log(
+				Priority => 'error',
+				Message  => $DecompteUO
+			);
+			$Kernel::OM->Get('Kernel::System::Log')->Log(
+				Priority => 'error',
+				Message  => $NewSolde
+			);
+					
+					my $DF_DecompteSolde = $DynamicFieldValueObject->ValueSet(
+						FieldID  => $DF_DecompteSolde_ID,                 # ID of the dynamic field
+						ObjectID => $TicketID,                # ID of the current object that the field
+															  #   must be linked to, e. g. TicketID
+						Value    => [
+							{
+								ValueTexte           => $NewSolde,                    
+							},
+						],
+						UserID   => $Ticket{OwnerID},
+					);
 					
 					my $SQLUpdate = "UPDATE APA_TR SET TR_Option2=? WHERE TR_ID=?";
 			
@@ -155,7 +288,7 @@ sub Run {
 					);
 				} else {
 				
-					my $CheckSoldeNewTR = "SELECT TR_Option2 from APA_TR where TR_ID=?";
+					my $CheckSoldeNewTR = "SELECT TR_Option2,TR_DateFin from APA_TR where TR_ID=?";
 			
 					$Self->{DBObjectotrs}->Prepare(
 						SQL => $CheckSoldeNewTR, 
@@ -164,9 +297,24 @@ sub Run {
 					); 
 						
 					my $UOSoldeNewTR;
+					my $PoolExpire;
 					while ( my @Row = $Self->{DBObjectotrs}->FetchrowArray() ) {
 						$UOSoldeNewTR = $Row[0];
+						$PoolExpire= $Row[1];
 					}
+					
+					my $DF_DecompteExpir = $DynamicFieldValueObject->ValueSet(
+						FieldID  => $DF_DecompteExpir_ID,                 # ID of the dynamic field
+						ObjectID => $TicketID,                # ID of the current object that the field
+															  #   must be linked to, e. g. TicketID
+						Value    => [
+							{
+								ValueDate           => $PoolExpire,                    
+							},
+						],
+						UserID   => $Ticket{OwnerID},
+					);
+				
 					
 					my $CheckSoldeOldTR = "SELECT TR_Option2 from APA_TR where TR_ID=?";
 			
@@ -183,6 +331,18 @@ sub Run {
 					
 					my $NewSoldeNewTR = $UOSoldeNewTR-$DecompteUO;
 					
+					my $DF_DecompteSolde = $DynamicFieldValueObject->ValueSet(
+						FieldID  => $DF_DecompteSolde_ID,                 # ID of the dynamic field
+						ObjectID => $TicketID,                # ID of the current object that the field
+															  #   must be linked to, e. g. TicketID
+						Value    => [
+							{
+								ValueTexte           => $NewSoldeNewTR,                    
+							},
+						],
+						UserID   => $Ticket{OwnerID},
+					);
+					
 					my $SQLUpdate = "UPDATE APA_TR SET TR_Option2=? WHERE TR_ID=?";
 			
 					$Self->{DBObjectotrs}->Do(
@@ -192,10 +352,10 @@ sub Run {
 					
 					my $NewSoldeOldTR = $UOSoldeOldTR+$OldDecompte;
 					
-					my $SQLUpdate = "UPDATE APA_TR SET TR_Option2=? WHERE TR_ID=?";
+					my $SQLUpdate2 = "UPDATE APA_TR SET TR_Option2=? WHERE TR_ID=?";
 			
 					$Self->{DBObjectotrs}->Do(
-						SQL  => $SQLUpdate,
+						SQL  => $SQLUpdate2,
 						Bind => [ \$NewSoldeOldTR,\$OldTRID]
 					);
 				}

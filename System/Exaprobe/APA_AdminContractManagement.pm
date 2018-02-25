@@ -41,7 +41,10 @@ sub new {
 	$Self->{UserDBOTRS} = $ConfigObject->Get('ContractManagement::Config')->{UserDBOTRS};
 	$Self->{PasswordDBOTRS} = $ConfigObject->Get('ContractManagement::Config')->{PasswordDBOTRS};
 	$Self->{RowNumber} = $ConfigObject->Get('ContractManagement::Config::Admin')->{RowNumber};
-		
+	$Self->{EntryDate} = $ConfigObject->Get('ContractManagement::Config::Admin')->{EntryDate};
+	$Self->{Diff2Date} = $ConfigObject->Get('ContractManagement::Config::Admin')->{Diff2Date};
+	$Self->{DocorAbo} = $ConfigObject->Get('ContractManagement::Config::Admin')->{DocorAbo};
+	
 	# create new db connect if DSN is given
 	$Self->{DBObjectsage} = Kernel::System::DB->new(
 		DatabaseDSN  => 'DBI:ODBC:otrs',
@@ -61,7 +64,990 @@ sub new {
 	return $Self;
 }
 
-sub GetSubscription {
+sub GetSubscriptionDoc {
+
+	use POSIX qw(strftime); 
+	use Time::Local;
+	
+	my ( $Self, %Param ) = @_;
+	
+	my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+	my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
+	my $CustomerCompanyObject = $Kernel::OM->Get('Kernel::System::CustomerCompany');
+	my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+	
+	my $PageShown = $Self->{RowNumber};
+	
+	my $Subaction = $ParamObject->GetParam( Param => 'Subaction' );
+	my $SageID = $ParamObject->GetParam( Param => 'SageID' );
+	
+	my $Zoom = 0;
+	if ( $Subaction && $Subaction eq 'Zoom' ) {
+        $Zoom = 1;
+	} 
+
+	my $Nav = $ParamObject->GetParam( Param => 'Nav' ) || 0;
+	my $Search = $ParamObject->GetParam( Param => 'Search' );
+	$Search
+        ||= $ConfigObject->Get('AdminCustomerCompany::RunInitialWildcardSearch') ? '*' : '';
+	my $SearchList = $ParamObject->GetParam( Param => 'SearchList' ) || 0;	
+	my $IsTreated = $ParamObject->GetParam( Param => 'IsTreated' );
+	my $Filter= $ParamObject->GetParam( Param => 'Filter' );
+	my $StartHit = $ParamObject->GetParam( Param => 'StartHit' ) || 1;
+	my $DateDeb;
+	my $ParamEntryDate=$Self->{EntryDate};
+	my $Date2Monthago=time()-$ParamEntryDate;
+	my $ParamDiff2Date=$Self->{Diff2Date};
+	
+	
+	if (!$IsTreated) {
+		$IsTreated ='off';
+		$DateDeb = strftime "%Y-%m-%d", gmtime($Date2Monthago);
+	} else {
+		$DateDeb = "1970-01-01";
+	}
+	
+	my $SearchSQL = $Search;
+	$SearchSQL =~ s/\*/%/g;
+	$Param{Search}=$Search;
+	$Param{SearchList}=$SearchList;
+	$Param{IsTreated}=$IsTreated;
+	$Param{SageTable}=$Self->{DocorAbo};
+	$LayoutObject->Block( Name => 'ActionList' );
+	$LayoutObject->Block(
+		Name => 'ActionSearch',
+		Data => \%Param,
+	);	
+	
+	my $SQLOtrs = "SELECT EnrIDSage, CustomerIDSage, Follow, DATE_FORMAT(AB_Fin, '%y%m%d'), CustomerIDOtrs, AB_Fin from APA_contract";
+
+	# get data
+	$Self->{DBObjectotrs}->Prepare(
+			SQL   => $SQLOtrs,
+	);
+
+
+
+	my @ContractData;
+
+	while ( my @Row = $Self->{DBObjectotrs}->FetchrowArray() ) {
+		my %Data;
+		
+		$Data{EnrIDSage} = $Row[0];
+        $Data{CustID} = $Row[1];
+        $Data{Follow} = $Row[2];
+        $Data{AB_Fin} = $Row[3];
+		$Data{CustIDOtrs} = $Row[4];
+		$Data{Abo_AB_Fin} = $Row[5];
+		$Data{IsTreated} = $IsTreated;
+        push( @ContractData, \%Data );
+	}
+		
+	# no data found...
+    if ( !@ContractData) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Nothing OTRS",
+        );
+    }
+	
+	if ( $Search ne "*" && $SearchList == 0) {
+		my $SQLSage = "select Do_Tiers, F_DOCENTETE.CA_Num, F_COMPTEA.IC, F_DOCENTETE.DO_Piece, DO_Date, AB_No, DO_FinAbo from F_DOCENTETE LEFT JOIN F_COMPTEA ON F_COMPTEA.CA_Num=F_DOCENTETE.CA_Num where DO_Piece IN (select distinct DO_Piece from F_DOCLIGNE WHERE DO_Date>=? and CT_Num LIKE ? and DO_Piece like 'DE%' and (AR_Ref like 'CONC_%' OR AR_ref like 'PACK_%' OR AR_Ref like 'SO_%'  OR AR_Ref like 'PRO_SUP%' OR AR_Ref like 'SUPINF%' OR AR_Ref like 'RTC%' OR AR_Ref like 'COG%')) ORDER BY DO_Date DESC, DO_Tiers ASC ";# get data
+		$Self->{DBObjectsage}->Prepare(
+				SQL   => $SQLSage,
+				Encode => [1,1,0,1,1,1,1,1],
+				Bind => [\$DateDeb,\$SearchSQL]
+		);
+			
+	} elsif ( $Search ne "*" && $SearchList == 1) {
+		my $SQLSage = "select Do_Tiers, F_DOCENTETE.CA_Num, F_COMPTEA.IC, F_DOCENTETE.DO_Piece, DO_Date, AB_No, DO_FinAbo from F_DOCENTETE LEFT JOIN F_COMPTEA ON F_COMPTEA.CA_Num=F_DOCENTETE.CA_Num where DO_Piece IN (select distinct DO_Piece from F_DOCLIGNE WHERE DO_Date>=? and CA_Num LIKE ? and DO_Piece like 'DE%' and (AR_Ref like 'CONC_%' OR AR_ref like 'PACK_%' OR AR_Ref like 'SO_%' OR AR_Ref like 'PRO_SUP%' OR AR_Ref like 'SUPINF%' OR AR_Ref like 'RTC%' OR AR_Ref like 'COG%')) ORDER BY DO_Date DESC, DO_Tiers ASC ";# get data
+		$Self->{DBObjectsage}->Prepare(
+				SQL   => $SQLSage,
+				Encode => [1,1,0,1,1,1,1,1],
+				Bind => [\$DateDeb,\$SearchSQL]
+		);
+			
+	} elsif ( $Search ne "*" && $SearchList == 2) {
+		my $SQLSage = "select Do_Tiers, F_DOCENTETE.CA_Num, F_COMPTEA.IC, F_DOCENTETE.DO_Piece, DO_Date, AB_No, DO_FinAbo from F_DOCENTETE LEFT JOIN F_COMPTEA ON F_COMPTEA.CA_Num=F_DOCENTETE.CA_Num where DO_Piece IN (select distinct DO_Piece from F_DOCLIGNE WHERE DO_Date=? and DO_Piece like 'DE%' and (AR_Ref like 'CONC_%' OR AR_ref like 'PACK_%' OR AR_Ref like 'SO_%' OR AR_Ref like 'PRO_SUP%' OR AR_Ref like 'SUPINF%' OR AR_Ref like 'RTC%' OR AR_Ref like 'COG%')) ORDER BY DO_Date DESC, DO_Tiers ASC ";# get data
+		$Self->{DBObjectsage}->Prepare(
+				SQL   => $SQLSage,
+				Encode => [1,1,0,1,1,1,1,1],
+				Bind => [\$SearchSQL]
+		);
+			
+	} elsif ( $Search ne "*" && $SearchList == 3) {
+		my $SQLSage = "select Do_Tiers, F_DOCENTETE.CA_Num, F_COMPTEA.IC, F_DOCENTETE.DO_Piece, DO_Date, AB_No, DO_FinAbo from F_DOCENTETE LEFT JOIN F_COMPTEA ON F_COMPTEA.CA_Num=F_DOCENTETE.CA_Num where DO_Piece IN (select distinct DO_Piece from F_DOCLIGNE WHERE DO_Date>=? and DO_Piece like 'DE%' and (AR_Ref like 'CONC_%' OR AR_ref like 'PACK_%' OR AR_Ref like 'SO_%' OR AR_Ref like 'PRO_SUP%' OR AR_Ref like 'SUPINF%' OR AR_Ref like 'RTC%' OR AR_Ref like 'COG%')) ORDER BY DO_Date DESC, DO_Tiers ASC ";# get data
+		$Self->{DBObjectsage}->Prepare(
+				SQL   => $SQLSage,
+				Encode => [1,1,0,1,1,1,1,1],
+				Bind => [\$SearchSQL]
+		);
+			
+	} elsif ( $Search ne "*" && $SearchList == 4) {
+		my $SQLSage = "select Do_Tiers, F_DOCENTETE.CA_Num, F_COMPTEA.IC, F_DOCENTETE.DO_Piece, DO_Date, AB_No, DO_FinAbo from F_DOCENTETE LEFT JOIN F_COMPTEA ON F_COMPTEA.CA_Num=F_DOCENTETE.CA_Num where DO_Piece IN (select distinct DO_Piece from F_DOCLIGNE WHERE DO_Date<=? and DO_Piece like 'DE%' and (AR_Ref like 'CONC_%' OR AR_ref like 'PACK_%' OR AR_Ref like 'SO_%'  OR AR_Ref like 'PRO_SUP%' OR AR_Ref like 'SUPINF%' OR AR_Ref like 'RTC%' OR AR_Ref like 'COG%')) ORDER BY DO_Date DESC, DO_Tiers ASC ";																																																															
+		# get data
+		$Self->{DBObjectsage}->Prepare(
+				SQL   => $SQLSage,
+				Encode => [1,1,0,1,1,1,1,1],
+				Bind => [\$SearchSQL]
+		);
+			
+	} else {
+
+		# build SQL request
+		my $SQLSage = "select Do_Tiers, F_DOCENTETE.CA_Num, F_COMPTEA.IC, F_DOCENTETE.DO_Piece, DO_Date, AB_No, DO_FinAbo from F_DOCENTETE LEFT JOIN F_COMPTEA ON F_COMPTEA.CA_Num=F_DOCENTETE.CA_Num where DO_Piece IN (select distinct DO_Piece from F_DOCLIGNE WHERE DO_Date>=? and DO_Piece like 'DE%' and (AR_Ref like 'CONC_%' OR AR_ref like 'PACK_%' OR AR_Ref like 'SO_%'  OR AR_Ref like 'PRO_SUP%' OR AR_Ref like 'SUPINF%' OR AR_Ref like 'RTC%' OR AR_Ref like 'COG%')) ORDER BY DO_Date DESC, DO_Tiers ASC ";
+		# get data
+		$Self->{DBObjectsage}->Prepare(
+				SQL   => $SQLSage,
+				Encode => [1,1,0,1,1,1,1,1],
+				Bind => [\$DateDeb]
+		);
+
+	}
+
+	my @DocData;
+	my $count=0;
+	my $DataContractOtrs;
+	my $AboAncDateFin;
+	my $Custo;
+	
+		
+	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
+		my %Data;
+		my $Display=0;
+		my $Renew=0;
+		
+		
+		
+		my ($year2,$mon2,$mday2,$hour2,$min2,$sec2) = split(/[\s-:]+/, $Row[6]);
+		my $timeSage = timelocal($sec2,$min2,$hour2,$mday2,$mon2-1,$year2);
+		my $timeSageSup=$timeSage+$ParamDiff2Date;
+		my $timeSageInf=$timeSage-$ParamDiff2Date;
+		
+		for $DataContractOtrs (@ContractData) {
+		
+			my ($year,$mon,$mday,$hour,$min,$sec) = split(/[\s-:]+/, ${$DataContractOtrs}{Abo_AB_Fin});
+			my $timeOTRS = timelocal($sec,$min,$hour,$mday,$mon-1,$year);
+			
+			
+			if (${$DataContractOtrs}{EnrIDSage} eq $Row[3]) {
+				$Data{Follow} = ${$DataContractOtrs}{Follow};
+				$Data{CustomerIDOtrs} = ${$DataContractOtrs}{CustIDOtrs};
+			}
+			
+			
+			if ((${$DataContractOtrs}{EnrIDSage} eq $Row[3]) && (($timeSage == $timeOTRS) || ($timeSage =~ /-+\d+/) || (($timeOTRS < $timeSageSup) && ($timeOTRS > $timeSageInf))) && ((${$DataContractOtrs}{Follow} == 0 ) || ((${$DataContractOtrs}{CustIDOtrs} ne 0 )&& (${$DataContractOtrs}{Follow} == 1 ))) && ${$DataContractOtrs}{IsTreated} eq 'off')  {
+				$Display=1;
+			} elsif ((${$DataContractOtrs}{EnrIDSage} eq $Row[3]) && (($timeOTRS > $timeSageSup) || ($timeOTRS < $timeSageInf) )) {
+				$Display=0;
+				$Renew=1;
+				$AboAncDateFin = ${$DataContractOtrs}{Abo_AB_Fin};
+			} else {
+				if ($Display==1) {
+					$Display=1;
+				} else {
+					$Display=0;
+				}
+			}
+			
+			
+			
+		}
+		
+		
+		if ($Display==0) {
+			
+			$Data{CustomerID} = $Row[0];
+			$Data{Intitule} = $Row[1];
+			$Data{DocSaisie} = $Row[4];
+			$Data{SageID} = $Row[5];
+			$Data{AboDateFin} = $Row[6];
+			$Data{AboAncDateFin} = $AboAncDateFin;
+			$Data{EnrIDSage} = $Row[3];
+			$Data{Renew} = $Renew;
+			$Data{etat} = $SageID;
+			$Data{IDOtrs} = ${$DataContractOtrs}{IDOtrs};
+			$Data{IC} = $Row[2];
+			
+			$count++;
+			
+			
+			push( @DocData, \%Data );
+		}
+	}
+
+	# no data found...
+    if ( !@DocData) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Nothing SAGE",
+        );
+        return;
+    }
+
+	
+   # my $CustomerList = $LayoutObject->BuildSelection(
+    #        Name         => 'Customer',
+	#		Data         => {%CustomerCompanyList},
+     #       PossibleNone => 1,
+      #      Sort         => 'AlphanumericValue',
+       #     Translation  => 0,
+	#		TreeView     => 1,
+     #   );
+		
+	# calculate max. shown per page
+    if ( $StartHit > $count ) {
+        my $Pages = int( ( $count / $PageShown ) + 0.99999 );
+        $StartHit = ( ( $Pages - 1 ) * $PageShown ) + 1;
+    }
+	
+	my $MaxItem=0;
+	if ( ($StartHit+$PageShown) > $count ) {
+        $MaxItem = $count-1;
+    }
+	else {
+		$MaxItem =$StartHit+$PageShown-2;
+	}
+	
+	my $WindowStart = sprintf( "%.0f", ( $StartHit / $PageShown ) );
+    $WindowStart = int( ( $WindowStart / 5 ) ) + 1;
+    $WindowStart = ( $WindowStart * 5 ) - (5);
+	$Param{StartWindow}=$WindowStart;
+	$Param{StartHit}=$StartHit;
+
+	# build nav bar
+	my %PageNav = $LayoutObject->PageNavBar(
+		StartHit  => $StartHit,
+		PageShown => $PageShown,
+		WindowSize  => 5,
+		AllHits   => $count,
+		Action    => 'Action=' . $LayoutObject->{Action},
+		Link        => 'IsTreated='.$IsTreated.';Search='.$Search.';SearchList='.$SearchList.';',
+		IDPrefix  => $LayoutObject->{Action},
+	);
+
+	if (%PageNav) {
+        $LayoutObject->Block(
+            Name => 'OverviewNavBarPageNavBar',
+            Data => \%PageNav,
+        );
+	}
+
+	my $SQLOtrsLink = "SELECT IDOtrs,IDSage, Changeable from APA_contract_sagetootrs";
+			# get data
+			$Self->{DBObjectotrs}->Prepare(
+					SQL   => $SQLOtrsLink
+			);
+			
+			
+							
+					
+	
+	my @CustLink;
+	while ( my @Custo = $Self->{DBObjectotrs}->FetchrowArray() ) {
+		my %Data;
+		$Data{IDOtrs}=$Custo[0];
+		$Data{IDSage}=$Custo[1];
+	
+		push( @CustLink, \%Data );
+		
+	}
+	
+	
+	if (@DocData) {
+		for my $DataItem (@DocData[$StartHit-1..$MaxItem]) {			
+			$LayoutObject->Block(
+				Name => 'EnrRow',
+				Data => $DataItem,
+			);
+			
+			my %Customer;
+			
+			if (@CustLink) {
+				for my $CustLinkItem (@CustLink) {
+					my %CustoLink;
+					
+					
+					if (${$DataItem}{CustomerID} eq ${$CustLinkItem}{IDSage}) {
+						$Customer{LinkOtrs}=${$CustLinkItem}{IDOtrs};
+						
+					}
+					
+				}
+			}
+					
+			my %CustomerCompanyList = $CustomerCompanyObject->CustomerCompanyList(
+				Limit => 0,
+				Valid =>0,
+			);
+			
+			for my $CustomerList ( sort keys %CustomerCompanyList ) {
+				$Customer{Sage}=${$DataItem}{CustomerID};
+				$Customer{CustomerIDOtrs}=${$DataItem}{CustomerIDOtrs};
+				$Customer{CustID} = $CustomerList;
+				my %CustomerCompany = $CustomerCompanyObject->CustomerCompanyGet(
+					CustomerID => $CustomerList,
+				);
+				$Customer{CustName} = $CustomerCompany{CustomerCompanyName};	
+				
+				$LayoutObject->Block(
+					Name => 'Customer',
+					Data => {%Customer},
+				);
+			}	
+			
+			if ($SageID) {
+				if ($SageID eq ${$DataItem}{EnrIDSage}) {
+					# build SQL request
+					my $SQL = "SELECT DO_Piece,AR_Ref,DL_Design,CONVERT(DECIMAL(10,2),DL_Qte),CONVERT(DECIMAL(10,2),DL_PrixUnitaire) from F_DOCLIGNE where DO_Piece=? ORDER BY DL_Ligne ASC";
+
+					# get data
+					$Self->{DBObjectsage}->Prepare(
+							SQL   => $SQL,
+							Limit => 1000,
+							Encode => [1,1,0,1,1],
+							Bind   => [ \$SageID],
+					);
+					my @LineDoc;
+
+					while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
+						my %Data;
+						$Data{AB_No} = $Row[0];
+						$Data{AR_Ref} = $Row[1];
+						$Data{DL_Design} = $Row[2];
+						$Data{DL_Qte} = $Row[3];
+						$Data{DL_PrixUnitaire} = $Row[4];
+						$Data{DL_PrixTotal} = sprintf("%.2f",($Row[4]*$Row[3]));
+						push( @LineDoc, \%Data );
+					}
+					
+					# no data found...
+					if ( !@LineDoc) {
+						$Kernel::OM->Get('Kernel::System::Log')->Log(
+							Priority => 'error',
+							Message  => "Nothing SAGE",
+						);
+						return;
+					}
+					
+					if (@LineDoc) {
+						$LayoutObject->Block(
+								Name => 'ZoomTR',
+						);
+						for my $DataItem2 (@LineDoc) {			
+							$LayoutObject->Block(
+								Name => 'Zoom',
+								Data => $DataItem2,
+							);
+							
+						}	
+						
+						$LayoutObject->Block(
+							Name => 'ZoomLast',
+						);
+					}
+				}
+			}
+		}	
+	}
+	
+	
+	$LayoutObject->Block(
+				Name => 'Doccount',
+				Data => $count,
+	);
+
+ 
+	return 1;
+
+		
+}
+
+sub UpdatefollowDoc {
+
+	my ( $Self, %Param ) = @_;
+	
+	# get needed objects
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
+	my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+	my $GeneralCatalogObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
+	
+	# get params
+	my $Do_Tiers;
+	my $AB_Fin;
+	my $AB_Debut;
+	my $EnrIDSage = $ParamObject->GetParam( Param => 'EnrIDSage' );
+	my $Value = $ParamObject->GetParam( Param => 'Value' );
+	my $CustomerIDOtrs = $ParamObject->GetParam( Param => 'CustomerIDOtrs' );
+	
+	#$Kernel::OM->Get('Kernel::System::Log')->Log(
+    #        Priority => 'error',
+    #        Message  => $Value,
+    #);
+	
+	my $SQLSage = "select Do_Tiers, DO_FinAbo, DO_DebutAbo from F_DOCENTETE where DO_Piece = ? ";# get data
+	
+	$Self->{DBObjectsage}->Prepare(
+		SQL   => $SQLSage,
+		Bind => [ \$EnrIDSage],
+		Limit => 1,
+	);
+		
+	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
+		$Do_Tiers = $Row[0];
+		$AB_Fin = $Row[1];
+		$AB_Debut = $Row[2];
+	}
+			
+	my $CheckFollow  = "select EnrIDSage from APA_contract where EnrIDSage=?";
+	
+	$Self->{DBObjectotrs}->Prepare(
+        	SQL   => $CheckFollow,
+			Bind => [ \$EnrIDSage],
+			Limit => 1,
+	);
+	
+	my @IsPresent;
+
+	while ( my @Row = $Self->{DBObjectotrs}->FetchrowArray() ) {
+		my %Data;
+		$Data{EnrIDSage} = $Row[0];
+        push( @IsPresent, \%Data );
+	}
+		
+	# no data found...
+    if ( !@IsPresent) {
+									
+		my $SQLotrs = "INSERT INTO APA_contract (EnrIDSage, CustomerIDSage, CustomerIDOtrs, Follow, AB_Debut, AB_Fin) VALUES (?, ?, ?, ?, ?, ?)";
+		
+		$Self->{DBObjectotrs}->Do(
+			SQL  => $SQLotrs,
+			Bind => [ \$EnrIDSage,\$Do_Tiers,\$CustomerIDOtrs,\$Value,\$AB_Debut,\$AB_Fin],
+		);
+		
+		# $Kernel::OM->Get('Kernel::System::Log')->Dumper($HashRef);
+	
+			
+	} elsif ($Value=='2') {
+		my $SQLotrs = "UPDATE APA_contract SET Renew=?, AB_Debut=?, AB_Fin=? WHERE EnrIDSage=?";
+		$Self->{DBObjectotrs}->Do(
+			SQL  => $SQLotrs,
+			Bind => [ \$Value,\$AB_Debut,\$AB_Fin,\$EnrIDSage],
+		);
+	} else {
+		my $SQLotrs = "UPDATE APA_contract SET Follow=? WHERE EnrIDSage=?";
+		$Self->{DBObjectotrs}->Do(
+			SQL  => $SQLotrs,
+			Bind => [ \$Value,\$EnrIDSage],
+		);
+	}
+	
+	
+	my $SQLSage2 = "SELECT AR_Ref from F_DOCLIGNE where DO_Piece=?";
+		
+	$Self->{DBObjectsage}->Prepare(
+		SQL   => $SQLSage2,
+		Bind => [ \$EnrIDSage],
+	);
+	
+	# $Kernel::OM->Get('Kernel::System::Log')->Log(
+				# Priority => 'error',
+				# Message  => $EnrIDSage,
+		# );
+	
+	my $Pack=0;
+	my $RTC=0;
+	my $Sup=0;
+	my $Cog=0;
+	my $Conc=0;
+	my $Conf=0;
+	my $AssTech=0;
+	my $EvolLog=0;
+	my $MajSecu=0;
+	my $VFM=0;
+	my $Go4collab=0;
+	my $SupMet=0;
+	my $SupRep=0;
+		
+	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
+		 # $Kernel::OM->Get('Kernel::System::Log')->Log(
+				 # Priority => 'error',
+				 # Message  => $Row[0],
+		 # );
+		if ($Row[0]) {
+			if ($Row[0] eq "PACK_BASIC" || $Row[0] eq "PACK_ESSENTIEL" || $Row[0] eq "PACK_PREMIER" || $Row[0] eq "PACK_GOLD") {
+				$Pack=1;
+			} elsif ($Row[0] eq "RTC_PIL-REP" || $Row[0] eq "RTC_EXP-TECH" || $Row[0] eq "SO_RTC-JOUR-1" || $Row[0] eq "SO_RTC-JOUR-2" || $Row[0] eq "SO_RTC-PAR") {
+				$RTC=1;
+			} elsif ($Row[0] eq "PRO_SUP-INFR" || $Row[0] eq "PRO_METRO" || $Row[0] eq "SO_SUP-HO" || $Row[0] eq "SO_SUP-HNO") {
+				$Sup=1;
+			} elsif ($Row[0] eq "COG_GEST-CHGT" || $Row[0] eq "COG_CHGT-INFRA" || $Row[0] eq "SO_COG-UO-1") {
+				$Cog=1;
+			} elsif ($Row[0] eq "COG_CHGT-CONC" || $Row[0] eq "SO_COG-UO-6") {
+				$Conc=1;
+			} elsif ($Row[0] eq "COG_GEST-CONF" || $Row[0] eq "SO_BACKUP-DEVICES") {
+				$Conf=1;
+			} elsif ($Row[0] eq "COG_ASS-TECH" || $Row[0] eq "SO_COG-UO-2" || $Row[0] eq "SO_COG-JOUR-2") {
+				$AssTech=1;
+			} elsif ($Row[0] eq "COG_EVOL-LOGIC" || $Row[0] eq "SO_COG-UO-4" || $Row[0] eq "SO_COG-JOUR-4" ) {
+				$EvolLog=1;
+			} elsif ($Row[0] eq "COG_MAJ-SECU" || $Row[0] eq "SO_COG-UO-3" || $Row[0] eq "SO_COG-JOUR-3") {
+				$MajSecu=1;
+			} elsif ($Row[0] eq "COG_VFM" || $Row[0] eq "SO_VFM") {
+				$VFM=1;
+			} elsif ($Row[0] eq "SO_SUP-METROLOGIE") {
+				$SupMet=1;
+			} elsif ($Row[0] eq "SO_SUP-REPORTING") {
+				$SupRep=1;
+			} elsif ($Row[0] =~ m/^CONC_.*/ || $Row[0] eq "SO_COG-UO-5") {
+				$Go4collab=1;
+			}
+		}
+		
+		 # $Kernel::OM->Get('Kernel::System::Log')->Log(
+				 # Priority => 'error',
+				 # Message  => "$Pack $RTC $Sup $Cog $Conc $Conf $AssTech $EvolLog $MajSecu $VFM $Vidyo $Go4collab $SupMet $SupRep",
+		 # );
+		
+	}
+	
+	if ($Pack==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::PACK'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	} 
+	if ($RTC==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::RTC'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	} 
+	if ($Sup==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::SUP'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	} 
+	if ($Cog==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::UO'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	} 
+	if ($Conc==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::CONC'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	} 
+	if ($Conf==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::CONF'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	} 
+	if ($AssTech==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::ASSTECH'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	} 
+	if ($EvolLog==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::EVOLLOG'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	} 
+	if ($MajSecu==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::MAJSECU'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	} 
+	if ($Go4collab==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::GO4'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	} 
+	if ($VFM==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::VFM'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	}
+	if ($SupRep==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::SUPREP'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	}
+	if ($SupMet==1) {
+		my $ClassList = $GeneralCatalogObject->ItemList(
+			Class         => 'ContractManagement::SUPMET'
+		);
+
+		 
+		for my $ClassID ( sort keys %{$ClassList} ) {
+			
+			my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+				ItemID => $ClassID,
+			);
+			
+			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
+			
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $Mep=$ItemDataRef->{Name};
+			my $DescMep=$ItemDataRef->{Comment};
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
+			);
+		}
+	}
+		
+
+	my $JSON = $LayoutObject->BuildSelectionJSON(
+        [
+            {
+                Name         => 'Result',
+                Data         => 'OK',
+            },
+        ],
+    );
+    return $LayoutObject->Attachment(
+        ContentType => 'application/json; charset=' . $LayoutObject->{Charset},
+        Content     => $JSON,
+        Type        => 'inline',
+        NoCache     => 1,
+    );
+}
+
+sub UpdateselectDoc {
+	
+	my ( $Self, %Param ) = @_;
+	
+	# get needed objects
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
+	my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+	
+	# get params
+	my $Do_Tiers;
+	my $AB_Fin;
+	my $AB_Debut;
+	my $EnrIDSage = $ParamObject->GetParam( Param => 'EnrIDSage' );
+	my $Value = $ParamObject->GetParam( Param => 'Value' );
+	
+	$Kernel::OM->Get('Kernel::System::Log')->Log(
+           Priority => 'error',
+           Message  => $EnrIDSage,
+    );
+	my $SQLSage = "select Do_Tiers, DO_FinAbo, DO_DebutAbo from F_DOCENTETE where DO_Piece = ? ";# get data
+		
+	$Self->{DBObjectsage}->Prepare(
+		SQL   => $SQLSage,
+		Bind => [ \$EnrIDSage],
+		Limit => 1,
+	);
+		
+	while ( my @Row = $Self->{DBObjectsage}->FetchrowArray() ) {
+		$Do_Tiers = $Row[0];
+		$AB_Fin = $Row[1];
+		$AB_Debut = $Row[2];
+	}
+			
+	my $CheckFollow  = "select EnrIDSage from APA_contract where EnrIDSage=?";
+	
+	$Self->{DBObjectotrs}->Prepare(
+        	SQL   => $CheckFollow,
+			Bind => [ \$EnrIDSage],
+			Limit => 1,
+	);
+	
+	my @IsPresent;
+
+	while ( my @Row = $Self->{DBObjectotrs}->FetchrowArray() ) {
+		my %Data;
+		$Data{EnrIDSage} = $Row[0];
+        push( @IsPresent, \%Data );
+	}
+		
+	# no data found...
+    if ( !@IsPresent) {
+							
+		my $SQLotrs = "INSERT INTO APA_contract (EnrIDSage, CustomerIDSage, CustomerIDOtrs, AB_Debut, AB_Fin) VALUES (?, ?, ?, ?,?)";
+		$Self->{DBObjectotrs}->Do(
+			SQL  => $SQLotrs,
+			Bind => [ \$EnrIDSage,\$Do_Tiers,\$Value,\$AB_Debut,\$AB_Fin],
+		);
+	} else {
+			my $SQLotrs = "UPDATE APA_contract SET CustomerIDOtrs=? WHERE EnrIDSage=?";
+			$Self->{DBObjectotrs}->Do(
+				SQL  => $SQLotrs,
+				Bind => [ \$Value,\$EnrIDSage],
+			);
+	}
+	
+	my $CheckExist  = "select IDSage,Changeable from APA_contract_sagetootrs where IDSage=?";
+	
+	$Self->{DBObjectotrs}->Prepare(
+        	SQL   => $CheckExist,
+			Bind => [ \$Do_Tiers],
+			Limit => 1,
+	);
+	
+	my @IsExist;
+	my %Data;	
+	while ( my @Row = $Self->{DBObjectotrs}->FetchrowArray() ) {
+		
+		$Data{IDSage} = $Row[0];
+		$Data{Changeable} = $Row[1];
+        push( @IsExist, \%Data );
+	}
+	
+	if ( !@IsExist) {
+							
+		my $SQLotrs = "INSERT INTO APA_contract_sagetootrs (IDSage, IDOtrs, Changeable) VALUES (?, ?, 1)";
+		$Self->{DBObjectotrs}->Do(
+			SQL  => $SQLotrs,
+			Bind => [\$Do_Tiers,\$Value],
+		);
+	} else {
+			if ($Data{Changeable}==1) {
+				my $SQLotrs = "UPDATE APA_contract_sagetootrs SET IDOtrs=?  WHERE IDSage=?";
+				$Self->{DBObjectotrs}->Do(
+					SQL  => $SQLotrs,
+					Bind => [ \$Value,\$Do_Tiers],
+				);
+			}
+	}
+		
+
+	my $JSON = $LayoutObject->BuildSelectionJSON(
+        [
+            {
+                Name         => 'Result',
+                Data         => 'OK',
+            },
+        ],
+    );
+    return $LayoutObject->Attachment(
+        ContentType => 'application/json; charset=' . $LayoutObject->{Charset},
+        Content     => $JSON,
+        Type        => 'inline',
+        NoCache     => 1,
+    );
+}
+
+sub GetSubscriptionAbo {
 
 	use POSIX qw(strftime); 
 
@@ -76,7 +1062,8 @@ sub GetSubscription {
 	my $PageShown = $Self->{RowNumber};
 	
 	my $Subaction = $ParamObject->GetParam( Param => 'Subaction' );
-	my $AboID = $ParamObject->GetParam( Param => 'AboID' );
+	my $SageID = $ParamObject->GetParam( Param => 'SageID' );
+
 	
 	my $Zoom = 0;
 	if ( $Subaction && $Subaction eq 'Zoom' ) {
@@ -106,7 +1093,8 @@ sub GetSubscription {
 	$Param{Search}=$Search;
 	$Param{SearchList}=$SearchList;
 	$Param{IsTreated}=$IsTreated;	
-	$Param{Expired}=$Expired;	
+	$Param{Expired}=$Expired;
+	$Param{SageTable}=$Self->{DocorAbo};
 	$LayoutObject->Block( Name => 'ActionList' );
 	$LayoutObject->Block(
 		Name => 'ActionSearch',
@@ -120,7 +1108,7 @@ sub GetSubscription {
 		$DateFin = '1970-01-01';
 	}
 	
-	my $SQLOtrs = "SELECT AboIDSage, CustomerIDSage, Follow, DATE_FORMAT(AB_Fin, '%y%m%d'), CustomerIDOtrs, AB_Fin from APA_contract";
+	my $SQLOtrs = "SELECT EnrIDSage, CustomerIDSage, Follow, DATE_FORMAT(AB_Fin, '%y%m%d'), CustomerIDOtrs, AB_Fin from APA_contract";
 
 	# get data
 	$Self->{DBObjectotrs}->Prepare(
@@ -134,7 +1122,7 @@ sub GetSubscription {
 	while ( my @Row = $Self->{DBObjectotrs}->FetchrowArray() ) {
 		my %Data;
 		
-		$Data{AboIDSage} = $Row[0];
+		$Data{EnrIDSage} = $Row[0];
         $Data{CustID} = $Row[1];
         $Data{Follow} = $Row[2];
         $Data{AB_Fin} = $Row[3];
@@ -226,14 +1214,14 @@ sub GetSubscription {
 		
 		for $DataItemC (@ContractData) {
 					
-			if (${$DataItemC}{AboIDSage} == $Row[5]) {
+			if (${$DataItemC}{EnrIDSage} == $Row[5]) {
 				$Data{Follow} = ${$DataItemC}{Follow};
 				$Data{CustomerIDOtrs} = ${$DataItemC}{CustIDOtrs};
 			}
 			
-			if ((${$DataItemC}{AboIDSage} == $Row[5]) && (${$DataItemC}{AB_Fin} == $Row[6]) && ((${$DataItemC}{Follow} == 0 ) || ((${$DataItemC}{CustIDOtrs} ne 0 )&& (${$DataItemC}{Follow} == 1 ))) && ${$DataItemC}{IsTreated} eq 'off' )  {
+			if ((${$DataItemC}{EnrIDSage} == $Row[5]) && (${$DataItemC}{AB_Fin} == $Row[6]) && ((${$DataItemC}{Follow} == 0 ) || ((${$DataItemC}{CustIDOtrs} ne 0 )&& (${$DataItemC}{Follow} == 1 ))) && ${$DataItemC}{IsTreated} eq 'off' )  {
 				$Join=1;
-			} elsif ((${$DataItemC}{AboIDSage} == $Row[5]) && (${$DataItemC}{AB_Fin} != $Row[6])) {
+			} elsif ((${$DataItemC}{EnrIDSage} == $Row[5]) && (${$DataItemC}{AB_Fin} != $Row[6])) {
 				$Join=0;
 				$Renew=1;
 				$AboAncDateFin = ${$DataItemC}{Abo_AB_Fin};
@@ -250,15 +1238,15 @@ sub GetSubscription {
 		if ($Join==0) {
 			
 			$Data{CustomerID} = $Row[0];
-			$Data{AboIntitule} = $Row[1];
+			$Data{Intitule} = $Row[1];
 			$Data{AboDuree} = $Row[2];
 			$Data{AboDateDebut} = $Row[3];
 			$Data{AboDateFin} = $Row[4];
 			$Data{AboAncDateFin} = $AboAncDateFin;
-			$Data{AboIDSage} = $Row[5];
+			$Data{EnrIDSage} = $Row[5];
 			$Data{AboTypeDuree} = $Row[7];
 			$Data{Renew} = $Renew;
-			$Data{etat} = $AboID;
+			$Data{etat} = $SageID;
 			$Data{IDOtrs} = ${$DataItemC}{IDOtrs};
 			if ($Row[8] && $Row[9]) { 
 				$Data{IC} = $Row[8]." ".$Row[9];
@@ -351,7 +1339,7 @@ sub GetSubscription {
 	if (@AboData) {
 		for my $DataItem (@AboData[$StartHit-1..$MaxItem]) {			
 			$LayoutObject->Block(
-				Name => 'AboRow',
+				Name => 'EnrRow',
 				Data => $DataItem,
 			);
 			
@@ -390,8 +1378,8 @@ sub GetSubscription {
 				);
 			}	
 			
-			if ($AboID) {
-						if ($AboID == ${$DataItem}{AboIDSage}) {
+			if ($SageID) {
+						if ($SageID == ${$DataItem}{EnrIDSage}) {
 							# build SQL request
 							my $SQL = "SELECT AB_No,AR_Ref,AL_Design,CONVERT(DECIMAL(10,2),AL_Qte),CONVERT(DECIMAL(10,2),AL_PrixUnitaire) from F_ABOLIGNE where AB_No=?";
 
@@ -400,7 +1388,7 @@ sub GetSubscription {
 									SQL   => $SQL,
 									Limit => 1000,
 									Encode => [1,1,0,1,1],
-									Bind   => [ \$AboID],
+									Bind   => [ \$SageID],
 							);
 							my @LineAbo;
 
@@ -411,7 +1399,7 @@ sub GetSubscription {
 							$Data{AL_Design} = $Row[2];
 							$Data{AL_Qte} = $Row[3];
 							$Data{AL_PrixUnitaire} = $Row[4];
-							$Data{AL_PrixTotal} = ($Row[4]*$Row[3]);
+							$Data{AL_PrixTotal} = sprintf("%.2f",($Row[4]*$Row[3]));
 							push( @LineAbo, \%Data );
 						}
 							
@@ -461,7 +1449,7 @@ sub GetSubscription {
 		
 }
 
-sub Updatefollow {
+sub UpdatefollowAbo {
 
 	my ( $Self, %Param ) = @_;
 	
@@ -475,7 +1463,7 @@ sub Updatefollow {
 	my $CT_Num;
 	my $AB_Fin;
 	my $AB_Debut;
-	my $AboIDSage = $ParamObject->GetParam( Param => 'AboIDSage' );
+	my $EnrIDSage = $ParamObject->GetParam( Param => 'EnrIDSage' );
 	my $Value = $ParamObject->GetParam( Param => 'Value' );
 	my $CustomerIDOtrs = $ParamObject->GetParam( Param => 'CustomerIDOtrs' );
 	
@@ -488,7 +1476,7 @@ sub Updatefollow {
 		
 	$Self->{DBObjectsage}->Prepare(
 		SQL   => $SQLSage,
-		Bind => [ \$AboIDSage],
+		Bind => [ \$EnrIDSage],
 		Limit => 1,
 	);
 		
@@ -498,11 +1486,11 @@ sub Updatefollow {
 		$AB_Debut = $Row[2];
 	}
 			
-	my $CheckFollow  = "select AboIDSage from APA_contract where AboIDSage=?";
+	my $CheckFollow  = "select EnrIDSage from APA_contract where EnrIDSage=?";
 	
 	$Self->{DBObjectotrs}->Prepare(
         	SQL   => $CheckFollow,
-			Bind => [ \$AboIDSage],
+			Bind => [ \$EnrIDSage],
 			Limit => 1,
 	);
 	
@@ -510,34 +1498,34 @@ sub Updatefollow {
 
 	while ( my @Row = $Self->{DBObjectotrs}->FetchrowArray() ) {
 		my %Data;
-		$Data{AboIDSage} = $Row[0];
+		$Data{EnrIDSage} = $Row[0];
         push( @IsPresent, \%Data );
 	}
 		
 	# no data found...
     if ( !@IsPresent) {
 									
-		my $SQLotrs = "INSERT INTO APA_contract (AboIDSage, CustomerIDSage, CustomerIDOtrs, Follow, AB_Debut, AB_Fin) VALUES (?, ?, ?, ?, ?, ?)";
+		my $SQLotrs = "INSERT INTO APA_contract (EnrIDSage, CustomerIDSage, CustomerIDOtrs, Follow, AB_Debut, AB_Fin) VALUES (?, ?, ?, ?, ?, ?)";
 		
 		$Self->{DBObjectotrs}->Do(
 			SQL  => $SQLotrs,
-			Bind => [ \$AboIDSage,\$CT_Num,\$CustomerIDOtrs,\$Value,\$AB_Debut,\$AB_Fin],
+			Bind => [ \$EnrIDSage,\$CT_Num,\$CustomerIDOtrs,\$Value,\$AB_Debut,\$AB_Fin],
 		);
 		
 		# $Kernel::OM->Get('Kernel::System::Log')->Dumper($HashRef);
 	
 			
 	} elsif ($Value=='2') {
-		my $SQLotrs = "UPDATE APA_contract SET Renew=?, AB_Debut=?, AB_Fin=? WHERE AboIDSage=?";
+		my $SQLotrs = "UPDATE APA_contract SET Renew=?, AB_Debut=?, AB_Fin=? WHERE EnrIDSage=?";
 		$Self->{DBObjectotrs}->Do(
 			SQL  => $SQLotrs,
-			Bind => [ \$Value,\$AB_Debut,\$AB_Fin,\$AboIDSage],
+			Bind => [ \$Value,\$AB_Debut,\$AB_Fin,\$EnrIDSage],
 		);
 	} else {
-		my $SQLotrs = "UPDATE APA_contract SET Follow=? WHERE AboIDSage=?";
+		my $SQLotrs = "UPDATE APA_contract SET Follow=? WHERE EnrIDSage=?";
 		$Self->{DBObjectotrs}->Do(
 			SQL  => $SQLotrs,
-			Bind => [ \$Value,\$AboIDSage],
+			Bind => [ \$Value,\$EnrIDSage],
 		);
 	}
 	
@@ -546,12 +1534,12 @@ sub Updatefollow {
 		
 	$Self->{DBObjectsage}->Prepare(
 		SQL   => $SQLSage2,
-		Bind => [ \$AboIDSage],
+		Bind => [ \$EnrIDSage],
 	);
 	
 	# $Kernel::OM->Get('Kernel::System::Log')->Log(
 				# Priority => 'error',
-				# Message  => $AboIDSage,
+				# Message  => $EnrIDSage,
 		# );
 	
 	my $Pack=0;
@@ -624,12 +1612,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	} 
@@ -647,12 +1635,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	} 
@@ -670,12 +1658,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	} 
@@ -693,12 +1681,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	} 
@@ -716,12 +1704,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	} 
@@ -739,12 +1727,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	} 
@@ -762,12 +1750,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	} 
@@ -785,12 +1773,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	} 
@@ -808,12 +1796,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	} 
@@ -831,12 +1819,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	} 
@@ -854,12 +1842,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	}
@@ -877,12 +1865,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	}
@@ -900,12 +1888,12 @@ sub Updatefollow {
 			
 			#$Kernel::OM->Get('Kernel::System::Log')->Log(Priority => 'error',Message  => $ItemDataRef->{Name});
 			
-			my $SQLotrs = "INSERT INTO APA_contract_mep (AboIDSage, Mep, DescMep) VALUES (?, ?, ?)";
+			my $SQLotrs = "INSERT INTO APA_contract_mep (EnrIDSage, Mep, DescMep) VALUES (?, ?, ?)";
 			my $Mep=$ItemDataRef->{Name};
 			my $DescMep=$ItemDataRef->{Comment};
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$AboIDSage,\$Mep,\$DescMep],
+				Bind => [ \$EnrIDSage,\$Mep,\$DescMep],
 			);
 		}
 	}
@@ -927,7 +1915,7 @@ sub Updatefollow {
     );
 }
 
-sub Updateselect {
+sub UpdateselectAbo {
 	
 	my ( $Self, %Param ) = @_;
 	
@@ -940,7 +1928,7 @@ sub Updateselect {
 	my $CT_Num;
 	my $AB_Fin;
 	my $AB_Debut;
-	my $AboIDSage = $ParamObject->GetParam( Param => 'AboIDSage' );
+	my $EnrIDSage = $ParamObject->GetParam( Param => 'EnrIDSage' );
 	my $Value = $ParamObject->GetParam( Param => 'Value' );
 	
 	#$Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -952,7 +1940,7 @@ sub Updateselect {
 		
 	$Self->{DBObjectsage}->Prepare(
 		SQL   => $SQLSage,
-		Bind => [ \$AboIDSage],
+		Bind => [ \$EnrIDSage],
 		Limit => 1,
 	);
 		
@@ -962,11 +1950,11 @@ sub Updateselect {
 		$AB_Debut = $Row[2];
 	}
 			
-	my $CheckFollow  = "select AboIDSage from APA_contract where AboIDSage=?";
+	my $CheckFollow  = "select EnrIDSage from APA_contract where EnrIDSage=?";
 	
 	$Self->{DBObjectotrs}->Prepare(
         	SQL   => $CheckFollow,
-			Bind => [ \$AboIDSage],
+			Bind => [ \$EnrIDSage],
 			Limit => 1,
 	);
 	
@@ -974,23 +1962,23 @@ sub Updateselect {
 
 	while ( my @Row = $Self->{DBObjectotrs}->FetchrowArray() ) {
 		my %Data;
-		$Data{AboIDSage} = $Row[0];
+		$Data{EnrIDSage} = $Row[0];
         push( @IsPresent, \%Data );
 	}
 		
 	# no data found...
     if ( !@IsPresent) {
 							
-		my $SQLotrs = "INSERT INTO APA_contract (AboIDSage, CustomerIDSage, CustomerIDOtrs, AB_Debut, AB_Fin) VALUES (?, ?, ?, ?,?)";
+		my $SQLotrs = "INSERT INTO APA_contract (EnrIDSage, CustomerIDSage, CustomerIDOtrs, AB_Debut, AB_Fin) VALUES (?, ?, ?, ?,?)";
 		$Self->{DBObjectotrs}->Do(
 			SQL  => $SQLotrs,
-			Bind => [ \$AboIDSage,\$CT_Num,\$Value,\$AB_Debut,\$AB_Fin],
+			Bind => [ \$EnrIDSage,\$CT_Num,\$Value,\$AB_Debut,\$AB_Fin],
 		);
 	} else {
-			my $SQLotrs = "UPDATE APA_contract SET CustomerIDOtrs=? WHERE AboIDSage=?";
+			my $SQLotrs = "UPDATE APA_contract SET CustomerIDOtrs=? WHERE EnrIDSage=?";
 			$Self->{DBObjectotrs}->Do(
 				SQL  => $SQLotrs,
-				Bind => [ \$Value,\$AboIDSage],
+				Bind => [ \$Value,\$EnrIDSage],
 			);
 	}
 	

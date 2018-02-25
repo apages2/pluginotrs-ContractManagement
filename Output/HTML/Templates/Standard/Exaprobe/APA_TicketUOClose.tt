@@ -85,21 +85,27 @@
 <script type="text/javascript">//<![CDATA[
 $('#DecompteUO').bind('change', function (Event) {
 var checkPool=document.getElementsByName('Pool')[0].value;
+var decompte=document.getElementsByName('DecompteUO')[0].value;
 	if ( checkPool !== "") {
-		var Data = {
-			Action:	'APA_UpdateUO',
-			Subaction:    'UOUpdate',
-			TicketID:    document.getElementsByName('TicketID')[0].value,
-			DecompteUO:    document.getElementsByName('DecompteUO')[0].value,
-			TR_ID:    document.getElementsByName('Pool')[0].value,
-		};
-		Core.AJAX.FunctionCall(
-			Core.Config.Get('Baselink'),
-			Data,
-			function () {
-			},
-			'json'
-			);
+		if ( decompte <= "0") {
+			alert("Vous devez saisir un nombre d'UO supérieur à 0");
+			$("#DecompteUO").val("");
+		} else {
+			var Data = {
+				Action:	'APA_UpdateUO',
+				Subaction:    'UOUpdate',
+				TicketID:    document.getElementsByName('TicketID')[0].value,
+				DecompteUO:    document.getElementsByName('DecompteUO')[0].value,
+				TR_ID:    document.getElementsByName('Pool')[0].value,
+			};
+			Core.AJAX.FunctionCall(
+				Core.Config.Get('Baselink'),
+				Data,
+				function () {
+				},
+				'json'
+				);
+		}
 	} else {
 		alert("Vous devez selectionner une banque d\'UO/jour");
 		$("#DecompteUO").val("");

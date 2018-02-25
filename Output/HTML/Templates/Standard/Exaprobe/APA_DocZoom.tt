@@ -1,0 +1,1032 @@
+# --
+# Kernel/Output/HTML/Templates/Standard/Exaprobe/APA_DocZoom.tt - overview
+# Copyright (C) (2016) (Aurelien PAGES) (apages2@free.fr)
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+
+<style>
+.thmep {
+background-color: #285566 !important;
+color: #ccc !important;
+vertical-align: middle !important;
+} 
+
+.thmepfirst {
+background-color: #fdfdfd !important;
+border: 0px !important;
+}  
+
+.tdmep {
+background-color: #f2f2f2 !important;
+}  
+
+</style>
+
+<div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
+    <h1>[% Translate("Zoom") | html %]: [% Translate("Contract") %]</h1>
+
+    <div class="SidebarColumn"> 
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("Actions") | html %]</h2>
+            </div>
+            <div class="Content">
+                <ul class="ActionList"> 
+                    <li>
+                        <a href="[% Env("Baselink") %]Action=APA_AgentContractManagement" class="CallForAction Fullsize Center"><span><i class="fa fa-caret-left"></i>[% Translate("Go to overview") 
+| html %]</span></a>
+                    </li> 
+                  </ul>
+                </div>
+            </div> 
+        </div>
+
+        <div class="ContentColumn">
+            <div class="WidgetSimple">
+		 <div class="Header">
+                    <h2>[% Translate("List") | html %]
+                    [% IF Data.ListAll && Data.Limit && Data.ListAll > Data.Limit %]
+                            ([% Translate("only") | html %] [% Data.SearchListSize | html %] [% Translate("shown") | html %] -
+                            [% Translate("more available") | html %])
+                    [% ELSE %]
+                        ([% Data.ListAll | html %] [% Translate("total") | html %])
+                    [% END %]
+                    </h2>
+                </div>
+
+	        <div class="Content">
+                    <table class="DataTable">
+                        <thead>
+                            <tr align="center">
+                                <th class="W20pc" style="text-align:center">[% Translate("Article") | html %]</th>
+                                <th rowspan="2" style="text-align:center">[% Translate("Business Code") | html %]</th>
+                                <th class="W15pc" style="text-align:center">[% Translate("Amount") | html %]</th> 
+                                <th class="W10pc" style="text-align:center">[% Translate("Unit Price HT") | html %]</th>
+								<th class="W10pc" style="text-align:center">[% Translate("Action") | html %]</th>
+                            </tr>
+                        </thead>
+                        <tbody> 
+[% RenderBlockStart("LineDoc") %]
+							<tr>
+								<td style="text-align:center"> [% Data.AR_Ref | html %]</td>
+								<td style="text-align:center"> [% Data.DL_Design | html %]</td> 
+								<td style="text-align:center"> [% Data.DL_Qte | Localize("Date") | html %]</td>
+								<td style="text-align:center"> [% Data.DL_PrixUnitaire | html %] €</td>
+								<td></td>
+							</tr>
+[% RenderBlockEnd("LineDoc") %]  
+[% RenderBlockStart("LineDocAdmin") %]								
+								<tr id="ABLigne_[% Data.DO_Piece | html %]_[% Data.DL_Ligne | html %]_[% Data.TR_ID | html %]">
+								<td style="text-align:center"> [% Data.AR_Ref | html %]</td>
+								<td style="text-align:center"> [% Data.DL_Design | html %]</td> 
+								<td style="text-align:center"> [% Data.DL_Qte | Localize("Date") | html %]</td>
+								<td style="text-align:center"> [% Data.DL_PrixUnitaire | html %] €</td>
+								<input type="hidden" id="ARRef_[% Data.DO_Piece | html %]_[% Data.DL_Ligne | html %]_[% Data.TR_ID | html %]" value="[% Data.AR_Ref | html %]">
+								<input type="hidden" id="DateD_[% Data.DO_Piece | html %]_[% Data.DL_Ligne | html %]_[% Data.TR_ID | html %]" value="[% Data.DateDebut | Localize("Date") | html %]">
+								<input type="hidden" id="DateF_[% Data.DO_Piece | html %]_[% Data.DL_Ligne | html %]_[% Data.TR_ID | html %]" value="[% Data.DateFin | Localize("Date") | html %]">
+								<input type="hidden" id="Customer_[% Data.DO_Piece | html %]_[% Data.DL_Ligne | html %]_[% Data.TR_ID | html %]" value="[% Data.Customer | html %]">
+								<td>
+								[% IF  Data.AR_Ref == 'PACK_BASIC' || Data.AR_Ref == 'PACK_ESSENTIEL' || Data.AR_Ref == 'PACK_PREMIER' || Data.AR_Ref == 'PACK_GOLD' || Data.AR_Ref == 'COG_GEST-CHGT' || Data.AR_Ref == 'COG_CHGT-INFRA' || Data.AR_Ref == 'COG_CHGT-CONC' || Data.AR_Ref == 'COG_MAJ-SECU' || Data.AR_Ref == 'COG_CHGT-GO4' || Data.AR_Ref == 'SO_COG-UO-1'  || Data.AR_Ref == 'SO_COG-UO-2'  || Data.AR_Ref == 'SO_COG-UO-3'  || Data.AR_Ref == 'SO_COG-UO-4'  || Data.AR_Ref == 'SO_COG-UO-5'  || Data.AR_Ref == 'SO_COG-UO-6' || Data.AR_Ref == 'PRO_SUP-INFR' || Data.AR_Ref == 'SO_SUP-HO' || Data.AR_Ref == 'SO_SUP-HNO' || Data.AR_Ref == 'COG_GEST-CONF' || Data.AR_Ref == 'SO_BACKUP-DEVICES' || Data.AR_Ref == 'RTC_PIL-REP'  || Data.AR_Ref == 'RTC_EXP-TECH' || Data.AR_Ref == 'SO_RTC-JOUR-1' || Data.AR_Ref == 'SO_RTC-JOUR-2' || Data.AR_Ref == 'SO_RTC-PAR'  || Data.AR_Ref == 'GESCHG' %]
+									[% IF  Data.Exist==2 && Data.Renew==2 %]
+										<center><input type="button" class="buttonAddTR" value="[% Translate("Add Contract") | html %]" id="AddTR_[% Data.DO_Piece | html %]_[% Data.DL_Ligne | html %]"><br>
+									[% ELSIF Data.Exist==2 && Data.Renew==1 %]
+										<center><input type="button" class="buttonRenewTR" value="[% Translate("Renew Contract") | html %]" id="RenewTR_[% Data.DO_Piece | html %]_[% Data.DL_Ligne | html %]_[% Data.TR_ID | html %]"><br>
+									[% END %]
+								[% END %]								
+								</td>
+								</tr>
+[% RenderBlockEnd("LineDocAdmin") %]							                      
+                        </tbody>
+                    </table>
+                </div>
+
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">//<![CDATA[
+
+$(document).on('click', '.buttonAddTR', function(Event) {
+	var Id = this.id.split("_");
+	var DateDebut = $("#DateD_"+Id[1]+'_'+Id[2]+'_').val();
+	var DateFin = $("#DateF_"+Id[1]+'_'+Id[2]+'_').val();
+	var Data = {
+		Action:	'APA_DocZoom',
+		Subaction:    'AJAXClickBoutonAdd',
+		DO_Piece:  Id[1],
+		DL_Ligne: Id[2],
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+			var trm = '<tr class="TR_'+Id[1]+'_'+Id[2]+'">';
+			trm += '<input type="hidden" id="Type_Sage_'+Id[1]+'_'+Id[2]+'" Value="'+data.Type_Sage+'">';
+			trm += '<th class="thmep"><center>[% Translate("Affaire Code") | html %]</th>';
+			if (data.Type == 'COG_GEST-CONF' || data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<th class="thmep"><center>[% Translate("Perimeter") | html %]</th>';
+			} else {
+				trm += '<th class="thmep"><center>[% Translate("Contract Type") | html %]</th>';
+			}
+			if (data.Type == 'PRO_SUP-INFR' || data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<th class="thmep"><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("End Date") | html %]</th>';
+			} else if (data.Type == 'COG_GEST-CONF' || data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<input type="hidden" id="Typepack_'+Id[1]+'_'+Id[2]+'" Value="SO_BACKUP-DEVICES">';
+				trm += '<th class="thmep"><center>[% Translate("Nbr of Devices") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Nbr of Versions") | html %]</th>';
+			} else {
+				trm += '<th class="thmep"><center>[% Translate("Perimeter") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Description") | html %]</th>';
+			}
+			trm += '<th class="thmep"><center>[% Translate("Action") | html %]</th>';
+			trm += '</tr>';
+			trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'">';
+			trm += '<td class="tdmep"><center>';
+			trm += '<input style="text-align:center" type="text" id="Caff_'+Id[1]+'_'+Id[2]+'" size="17" maxlength="13" Value="'+data.Caff+'">';
+			trm += '</td>';
+			trm += '<td class="tdmep"><center>';
+			if (data.Type == 'PACK_BASIC') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'">';
+				trm += '<option value="MCO_P-BAS" selected> PACK BASIC </option>';
+				trm += '<option value="MCO_P-ESS"> PACK ESSENTIEL </option>';
+				trm += '<option value="MCO_P-PRE"> PACK PREMIER </option>';
+				trm += '<option value="MCO_P-GLD"> PACK GOLD </option>';
+				trm += '</select>';
+			}
+			else if (data.Type == 'PACK_ESSENTIEL') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'">';
+				trm += '<option value="MCO_P-BAS"> PACK BASIC </option>';
+				trm += '<option value="MCO_P-ESS" selected> PACK ESSENTIEL </option>';
+				trm += '<option value="MCO_P-PRE"> PACK PREMIER </option>';
+				trm += '<option value="MCO_P-GLD"> PACK GOLD </option>';
+				trm += '</select>';
+			}
+			else if (data.Type == 'PACK_PREMIER') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'">';
+				trm += '<option value="MCO_P-BAS"> PACK BASIC </option>';
+				trm += '<option value="MCO_P-ESS"> PACK ESSENTIEL </option>';
+				trm += '<option value="MCO_P-PRE" selected> PACK PREMIER </option>';
+				trm += '<option value="MCO_P-GLD"> PACK GOLD </option>';
+				trm += '</select>';
+			} else if (data.Type == 'PACK_GOLD') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'">';
+				trm += '<option value="MCO_P-BAS"> PACK BASIC </option>';
+				trm += '<option value="MCO_P-ESS"> PACK ESSENTIEL </option>';
+				trm += '<option value="MCO_P-PRE"> PACK PREMIER </option>';
+				trm += '<option value="MCO_P-GLD" selected> PACK GOLD </option>';
+				trm += '</select>';
+			} else if (data.Type == 'PRO_SUP-INFR' || data.Type == 'SO_SUP-HO') {
+				trm += '<select class="selectsup" id="Typepack_'+Id[1]+'_'+Id[2]+'">';
+					trm += '<option value="SO_SUP-HO" selected> Supervision HO </option>';
+					trm += '<option value="SO_SUP-HNO"> Supervision HNO </option>';
+				trm += '</select>';
+			} else if (data.Type == 'SO_SUP-HNO') {
+				trm += '<select class="selectsup" id="Typepack_'+Id[1]+'_'+Id[2]+'">';
+					trm += '<option value="SO_SUP-HO"> Supervision HO </option>';
+					trm += '<option value="SO_SUP-HNO" selected> Supervision HNO </option>';
+				trm += '</select>';
+			} 
+			else if (data.Type == 'COG_GEST-CHGT' || data.Type == 'COG_CHGT-INFRA' || data.Type == 'COG_CHGT-CONC' || data.Type == 'COG_CHGT-GO4' || data.Type == 'COG_MAJ-SECU'  || data.Type == 'SO_COG-UO-1'  || data.Type == 'SO_COG-UO-2'  || data.Type == 'SO_COG-UO-3'  || data.Type == 'SO_COG-UO-4'  || data.Type == 'SO_COG-UO-5'  || data.Type == 'SO_COG-UO-6' || data.Type == 'GESCHG') {
+				trm += '<select class="selecttype" name="TypeList" id="Typepack_'+Id[1]+'_'+Id[2]+'">';
+				trm += '<option value="0"> - </option>';
+				if (data.Type== 'SO_COG-UO-1' || data.Type == 'COG_GEST-CHGT' || data.Type == 'COG_CHGT-INFRA' || data.Type == 'GESCHG') {
+					trm += '<option value="SO_COG-UO-1" selected> BdUO INFRA</option>';
+					trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+					trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+					trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+					trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+					trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				} else if (data.Type== 'SO_COG-UO-2') {
+					trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+					trm += '<option value="SO_COG-UO-2" selected> BdUO ASSISTANCE TECHNIQUE</option>';
+					trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+					trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+					trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+					trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				} else if (data.Type== 'SO_COG-UO-3' || data.Type == 'COG_MAJ-SECU') {
+					trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+					trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+					trm += '<option value="SO_COG-UO-3" selected> BdUO MAJ SECU </option>';
+					trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+					trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+					trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				} else if (data.Type== 'SO_COG-UO-4') {
+					trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+					trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+					trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+					trm += '<option value="SO_COG-UO-4" selected> BdUO EVOL LOGICIELLES </option>';
+					trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+					trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				} else if (data.Type== 'SO_COG-UO-5' || data.Type == 'COG_CHGT-GO4') {
+					trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+					trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+					trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+					trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+					trm += '<option value="SO_COG-UO-5" selected> BdUO GO4COLLAB</option>';
+					trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				} else if (data.Type== 'SO_COG-UO-6' || data.Type == 'COG_CHGT-CONC') {
+					trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+					trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+					trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+					trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+					trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+					trm += '<option value="SO_COG-UO-6" selected> BdUO CONCIERGERIE </option>';
+				} 
+				trm += '</select>';
+			} else if (data.Type == 'COG_GEST-CONF' || data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<textarea id="Perimeter_'+Id[1]+'_'+Id[2]+'" cols="100" rows="5" maxlength="3000">'+data.Perimeter+'</textarea>';
+			} else if (data.Type == 'RTC_PIL-REP' || data.Type == 'SO_RTC-JOUR-1') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'">';
+				trm += '<option value="SO_RTC-JOUR-1" selected> Comitologie et Veille Techno </option>';
+				trm += '<option value="SO_RTC-JOUR-2"> Expertise Technique </option>';
+				trm += '<option value="SO_RTC-PAR"> RTC sous traité </option>';
+				trm += '</select>';
+			} else if (data.Type == 'RTC_EXP-TECH' || data.Type == 'SO_RTC-JOUR-2') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'">';
+				trm += '<option value="SO_RTC-JOUR-1"> Comitologie et Veille Techno </option>';
+				trm += '<option value="SO_RTC-JOUR-2" selected> Expertise Technique </option>';
+				trm += '<option value="SO_RTC-PAR"> RTC sous traité </option>';
+				trm += '</select>';
+			} else if (data.Type == 'SO_RTC-PAR') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'">';
+				trm += '<option value="SO_RTC-JOUR-1"> Comitologie et Veille Techno </option>';
+				trm += '<option value="SO_RTC-JOUR-2"> Expertise Technique </option>';
+				trm += '<option value="SO_RTC-PAR" selected> RTC sous traité </option>';
+				trm += '</select>';
+			}
+			trm += '</td>';
+			if (data.Type == 'PRO_SUP-INFR' || data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<td class="tdmep"><center>';
+				trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_'+Id[1]+'_'+Id[2]+'" maxlength="10" size="10" value="'+DateDebut+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep" style="text-align:center">';
+				trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_'+Id[1]+'_'+Id[2]+'" maxlength="10" size="10" value="'+DateFin+'">';
+				trm += '</td>';
+				trm += '<td ROWSPAN=7 style="text-align:center" class="tdmep"><input type="button" class="buttonsave" value="[% Translate("Add") | html %]" id="BApp_'+Id[1]+'_'+Id[2]+'"><BR><input type="button" class="buttoncancel" value="[% Translate("Cancel") | html %]" id="BCancel_'+Id[1]+'_'+Id[2]+'"></td>';
+			} else if (data.Type == 'COG_GEST-CONF' || data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<td class="tdmep"><center>';
+				trm += '<input style="text-align:center" type="text" id="Typeoption1_'+Id[1]+'_'+Id[2]+'" size="5" maxlength="5" Value="'+data.Option1+'">';
+				trm += '</td> ';
+				trm += '<td class="tdmep"><center>';
+				trm += '<input style="text-align:center" type="text" id="Typeoption2_'+Id[1]+'_'+Id[2]+'" size="5" maxlength="5" Value="'+data.Option2+'">';
+				trm += '</td>';
+				trm += '<td ROWSPAN=5 style="text-align:center" class="tdmep"><input type="button" class="buttonsave" value="[% Translate("Add") | html %]" id="BApp_'+Id[1]+'_'+Id[2]+'"><BR><input type="button" class="buttoncancel" value="[% Translate("Cancel") | html %]" id="BCancel_'+Id[1]+'_'+Id[2]+'"></td>';
+			} else {
+				trm += '<td class="tdmep"><center>';
+				trm += '<textarea id="Perimeter_'+Id[1]+'_'+Id[2]+'" cols="27" rows="8" maxlength="3000">'+data.Perimeter+'</textarea>';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+				trm += '<textarea id="Description_'+Id[1]+'_'+Id[2]+'" cols="27" rows="8" maxlength="3000">'+data.Description+'</textarea>';
+				trm += '</td>';
+				trm += '<td ROWSPAN=5 style="text-align:center" class="tdmep"><input type="button" class="buttonsave" value="[% Translate("Add") | html %]" id="BApp_'+Id[1]+'_'+Id[2]+'"><BR><input type="button" class="buttoncancel" value="[% Translate("Cancel") | html %]" id="BCancel_'+Id[1]+'_'+Id[2]+'"></td>';
+			}
+			
+			trm += '</tr>';
+			trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'">';
+			if (data.Type == 'COG_GEST-CHGT' || data.Type == 'COG_CHGT-INFRA' || data.Type == 'COG_CHGT-CONC' || data.Type == 'COG_CHGT-GO4' || data.Type == 'COG_MAJ-SECU'  || data.Type == 'SO_COG-UO-1'  || data.Type == 'SO_COG-UO-2'  || data.Type == 'SO_COG-UO-3'  || data.Type == 'SO_COG-UO-4'  || data.Type == 'SO_COG-UO-5'  || data.Type == 'SO_COG-UO-6' || data.Type == 'GESCHG') {
+				trm += '<th class="thmep"><center>[% Translate("UO") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Solde") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("End Date") | html %]</th>';
+			} else if (data.Type == 'PRO_SUP-INFR' || data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<th class="thmep" COLSPAN=2><center>[% Translate("Perimeter") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Nbr of Devices") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Nbr of Indicators") | html %]</th>';
+			} else if (data.Type == 'COG_GEST-CONF' || data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<th class="thmep" COLSPAN=2><center>[% Translate("Description") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("End Date") | html %]</th>';
+			} else if (data.Type == 'RTC_PIL-REP'  || data.Type == 'RTC_EXP-TECH' || data.Type == 'SO_RTC-JOUR-1' || data.Type == 'SO_RTC-JOUR-2' || data.Type == 'SO_RTC-PAR') {
+				trm += '<th class="thmep"><center>[% Translate("RTC") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Nbr of days") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("End Date") | html %]</th>';
+			} else {
+				trm += '<th class="thmep"><center>[% Translate("GTR") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("HNO") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("End Date") | html %]</th>';
+			} 
+            
+			trm += '</tr>';
+			trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'">';
+				
+			if (data.Type == 'PACK_BASIC' || data.Type == 'PACK_ESSENTIEL' || data.Type == 'PACK_PREMIER' || data.Type == 'PACK_GOLD'){
+				trm += '<td class="tdmep"><center>';
+				trm += '<select class="selectoption1_'+Id[1]+'_'+Id[2]+'" id="Typeoption1_'+Id[1]+'_'+Id[2]+'">';
+					if (data.Type == 'PACK_BASIC' || data.Type == 'PACK_ESSENTIEL') {
+						trm += '<option value="Aucune" selected> Aucune </option>';
+					} else if (data.Type == 'PACK_PREMIER') {
+								trm += '<option value="Aucune" selected> Aucune </option>';
+								trm += '<option value="GTR J+1" > GTR J+1 </option>';
+								trm += '<option value="GTR J+3"> GTR J+3 </option>';
+					} else if (data.Type == 'PACK_GOLD') {
+								trm += '<option value="Aucune" selected> Aucune </option>';
+								trm += '<option value="GTR 4H"> GTR 4H </option>';
+								trm += '<option value="GTR J+1"> GTR J+1 </option>';
+					}
+				trm += '</select>';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+					trm += '<select class="selectoption2" id="Typeoption2_'+Id[1]+'_'+Id[2]+'">';
+						trm += '<option value="NON" selected> NON </option>';
+						trm += '<option value="OUI"> OUI </option>';
+					trm += '</select>';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+				trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_'+Id[1]+'_'+Id[2]+'" maxlength="10" size="10" value="'+DateDebut+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep" style="text-align:center">';
+				trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_'+Id[1]+'_'+Id[2]+'" maxlength="10" size="10" value="'+DateFin+'">';
+				trm += '</td>';				
+			} else if (data.Type == 'COG_GEST-CHGT' || data.Type == 'COG_CHGT-INFRA' || data.Type == 'COG_CHGT-CONC' || data.Type == 'COG_CHGT-GO4' || data.Type == 'COG_MAJ-SECU'  || data.Type == 'SO_COG-UO-1'  || data.Type == 'SO_COG-UO-2'  || data.Type == 'SO_COG-UO-3'  || data.Type == 'SO_COG-UO-4'  || data.Type == 'SO_COG-UO-5'  || data.Type == 'SO_COG-UO-6' || data.Type == 'GESCHG') {
+					trm += '<td class="tdmep"><center>';
+					trm += '<input class="AddUO" style="text-align:center" type="text" id="Typeoption1_'+Id[1]+'_'+Id[2]+'" size="5" maxlength="5" Value="'+data.Option1+'">';
+				trm += '</td> ';
+				trm += '<td class="tdmep"><center>';
+					trm += '<input style="text-align:center" type="text" id="Typeoption2_'+Id[1]+'_'+Id[2]+'" size="5" maxlength="5" Value="'+data.Option2+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+					trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_'+Id[1]+'_'+Id[2]+'" maxlength="10" size="10" value="'+DateDebut+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep" style="text-align:center">';
+					trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_'+Id[1]+'_'+Id[2]+'" maxlength="10" size="10" value="'+DateFin+'">';
+				trm += '</td>';
+			} else if (data.Type == 'PRO_SUP-INFR' || data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<td class="tdmep" COLSPAN=2><center>';
+				trm += '<textarea id="Perimeter_'+Id[1]+'_'+Id[2]+'" cols="120" rows="5" maxlength="3000">'+data.Perimeter+'</textarea>';			
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+				trm += '<input style="text-align:center" type="text" id="Typeoption1_'+Id[1]+'_'+Id[2]+'" size="5" maxlength="5" Value="'+data.Option1+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+				trm += '<input style="text-align:center" type="text" id="Typeoption2_'+Id[1]+'_'+Id[2]+'" size="5" maxlength="5" Value="'+data.Option2+'">';
+				trm += '</td>';
+			} else if (data.Type == 'COG_GEST-CONF' || data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<td class="tdmep"  COLSPAN=2><center>';
+				trm += '<textarea id="Description_'+Id[1]+'_'+Id[2]+'" cols="120" rows="5" maxlength="3000">'+data.Description+'</textarea>';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+				trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_'+Id[1]+'_'+Id[2]+'" maxlength="10" size="10" value="'+DateDebut+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep" style="text-align:center">';
+				trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_'+Id[1]+'_'+Id[2]+'" maxlength="10" size="10" value="'+DateFin+'">';
+				trm += '</td>';
+			} else if (data.Type == 'RTC_PIL-REP'  || data.Type == 'RTC_EXP-TECH' || data.Type == 'SO_RTC-JOUR-1' || data.Type == 'SO_RTC-JOUR-2' || data.Type == 'SO_RTC-PAR') {
+				trm += '<td class="tdmep"><center>';
+					trm += '<input style="text-align:center" type="text" id="Typeoption1_'+Id[1]+'_'+Id[2]+'" size="30" maxlength="50" Value="'+data.Option1+'">';
+				trm += '</td> ';
+				trm += '<td class="tdmep"><center>';
+					trm += '<input style="text-align:center" type="text" id="Typeoption2_'+Id[1]+'_'+Id[2]+'" size="5" maxlength="5" Value="'+data.Option2+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+					trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_'+Id[1]+'_'+Id[2]+'" maxlength="10" size="10" value="'+DateDebut+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep" style="text-align:center">';
+					trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_'+Id[1]+'_'+Id[2]+'" maxlength="10" size="10" value="'+DateFin+'">';
+				trm += '</td>';
+			}
+			
+			trm += '</tr>';
+			if (data.Type == 'PRO_SUP-INFR' || data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'">';
+					trm += '<th class="thmep" COLSPAN=2><center>[% Translate("Description") | html %]</th>';
+					trm += '<th class="thmep"><center>[% Translate("Metrology") | html %]</th>';
+					trm += '<th class="thmep"><center>[% Translate("Report") | html %]</th>';
+				trm += '</tr>';
+				trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'">';
+				trm += '<td class="tdmep"  COLSPAN=2><center>';
+				trm += '<textarea id="Description_'+Id[1]+'_'+Id[2]+'" cols="120" rows="5" maxlength="3000">'+data.Description+'</textarea>';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+					trm += '<select class="selectoption3" id="Typeoption3_'+Id[1]+'_'+Id[2]+'">';
+						trm += '<option value="NON" selected> NON </option>';
+						trm += '<option value="OUI"> OUI </option>';
+					trm += '</select>';
+				trm += '</td> ';
+				trm += '<td class="tdmep"><center> ';
+					trm += '<select class="selectoption4" id="Typeoption4_'+Id[1]+'_'+Id[2]+'">';
+						trm += '<option value="NON" selected> NON </option>';
+						trm += '<option value="OUI"> OUI </option>';
+					trm += '</select>';
+				trm += '</td>';
+				trm += '</tr>';
+			}
+			trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'">';
+			if (data.Type == 'COG_GEST-CHGT' || data.Type == 'COG_CHGT-INFRA' || data.Type == 'COG_CHGT-CONC' || data.Type == 'COG_CHGT-GO4' || data.Type == 'COG_MAJ-SECU'  || data.Type == 'SO_COG-UO-1'  || data.Type == 'SO_COG-UO-2'  || data.Type == 'SO_COG-UO-3'  || data.Type == 'SO_COG-UO-4'  || data.Type == 'SO_COG-UO-5'  || data.Type == 'SO_COG-UO-6' || data.Type == 'GESCHG') {
+				trm += '<th class="thmep" COLSPAN=2><center>[% Translate("Commentaire") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Montant TTC") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Commercial") | html %]</th>';
+			} else {
+				trm += '<th class="thmep" COLSPAN=4><center>[% Translate("Commentaire") | html %]</th>';
+			}
+			trm += '</tr>';
+			trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'">';
+			if (data.Type == 'COG_GEST-CHGT' || data.Type == 'COG_CHGT-INFRA' || data.Type == 'COG_CHGT-CONC' || data.Type == 'COG_CHGT-GO4' || data.Type == 'COG_MAJ-SECU'  || data.Type == 'SO_COG-UO-1'  || data.Type == 'SO_COG-UO-2'  || data.Type == 'SO_COG-UO-3'  || data.Type == 'SO_COG-UO-4'  || data.Type == 'SO_COG-UO-5'  || data.Type == 'SO_COG-UO-6' || data.Type == 'GESCHG') {
+				trm += '<td class="tdmep" COLSPAN=2><textarea id="Commentaire_'+Id[1]+'_'+Id[2]+'" cols="90" rows="5" maxlength="3000">'+data.Commentaire+'</textarea></td>';			
+				trm += '<td class="tdmep"><center>';
+				trm += '<input style="text-align:center" type="text" id="Montant_'+Id[1]+'_'+Id[2]+'" size="17" maxlength="13" Value="'+data.Montant+' €">';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+				trm += '<input style="text-align:center" type="text" id="IC_'+Id[1]+'_'+Id[2]+'" size="30" maxlength="50" Value="'+data.IC+'">';
+				trm += '</td>';
+			} else {
+				trm += '<td class="tdmep" COLSPAN=4><textarea id="Commentaire_'+Id[1]+'_'+Id[2]+'" cols="155" rows="5" maxlength="3000">'+data.Commentaire+'</textarea></td>';			
+				trm += '<input type="hidden" id="Montant_'+Id[1]+'_'+Id[2]+'" Value="'+data.Montant+'">';
+				trm += '<input type="hidden" id="IC_'+Id[1]+'_'+Id[2]+'" Value="'+data.IC+'">';
+			}
+			trm += '</tr>';
+			$(trm).insertAfter('#ABLigne_'+Id[1]+'_'+Id[2]+'_');
+			
+		
+		},
+		'json'
+	);
+});
+$(document).on('change', '.selectpack', function(Event) {
+	var Id = this.id.split("_");
+	var Data = {
+		Action:	'APA_AdminTR',
+		Subaction:    'AJAXSelectPack',
+		Pack:     $("#Typepack_"+Id[1]+'_'+Id[2]).val(),
+		TR_ID: Id[1]
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+			var Obj = 'Typeoption1_'+Id[1]+'_'+Id[2];
+			$('#Typeoption1_'+Id[1]+'_'+Id[2]).empty();
+			if ( data.Pack == 'MCO_P-BAS' || data.Pack == 'MCO_P-ESS') {
+				document.getElementById(Obj).options.add( new Option('Aucune', 'Aucune'));
+			} else if ( data.Pack == 'MCO_P-PRE') {
+				document.getElementById(Obj).options.add( new Option('Aucune', 'Aucune'))
+				document.getElementById(Obj).options.add( new Option('GTR J+1', 'GTR J+1'));	
+				document.getElementById(Obj).options.add( new Option('GTR J+3', 'GTR J+3'));
+			} else if ( data.Pack == 'MCO_P-GLD') {
+				document.getElementById(Obj).options.add( new Option('Aucune', 'Aucune'))
+				document.getElementById(Obj).options.add( new Option('GTR 4H', 'GTR 4H'));
+				document.getElementById(Obj).options.add( new Option('GTR J+1', 'GTR J+1'));
+			}
+			
+		},
+		'json'
+		);
+	
+});
+$(document).on('change', '.AddUO', function(Event) {
+	var Id = this.id.split("_");
+	var Report=$("#Report_"+Id[1]+'_'+Id[2]).val();
+	var Renew=$("#Typeoption1_"+Id[1]+'_'+Id[2]).val();
+	var SoldeActu=$("#SoldeActu_"+Id[1]+'_'+Id[2]).val();
+	
+	if (Report==1){
+		var NewSolde=parseFloat(SoldeActu)+parseFloat(Renew);
+		$("#Typeoption2_"+Id[1]+'_'+Id[2]).val(NewSolde);
+	} else if (Report==2){
+		var NewSolde=Renew;
+		$("#Typeoption2_"+Id[1]+'_'+Id[2]).val(NewSolde);
+	} else {
+		var NewSolde=Renew;
+		$("#Typeoption2_"+Id[1]+'_'+Id[2]).val(NewSolde);
+	}
+
+	
+});
+$(document).on('click', '.buttoncancel', function(Event) {
+	var Id = this.id.split("_");
+	var Data = {
+		Action:	'APA_DocZoom',
+		Subaction:    'AJAXCancel',
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+			$('.TR_'+Id[1]+'_'+Id[2]).hide();
+		},
+		'json'
+		);
+	
+});
+$(document).on('click', '.buttonsave', function(Event) {
+	var Id = this.id.split("_");
+	document.getElementById('AddTR_'+Id[1]+'_'+Id[2]).style.display = 'none';
+	$('.TR_'+Id[1]+'_'+Id[2]).hide();
+	var Data = {
+		Action:	'APA_DocZoom',
+		Subaction:    'AJAXClickBoutonSave',
+		Caff:  $("#Caff_"+Id[1]+"_"+Id[2]).val(),
+		Type: $("#Typepack_"+Id[1]+"_"+Id[2]).val(),
+		Option1: $("#Typeoption1_"+Id[1]+"_"+Id[2]).val(),
+		Option2: $("#Typeoption2_"+Id[1]+"_"+Id[2]).val(),
+		Option3: $("#Typeoption3_"+Id[1]+"_"+Id[2]).val(),
+		Option4: $("#Typeoption4_"+Id[1]+"_"+Id[2]).val(),
+		Perimeter: $("#Perimeter_"+Id[1]+"_"+Id[2]).val(),
+		Description: $("#Description_"+Id[1]+"_"+Id[2]).val(),
+		DateDebut: $("#DateDebut_"+Id[1]+"_"+Id[2]).val(),
+		DateFin: $("#DateFin_"+Id[1]+"_"+Id[2]).val(),
+		Commentaire: $("#Commentaire_"+Id[1]+"_"+Id[2]).val(),
+		Customer: $("#Customer_"+Id[1]+"_"+Id[2]+"_").val(),
+		TR_ID: Id[1],
+		TR_Ligne : Id[2],
+		Montant: $("#Montant_"+Id[1]+"_"+Id[2]).val(),
+		IC: $("#IC_"+Id[1]+"_"+Id[2]).val(),
+		Type_Sage: $("#Type_Sage_"+Id[1]+"_"+Id[2]).val(),		
+	};
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+		},
+		'json'
+	);
+});
+$(document).on('click', '.buttonRenewTR', function(Event) {
+	var Id = this.id.split("_");
+	var DateDebut = $("#DateD_"+Id[1]+'_'+Id[2]+'_'+Id[3]).val();
+	var DateFin = $("#DateF_"+Id[1]+'_'+Id[2]+'_'+Id[3]).val();
+	var ARRef = $("#ARRef_"+Id[1]+'_'+Id[2]+'_'+Id[3]).val();	
+	
+	if (ARRef == 'SO_COG-UO-1' || ARRef == 'SO_COG-UO-2' || ARRef == 'SO_COG-UO-3' || ARRef == 'SO_COG-UO-4' || ARRef == 'SO_COG-UO-5' || ARRef == 'SO_COG-UO-6' || ARRef == 'COG_CHGT-INFRA' || ARRef == 'COG_CHGT-GO4' || ARRef == 'COG_MAJ-SECU'  || ARRef == 'COG_CHGT-CONC' || ARRef == 'COG_GEST-CHGT' || ARRef == 'GESCHG') {
+		if (confirm("Voulez-vous reporter le solde actuel de la banque d'UO?")) {
+			var Data = {
+			Action:	'APA_DocZoom',
+			Subaction:    'AJAXClickBoutonRenewTR',
+			Report: '1',
+			DO_Piece:  Id[1],
+			DL_Ligne: Id[2],
+			TR_ID: Id[3],
+			};
+		}
+		else {
+			var Data = {
+				Action:	'APA_DocZoom',
+				Subaction:    'AJAXClickBoutonRenewTR',
+				Report: '2',
+				DO_Piece:  Id[1],
+				DL_Ligne: Id[2],
+				TR_ID: Id[3],
+			};
+		} 
+	} else {
+		var Data = {
+			Action:	'APA_DocZoom',
+			Subaction:    'AJAXClickBoutonRenewTR',
+			Report: '0',
+			DO_Piece:  Id[1],
+			DL_Ligne: Id[2],
+			TR_ID: Id[3],
+		};
+	}
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+			
+			var trm = '<tr class="TR_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+			trm += '<input type="hidden" id="Type_Sage_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" Value="'+data.Type_Sage+'">';
+			trm += '<th class="thmep"><center>[% Translate("Affaire Code") | html %]</th>';
+			if (data.Type == 'COG_GEST-CONF' || data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<th class="thmep"><center>[% Translate("Perimeter") | html %]</th>';
+			} else {
+				trm += '<th class="thmep"><center>[% Translate("Contract Type") | html %]</th>';
+			}
+			if (data.Type == 'PRO_SUP-INFR' || data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<th class="thmep"><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("End Date") | html %]</th>';
+			} else if (data.Type == 'COG_GEST-CONF' || data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<input type="hidden" id="Typepack_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" Value="SO_BACKUP-DEVICES">';
+				trm += '<th class="thmep"><center>[% Translate("Nbr of Devices") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Nbr of Versions") | html %]</th>';
+			} else {
+				trm += '<th class="thmep"><center>[% Translate("Perimeter") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Description") | html %]</th>';
+			}
+			trm += '<th class="thmep"><center>[% Translate("Action") | html %]</th>';
+			trm += '</tr>';
+			trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+			trm += '<td class="tdmep"><center>';
+			trm += '<input style="text-align:center" type="text" id="Caff_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" size="17" maxlength="13" Value="'+data.Caff+'">';
+			trm += '</td>';
+			trm += '<td class="tdmep"><center>';
+			if (data.Type == 'MCO_P-BAS') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+				trm += '<option value="MCO_P-BAS" selected> PACK BASIC </option>';
+				trm += '<option value="MCO_P-ESS"> PACK ESSENTIEL </option>';
+				trm += '<option value="MCO_P-PRE"> PACK PREMIER </option>';
+				trm += '<option value="MCO_P-GLD"> PACK GOLD </option>';
+				trm += '</select>';
+			}
+			else if (data.Type == 'MCO_P-ESS') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+				trm += '<option value="MCO_P-BAS"> PACK BASIC </option>';
+				trm += '<option value="MCO_P-ESS" selected> PACK ESSENTIEL </option>';
+				trm += '<option value="MCO_P-PRE"> PACK PREMIER </option>';
+				trm += '<option value="MCO_P-GLD"> PACK GOLD </option>';
+				trm += '</select>';
+			}
+			else if (data.Type == 'MCO_P-PRE') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+				trm += '<option value="MCO_P-BAS"> PACK BASIC </option>';
+				trm += '<option value="MCO_P-ESS"> PACK ESSENTIEL </option>';
+				trm += '<option value="MCO_P-PRE" selected> PACK PREMIER </option>';
+				trm += '<option value="MCO_P-GLD"> PACK GOLD </option>';
+				trm += '</select>';
+			}
+			else if (data.Type == 'MCO_P-GLD') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+				trm += '<option value="MCO_P-BAS"> PACK BASIC </option>';
+				trm += '<option value="MCO_P-ESS"> PACK ESSENTIEL </option>';
+				trm += '<option value="MCO_P-PRE"> PACK PREMIER </option>';
+				trm += '<option value="MCO_P-GLD" selected> PACK GOLD </option>';
+				trm += '</select>';
+			} else if (data.Type == 'SO_SUP-HO') {
+				trm += '<select class="selectsup" id="Typepack_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+					trm += '<option value="SO_SUP-HO" selected> Supervision HO </option>';
+					trm += '<option value="SO_SUP-HNO"> Supervision HNO </option>';
+				trm += '</select>';
+			} else if (data.Type == 'SO_SUP-HNO') {
+				trm += '<select class="selectsup" id="Typepack_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+					trm += '<option value="SO_SUP-HO"> Supervision HO </option>';
+					trm += '<option value="SO_SUP-HNO" selected> Supervision HNO </option>';
+				trm += '</select>';
+			} 
+			else if (data.Type == 'SO_COG-UO-1'  || data.Type == 'SO_COG-UO-2'  || data.Type == 'SO_COG-UO-3'  || data.Type == 'SO_COG-UO-4'  || data.Type == 'SO_COG-UO-5'  || data.Type == 'SO_COG-UO-6') {
+				trm += '<select class="selecttype" name="TypeList" id="Typepack_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+				trm += '<option value="0"> - </option>';
+				if (data.Type== 'SO_COG-UO-1') {
+					trm += '<option value="SO_COG-UO-1" selected> BdUO INFRA</option>';
+					trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+					trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+					trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+					trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+					trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				} else if (data.Type== 'SO_COG-UO-2') {
+					trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+					trm += '<option value="SO_COG-UO-2" selected> BdUO ASSISTANCE TECHNIQUE</option>';
+					trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+					trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+					trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+					trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				} else if (data.Type== 'SO_COG-UO-3') {
+					trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+					trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+					trm += '<option value="SO_COG-UO-3" selected> BdUO MAJ SECU </option>';
+					trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+					trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+					trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				} else if (data.Type== 'SO_COG-UO-4') {
+					trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+					trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+					trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+					trm += '<option value="SO_COG-UO-4" selected> BdUO EVOL LOGICIELLES </option>';
+					trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+					trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				} else if (data.Type== 'SO_COG-UO-5') {
+					trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+					trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+					trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+					trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+					trm += '<option value="SO_COG-UO-5" selected> BdUO GO4COLLAB</option>';
+					trm += '<option value="SO_COG-UO-6"> BdUO CONCIERGERIE </option>';
+				} else if (data.Type== 'SO_COG-UO-6') {
+					trm += '<option value="SO_COG-UO-1"> BdUO INFRA</option>';
+					trm += '<option value="SO_COG-UO-2"> BdUO ASSISTANCE TECHNIQUE</option>';
+					trm += '<option value="SO_COG-UO-3"> BdUO MAJ SECU </option>';
+					trm += '<option value="SO_COG-UO-4"> BdUO EVOL LOGICIELLES </option>';
+					trm += '<option value="SO_COG-UO-5"> BdUO GO4COLLAB</option>';
+					trm += '<option value="SO_COG-UO-6" selected> BdUO CONCIERGERIE </option>';
+				}
+				trm += '</select>';
+			} else if (data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<textarea id="Perimeter_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" cols="100" rows="5" maxlength="3000">'+data.Perimeter+'</textarea>';
+			} else if (data.Type == 'SO_RTC-JOUR-1') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+				trm += '<option value="SO_RTC-JOUR-1" selected> Comitologie et Veille Techno </option>';
+				trm += '<option value="SO_RTC-JOUR-2"> Expertise Technique </option>';
+				trm += '<option value="SO_RTC-PAR"> RTC sous traité </option>';
+				trm += '</select>';
+			} else if (data.Type == 'SO_RTC-JOUR-2') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+				trm += '<option value="SO_RTC-JOUR-1"> Comitologie et Veille Techno </option>';
+				trm += '<option value="SO_RTC-JOUR-2" selected> Expertise Technique </option>';
+				trm += '<option value="SO_RTC-PAR"> RTC sous traité </option>';
+				trm += '</select>';
+			} else if (data.Type == 'SO_RTC-PAR') {
+				trm += '<select class="selectpack" id="Typepack_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+				trm += '<option value="SO_RTC-JOUR-1"> Comitologie et Veille Techno </option>';
+				trm += '<option value="SO_RTC-JOUR-2"> Expertise Technique </option>';
+				trm += '<option value="SO_RTC-PAR" selected> RTC sous traité </option>';
+				trm += '</select>';
+			}
+			trm += '</td>';
+			if (data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<td class="tdmep"><center>';
+				trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" maxlength="10" size="10" value="'+DateDebut+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep" style="text-align:center">';
+				trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" maxlength="10" size="10" value="'+DateFin+'">';
+				trm += '</td>';
+				trm += '<td ROWSPAN=7 style="text-align:center" class="tdmep"><input type="button" class="buttonapply" value="[% Translate("Apply") | html %]" id="BApp_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'"><BR><input type="button" class="buttoncancel" value="[% Translate("Cancel") | html %]" id="BCancel_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'"></td>';
+			} else if (data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<td class="tdmep"><center>';
+				trm += '<input style="text-align:center" type="text" id="Typeoption1_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" size="5" maxlength="5" Value="'+data.Option1+'">';
+				trm += '</td> ';
+				trm += '<td class="tdmep"><center>';
+				trm += '<input style="text-align:center" type="text" id="Typeoption2_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" size="5" maxlength="5" Value="'+data.Option2+'">';
+				trm += '</td>';
+				trm += '<td ROWSPAN=5 style="text-align:center" class="tdmep"><input type="button" class="buttonapply" value="[% Translate("Apply") | html %]" id="BApp_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'"><BR><input type="button" class="buttoncancel" value="[% Translate("Cancel") | html %]" id="BCancel_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'"></td>';} else {
+				trm += '<td class="tdmep"><center>';
+				trm += '<textarea id="Perimeter_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" cols="27" rows="8" maxlength="3000">'+data.Perimeter+'</textarea>';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+				trm += '<textarea id="Description_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" cols="27" rows="8" maxlength="3000">'+data.Description+'</textarea>';
+				trm += '</td>';
+				trm += '<td ROWSPAN=5 style="text-align:center" class="tdmep"><input type="button" class="buttonapply" value="[% Translate("Apply") | html %]" id="BApp_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'"><BR><input type="button" class="buttoncancel" value="[% Translate("Cancel") | html %]" id="BCancel_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'"></td>';
+			}
+			
+			trm += '</tr>';
+			trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+			if (data.Type == 'SO_COG-UO-1'  || data.Type == 'SO_COG-UO-2'  || data.Type == 'SO_COG-UO-3'  || data.Type == 'SO_COG-UO-4'  || data.Type == 'SO_COG-UO-5'  || data.Type == 'SO_COG-UO-6') {
+				trm += '<th class="thmep"><center>[% Translate("UO") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("NEW SOLDE") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("End Date") | html %]</th>';
+			} else if (data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<th class="thmep" COLSPAN=2><center>[% Translate("Perimeter") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Nbr of Devices") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Nbr of Indicators") | html %]</th>';
+			} else if (data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<th class="thmep" COLSPAN=2><center>[% Translate("Description") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("End Date") | html %]</th>';
+			} else if (data.Type == 'SO_RTC-JOUR-1' || data.Type == 'SO_RTC-JOUR-2' || data.Type == 'SO_RTC-PAR') {
+				trm += '<th class="thmep"><center>[% Translate("RTC") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Nbr of days") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("End Date") | html %]</th>';
+			} else {
+				trm += '<th class="thmep"><center>[% Translate("GTR") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("HNO") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Start Date") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("End Date") | html %]</th>';
+			}
+            trm += '</tr>';
+			trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+			if (data.Type == 'MCO_P-BAS' || data.Type == 'MCO_P-ESS' || data.Type == 'MCO_P-PRE' || data.Type == 'MCO_P-GLD'){
+				trm += '<td class="tdmep"><center>';
+				trm += '<select class="selectoption1_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" id="Typeoption1_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+					if (data.Type == 'MCO_P-BAS' || data.Type == 'MCO_P-ESS') {
+						trm += '<option value="Aucune" selected> Aucune </option>';
+					} else if (data.Type == 'MCO_P-PRE') {
+								if (data.Option1 == 'GTR J+1') {
+									trm += '<option value="Aucune" > Aucune </option>';
+									trm += '<option value="GTR J+1" selected> GTR J+1 </option>';
+									trm += '<option value="GTR J+3"> GTR J+3 </option>';
+								} else if (data.Option1 == 'GTR J+3') {	
+									trm += '<option value="Aucune" > Aucune </option>';
+									trm += '<option value="GTR J+1" > GTR J+1 </option>';
+									trm += '<option value="GTR J+3" selected> GTR J+3 </option>';
+								} else if (data.Option1 == 'Aucune') {	
+									trm += '<option value="Aucune" selected> Aucune </option>';
+									trm += '<option value="GTR J+1" > GTR J+1 </option>';
+									trm += '<option value="GTR J+3"> GTR J+3 </option>';
+								}
+					} else if (data.Type == 'MCO_P-GLD') {
+								if (data.Option1 == 'GTR 4H') {
+									trm += '<option value="Aucune" > Aucune </option>';
+									trm += '<option value="GTR 4H" selected> GTR 4H </option>';
+									trm += '<option value="GTR J+1"> GTR J+1 </option>';
+								} else if (data.Option1 == 'GTR J+1') {	
+									trm += '<option value="Aucune" > Aucune </option>';
+									trm += '<option value="GTR 4H"> GTR 4H </option>';
+									trm += '<option value="GTR J+1" selected> GTR J+1 </option>';
+								} else if (data.Option1 == 'Aucune') {	
+									trm += '<option value="Aucune" selected> Aucune </option>';
+									trm += '<option value="GTR 4H"> GTR 4H </option>';
+									trm += '<option value="GTR J+1"> GTR J+1 </option>';
+								}
+					}
+				trm += '</select>';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+					trm += '<select class="selectoption2" id="Typeoption2_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+						if (data.Option2 == 'NON') {
+							trm += '<option value="NON" selected> NON </option>';
+							trm += '<option value="OUI"> OUI </option>';
+						} else if (data.Option2 == 'OUI') {	
+							trm += '<option value="NON" > NON </option>';
+							trm += '<option value="OUI" selected> OUI </option>';
+						}
+					trm += '</select>';
+					trm += '</td>';
+					trm += '<td class="tdmep"><center>';
+					trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" maxlength="10" size="10" value="'+DateDebut+'">';
+					trm += '</td>';
+					trm += '<td class="tdmep" style="text-align:center">';
+					trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" maxlength="10" size="10" value="'+DateFin+'">';
+					trm += '</td>';	
+			} else if (data.Type == 'SO_COG-UO-1'  || data.Type == 'SO_COG-UO-2'  || data.Type == 'SO_COG-UO-3'  || data.Type == 'SO_COG-UO-4'  || data.Type == 'SO_COG-UO-5'  || data.Type == 'SO_COG-UO-6') {
+					trm += '<input type="hidden" id="Report_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" Value="'+data.Report+'">';
+					trm += '<input type="hidden" id="SoldeActu_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" Value="'+data.SoldeActuel+'">';
+				trm += '<td class="tdmep"><center>';
+					trm += '<input class="AddUO" style="text-align:center" type="text" id="Typeoption1_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" size="5" maxlength="5" Value="'+data.Option1+'">';
+				trm += '</td> ';
+				trm += '<td class="tdmep"><center>';
+					trm += '<input style="text-align:center" type="text" readonly id="Typeoption2_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" size="5" maxlength="5" title="Solde actuel : '+data.SoldeActuel+'" Value="'+data.Option2+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+					trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" maxlength="10" size="10" value="'+DateDebut+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep" style="text-align:center">';
+					trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" maxlength="10" size="10" value="'+DateFin+'">';
+				trm += '</td>';
+			} else if (data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<td class="tdmep" COLSPAN=2><center>';
+				trm += '<textarea id="Perimeter_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" cols="120" rows="5" maxlength="3000">'+data.Perimeter+'</textarea>';			
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+				trm += '<input style="text-align:center" type="text" id="Typeoption1_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" size="5" maxlength="5" Value="'+data.Option1+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+				trm += '<input style="text-align:center" type="text" id="Typeoption2_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" size="5" maxlength="5" Value="'+data.Option2+'">';
+				trm += '</td>';
+			} else if (data.Type == 'SO_BACKUP-DEVICES') {
+				trm += '<td class="tdmep"  COLSPAN=2><center>';
+				trm += '<textarea id="Description_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" cols="120" rows="5" maxlength="3000">'+data.Description+'</textarea>';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+				trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" maxlength="10" size="10" value="'+DateDebut+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep" style="text-align:center">';
+				trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" maxlength="10" size="10" value="'+DateFin+'">';
+				trm += '</td>';
+			} else if (data.Type == 'SO_RTC-JOUR-1' || data.Type == 'SO_RTC-JOUR-2' || data.Type == 'SO_RTC-PAR') {
+				trm += '<td class="tdmep"><center>';
+					trm += '<input style="text-align:center" type="text" id="Typeoption1_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" size="30" maxlength="50" Value="'+data.Option1+'">';
+				trm += '</td> ';
+				trm += '<td class="tdmep"><center>';
+					trm += '<input style="text-align:center" type="text" id="Typeoption2_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" size="5" maxlength="5" Value="'+data.Option2+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+					trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" maxlength="10" size="10" value="'+DateDebut+'">';
+				trm += '</td>';
+				trm += '<td class="tdmep" style="text-align:center">';
+					trm += '<input title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_'+Id[1]+'_'+Id[2]+'" maxlength="10" size="10" value="'+DateFin+'">';
+				trm += '</td>';
+			}
+			trm += '</tr>';
+			if (data.Type == 'SO_SUP-HO' || data.Type == 'SO_SUP-HNO') {
+				trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+					trm += '<th class="thmep" COLSPAN=2><center>[% Translate("Description") | html %]</th>';
+					trm += '<th class="thmep"><center>[% Translate("Metrology") | html %]</th>';
+					trm += '<th class="thmep"><center>[% Translate("Report") | html %]</th>';
+				trm += '</tr>';
+				trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+				trm += '<td class="tdmep"  COLSPAN=2><center>';
+				trm += '<textarea id="Description_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" cols="120" rows="5" maxlength="3000">'+data.Description+'</textarea>';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+					trm += '<select class="selectoption3" id="Typeoption3_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+						if (data.Option3 == 'NON') {
+							trm += '<option value="NON" selected> NON </option>';
+							trm += '<option value="OUI"> OUI </option>';
+						} else if (data.Option3 == 'OUI') {
+							trm += '<option value="NON"> NON </option>';
+							trm += '<option value="OUI" selected> OUI </option>';
+						}
+					trm += '</select>';
+				trm += '</td> ';
+				trm += '<td class="tdmep"><center> ';
+					trm += '<select class="selectoption4" id="Typeoption4_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+						if (data.Option4 == 'NON') {
+							trm += '<option value="NON" selected> NON </option>';
+							trm += '<option value="OUI"> OUI </option>';
+						} else if (data.Option4 == 'OUI') {
+							trm += '<option value="NON"> NON </option>';
+							trm += '<option value="OUI" selected> OUI </option>';
+						}
+					trm += '</select>';
+				trm += '</td>';
+				trm += '</tr>';
+			}
+			trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+			if (data.Type == 'SO_COG-UO-1'  || data.Type == 'SO_COG-UO-2'  || data.Type == 'SO_COG-UO-3'  || data.Type == 'SO_COG-UO-4'  || data.Type == 'SO_COG-UO-5'  || data.Type == 'SO_COG-UO-6') {
+				trm += '<th class="thmep" COLSPAN=2><center>[% Translate("Commentaire") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Montant TTC") | html %]</th>';
+				trm += '<th class="thmep"><center>[% Translate("Commercial") | html %]</th>';
+			} else {
+				trm += '<th class="thmep" COLSPAN=4><center>[% Translate("Commentaire") | html %]</th>';
+			}
+			trm += '</tr>';
+			trm += '<tr class="TR_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'">';
+			if (data.Type == 'SO_COG-UO-1'  || data.Type == 'SO_COG-UO-2'  || data.Type == 'SO_COG-UO-3'  || data.Type == 'SO_COG-UO-4'  || data.Type == 'SO_COG-UO-5'  || data.Type == 'SO_COG-UO-6') {
+				trm += '<td class="tdmep" COLSPAN=2><textarea id="Commentaire_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" cols="85" rows="5" maxlength="3000">'+data.Commentaire+'</textarea></td>';			
+				trm += '<td class="tdmep"><center>';
+				trm += '<input style="text-align:center" type="text" id="Montant_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" size="17" maxlength="13" Value="'+data.Montant+' €">';
+				trm += '</td>';
+				trm += '<td class="tdmep"><center>';
+				trm += '<input style="text-align:center" type="text" id="IC_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" size="30" maxlength="50" Value="'+data.IC+'">';
+				trm += '</td>';
+			} else {
+				trm += '<td class="tdmep" COLSPAN=4><textarea id="Commentaire_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" cols="150" rows="5" maxlength="3000">'+data.Commentaire+'</textarea></td>';			
+				trm += '<input type="hidden" id="Montant_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" Value="'+data.Montant+'">';
+				trm += '<input type="hidden" id="IC_'+Id[1]+'_'+Id[2]+'_'+Id[3]+'" Value="'+data.IC+'">';
+			}
+			trm += '</tr>';
+			$(trm).insertAfter('#ABLigne_'+Id[1]+'_'+Id[2]+'_'+Id[3]);
+			
+		
+		},
+		'json'
+	);
+});
+$(document).on('click', '.buttonapply', function(Event) {
+	var Id = this.id.split("_");
+	document.getElementById('RenewTR_'+Id[1]+'_'+Id[2]+'_'+Id[3]).style.display = 'none';
+	$('.TR_'+Id[1]+'_'+Id[2]+'_'+Id[3]).hide();
+	var Report = $("#Report_"+Id[1]+'_'+Id[2]+'_'+Id[3]).val();	
+	if ( Report ==1) {
+		var Data = {
+			Action:	'APA_DocZoom',
+			Subaction:    'AJAXClickBoutonApply',
+			Caff:  $("#Caff_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Type: $("#Typepack_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Option1: $("#Typeoption1_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Option2: $("#Typeoption2_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Perimeter: $("#Perimeter_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Description: $("#Description_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			DateDebut: $("#DateDebut_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			DateFin: $("#DateFin_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Commentaire: $("#Commentaire_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Customer: $("#Customer_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			TR_ID: Id[3],
+			TR_Ligne : Id[2],
+			TR_EnrIDSage : Id[1],
+			Montant: $("#Montant_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			IC: $("#IC_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Type_Sage: $("#Type_Sage_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Report: '1',
+		};
+	}	else if (Report ==2) {
+		var Data = {
+			Action:	'APA_DocZoom',
+			Subaction:    'AJAXClickBoutonApply',
+			Caff:  $("#Caff_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Type: $("#Typepack_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Option1: $("#Typeoption1_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Option2: $("#Typeoption2_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Perimeter: $("#Perimeter_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Description: $("#Description_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			DateDebut: $("#DateDebut_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			DateFin: $("#DateFin_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Commentaire: $("#Commentaire_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Customer: $("#Customer_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			TR_ID: Id[3],
+			TR_Ligne : Id[2],
+			TR_EnrIDSage : Id[1],
+			Montant: $("#Montant_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			IC: $("#IC_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Type_Sage: $("#Type_Sage_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Report: '2',
+		};
+	} else {
+		var Data = {
+			Action:	'APA_DocZoom',
+			Subaction:    'AJAXClickBoutonApply',
+			Caff:  $("#Caff_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Type: $("#Typepack_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Option1: $("#Typeoption1_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Option2: $("#Typeoption2_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Option3: $("#Typeoption3_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Option4: $("#Typeoption4_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Perimeter: $("#Perimeter_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Description: $("#Description_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			DateDebut: $("#DateDebut_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			DateFin: $("#DateFin_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Commentaire: $("#Commentaire_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Customer: $("#Customer_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			TR_ID: Id[3],
+			TR_Ligne : Id[2],
+			TR_EnrIDSage : Id[1],
+			Montant: $("#Montant_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			IC: $("#IC_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Type_Sage: $("#Type_Sage_"+Id[1]+"_"+Id[2]+'_'+Id[3]).val(),
+			Report: '0',
+		};
+	}
+	
+	Core.AJAX.FunctionCall(
+		Core.Config.Get('Baselink'),
+		Data,
+		function (data) {
+		},
+		'json'
+	);
+});
+
+//]]></script>
+[% END %]

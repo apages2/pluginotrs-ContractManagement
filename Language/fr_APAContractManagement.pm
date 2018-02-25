@@ -28,7 +28,11 @@ sub Data {
 	$Self->{Translation}->{'Starting Date ='} = 'Date de Démarrage =';
 	$Self->{Translation}->{'Starting Date >='} = 'Date de Démarrage >=';
 	$Self->{Translation}->{'Starting Date <='} = 'Date de Démarrage <=';
+	$Self->{Translation}->{'Entry Date ='} = 'Date de Saisie =';
+	$Self->{Translation}->{'Entry Date >='} = 'Date de Saisie >=';
+	$Self->{Translation}->{'Entry Date <='} = 'Date de Saisie <=';
 	$Self->{Translation}->{'End Date'} = 'Date de Fin';
+	$Self->{Translation}->{'Entry Date'} = 'Date de Saisie';
 	$Self->{Translation}->{'Wildcards like \'*\' are allowed. Date Format is YYYY-MM-DD'} = 'Les jokers comme \'*\' sont autorisés. Le format des dates est YYYY-MM-DD';
 	$Self->{Translation}->{'Search'} = 'Rechercher';
 	$Self->{Translation}->{'Show next pages'} = 'Afficher pages suivantes';
@@ -43,14 +47,16 @@ sub Data {
 	$Self->{Translation}->{'Yes'} = 'Oui';
 	$Self->{Translation}->{'No'} = 'Non';
 	$Self->{Translation}->{'Entitled'} = 'Intitulé';
+	$Self->{Translation}->{'Business Code'} = 'Code Affaire';
 	$Self->{Translation}->{'Transfer to MSC'} = 'Transfert au MSC';
 	$Self->{Translation}->{'Renew'} = 'Renouvellement';
 	$Self->{Translation}->{'List'} = 'Liste';
+	$Self->{Translation}->{' Search in all Cases'}  = ' Rechercher dans toutes les affaires';
 	$Self->{Translation}->{' Search in all contracts'}  = ' Rechercher dans tous les contrats';
 	$Self->{Translation}->{' Search in expired contracts'}  = ' Rechercher dans les contrats expirés';
 	$Self->{Translation}->{'items'}  = 'éléments';
-	$Self->{Translation}->{'Old End Date'} = 'Ancienne Date de Fin';
-	$Self->{Translation}->{'New End Date'} = 'Nouvelle Date de Fin';
+	$Self->{Translation}->{'Date in Otrs Database'} = 'Date dans la base OTRS';
+	$Self->{Translation}->{'Date in Sage Database'} = 'Date dans la base Sage';
 		
 	#AgentContractManagement
 	$Self->{Translation}->{'MEP Task'} = 'Tache MEP';

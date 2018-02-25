@@ -512,10 +512,10 @@ sub ApplyTR {
 		$Dated = $DateDebut;
 	}
 
-	# $Kernel::OM->Get('Kernel::System::Log')->Log(
-            # Priority => 'error',
-            # Message  =>$Dated,
-    # );
+	$Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  =>"$Dated:$TR_ID",
+    );
 	
 	
 	my $Datef;
