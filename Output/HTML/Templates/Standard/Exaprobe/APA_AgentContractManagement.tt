@@ -47,7 +47,7 @@ background-color: #f2f2f2 !important;
 }  
 
 </style>
-<form  method="post" enctype="multipart/form-data" name="update" class="Validate PreventMultipleSubmits" id="update">
+<form  action="[% Env("CGIHandle") %]" method="post" enctype="multipart/form-data" name="update" class="Validate PreventMultipleSubmits" id="update">
 
 <div class="OverviewBox ARIARoleMain">
 		<h1>[% Translate("Overview") | html %]: [% Translate("MEP Management") %]</h1>
@@ -60,16 +60,23 @@ background-color: #f2f2f2 !important;
                 <ul class="ActionList">
 [% RenderBlockStart("ActionSearch") %]
 					[% Search = Data.Search  %]
+					[% SearchResponsible = Data.SearchResponsible  %]
 					[% SearchList = Data.SearchList  %]
 					[% StartWindow=Data.StartWindow %]
 					[% StartHit=Data.StartHit %]
+					[% IsTreated = Data.IsTreated %]
 					[% SageTable = Data.SageTable %]
                     <li>						
                           
 							<input type="hidden" name="Action" value="[% Env("Action") %]"/>
                             <input type="hidden" name="Subaction" value=""/>
                             <input type="hidden" name="Nav" value="[% Data.Nav | html %]"/>
-                        <p class="SearchSelect ">    
+                        [% IF Data.IsTreated=='on' %]
+							<input type="checkbox" name="IsTreated" class="FieldExplanation" id="IsTreated" checked>[% Translate(" Search in finished MEP") | html %]
+						[% ELSE %]
+							<input type="checkbox" name="IsTreated" class="FieldExplanation"  id="IsTreated">[% Translate(" Search in finished MEP") | html %]
+						[% END %]
+						<br><p class="SearchSelect ">    
 							<select name="SearchList" id="SearchList" style="width: 200px ">
 								[% IF Data.SageTable=='Doc' %]
 									[% IF Data.SearchList == 0 %]
@@ -97,6 +104,11 @@ background-color: #f2f2f2 !important;
 									[% ELSE %]
 										<option value="4"> [% Translate("Starting Date <=") | html %] </option>
 									[% END %]
+									[% IF Data.SearchList == 5 %]
+										<option value="5" selected> [% Translate("Responsible") | html %] </option>
+									[% ELSE %]
+										<option value="5"> [% Translate("Responsible") | html %] </option>
+									[% END %]
 								[% ELSIF Data.SageTable=='Abo' %]	
 									[% IF Data.SearchList == 0 %]
 										<option value="0" selected> [% Translate("OTRS Customers") | html %] </option>
@@ -123,13 +135,30 @@ background-color: #f2f2f2 !important;
 									[% ELSE %]
 										<option value="4"> [% Translate("Starting Date <=") | html %] </option>
 									[% END %]
+									[% IF Data.SearchList == 5 %]
+										<option value="5" selected> [% Translate("Responsible") | html %] </option>
+									[% ELSE %]
+										<option value="5"> [% Translate("Responsible") | html %] </option>
+									[% END %]
 								[% END %]
 							</select>
 						</p>
-						<p class="SearchSelect ">  
-							<input type="text" name="Search" value="[% Data.Search | html %]" id="Search" title="[% Translate("Search") | html %]"/>
-							<button type="submit" value="[% Translate("Search") | html %]" title="[% Translate("Search") | html %]"><i class="fa fa-search"></i></button>
+						<p class="SearchSelect" id="SearchSelect">  
+							[% IF Data.SearchList == 5 %]
+								<select id="Search" name="Search" type="text" value="0">
+								[% RenderBlockStart("Responsible") %]
+								[% IF Data.RespID == Search %]
+									<option value="[% Data.RespID %]" selected>[% Data.RespFullName %]</option>
+								[% ELSE %]
+									<option value="[% Data.RespID %]">[% Data.RespFullName %]</option>
+								[% END %]
+								[% RenderBlockEnd("Responsible") %]
+								</select>
+							[% ELSE %]
+								<input type="text" name="Search" value="[% Data.Search | html %]" id="Search" title="[% Translate("Search") | html %]"/>
+							[% END %]
 						</p>
+						<br><button type="submit" value="[% Translate("Search") | html %]" title="[% Translate("Search") | html %]"><i class="fa fa-search"></i></button>
 						<p class="FieldExplanation">    
                             [% Translate("Wildcards like '*' are allowed. Date Format is YYYY-MM-DD") | html %]
 						</p>
@@ -165,6 +194,7 @@ background-color: #f2f2f2 !important;
 									<th class="W15pc" rowspan="2" style="text-align:center">[% Translate("SAGE Customers") | html %]</th>
 									<th class="W15pc" rowspan="2" style="text-align:center">[% Translate("OTRS Customers") | html %]</th>
 									<th rowspan="2" style="text-align:center">[% Translate("Business Code") | html %]</th>
+									<th rowspan="2" style="text-align:center">[% Translate("Selling Price") | html %] HT</th>
 									<th class="W15pc" rowspan="2" style="text-align:center">[% Translate("Start Date") | html %]</th>
 									<th class="W15pc" rowspan="2" style="text-align:center">[% Translate("End Date") | html %]</th>
 									<th class="W20pc" rowspan="2" style="text-align:center">[% Translate("MEP") | html %]</th>
@@ -179,21 +209,22 @@ background-color: #f2f2f2 !important;
 									<td style="text-align:center">
 									[% IF Data.Search!="*" %]
 										[% IF Data.etat == Data.EnrIDSage && Data.EnrIDSage != NULL%]
-											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement;Search=[% Search %];SearchList=[% SearchList %];StartWindow=[% StartWindow %];StartHit=[% StartHit %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-down"></i>[% Data.CustIDSage | html %]</a>
+											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement;IsTreated=[% IsTreated %];Search=[% Search %];SearchList=[% SearchList %];StartWindow=[% StartWindow %];StartHit=[% StartHit %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-down"></i>[% Data.CustIDSage | html %]</a>
 										[% ELSIF Data.EnrIDSage != NULL %]
-											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement;Subaction=MEP;Search=[% Search %];SearchList=[% SearchList %];EnrID=[% Data.EnrIDSage | uri %];StartWindow=[% StartWindow %];StartHit=[% StartHit %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-right"></i>[% Data.CustIDSage | html %]</a>
+											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement;Subaction=MEP;IsTreated=[% IsTreated %];Search=[% Search %];SearchList=[% SearchList %];EnrID=[% Data.EnrIDSage | uri %];StartWindow=[% StartWindow %];StartHit=[% StartHit %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-right"></i>[% Data.CustIDSage | html %]</a>
 										[% END %]	
 									[% ELSE %]
 										[% IF Data.etat == Data.EnrIDSage && Data.EnrIDSage != NULL%]
-											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-down"></i>[% Data.CustIDSage | html %]</a>
+											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement;IsTreated=[% IsTreated %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-down"></i>[% Data.CustIDSage | html %]</a>
 										[% ELSIF Data.EnrIDSage != NULL %]
-											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement;Subaction=MEP;EnrID=[% Data.EnrIDSage | uri %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-right"></i>[% Data.CustIDSage | html %]</a>
+											<a href="[% Env("Baselink") %]Action=APA_AgentContractManagement;Subaction=MEP;IsTreated=[% IsTreated %];EnrID=[% Data.EnrIDSage | uri %]" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-right"></i>[% Data.CustIDSage | html %]</a>
 										[% END %]	
 									[% END %]
 										
 									</td>
 								</div>
 								<td style="text-align:center"> [% Data.CustIDOtrs | html %]</td>
+								
 								[% IF SageTable=='Abo' %]
 									<td style="text-align:center"><a class="MasterActionLink" href="[% Env("Baselink") %]Action=APA_AboZoom;EnrID=[% Data.EnrIDSage | uri %]">[% Data.AboIntitule | html %]</a></td>
 									[% IF Data.AboDuree > 1 %]
@@ -205,6 +236,7 @@ background-color: #f2f2f2 !important;
 									<td style="text-align:center"> [% Data.AboDateFin | Localize("Date") | html %]</td>
 								[% ELSIF SageTable=='Doc' %]
 										<td style="text-align:center"><a class="MasterActionLink" href="[% Env("Baselink") %]Action=APA_DocZoom;EnrID=[% Data.EnrIDSage | uri %]">[% Data.Caff | html %]</a></td>
+										<td style="text-align:center"> [% Data.Price | html %] €</td>
 										[% IF Data.IsAdmin==1 %]
 											<td style="text-align:center"><input class="updatedate" title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateDebut_[% Data.EnrIDSage %]" maxlength="10" size="10" value="[% Data.AboDateDebut | Localize("Date") | html %]">
 											<td style="text-align:center"><input class="updatedate"  title="[% Translate("Date Format is : ") | html %][% "2017-12-31 00:00:00" | Localize("Date") | html %]" style="text-align:center" type="datetime" id="DateFin_[% Data.EnrIDSage %]" maxlength="10" size="10" value="[% Data.AboDateFin | Localize("Date") | html %]">
@@ -368,6 +400,35 @@ background-color: #f2f2f2 !important;
 
 $('.Avanc').bootstrapSwitch();
 
+$(document).on('change', '#SearchList', function(Event) {
+	var ValueSearch = document.getElementById('Search').value;
+if (this.value==5) {
+		var Data = {
+			Action:	'APA_AgentContractManagement',
+			Subaction:    'AJAXResponsible'
+		};
+		Core.AJAX.FunctionCall(
+			Core.Config.Get('Baselink'),
+			Data,
+			function (data) {
+				$("#Search").remove();
+				var trm = '<select id="Search" name="Search" type="text" value="0">';
+				trm += '<option value="0"> - </option>';
+				for (var i=0; i < data.Responsable.length; i++) {
+					trm += '<option value="'+data.Responsable[i].RespIDTri+'" >'+data.Responsable[i].RespFullName+'</option>';
+				}
+				trm += '</select>';
+				$("#SearchSelect").append(trm); 
+			},
+			'json'
+		);
+	} else {
+		
+		$("#Search").remove(); 
+		$("#SearchSelect").append('<input type="text" id="Search" name="Search" value="'+ValueSearch+'" title="[% Translate("Search") | html %]"/>');
+	}
+});
+							
 $(document).on('change', '.updateselect', function(Event) {
 	var Id = this.id.split("_");
 	var Data = {
@@ -386,7 +447,7 @@ $(document).on('change', '.updateselect', function(Event) {
 			document.getElementById(Obj).setAttribute('title',Title);
 		},
 		'json'
-		);
+	);
 });
 $(document).on('click', '.buttondel', function(Event) {
 	var Id = this.id.split("_");

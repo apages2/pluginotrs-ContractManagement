@@ -1,0 +1,179 @@
+# --
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+[% RenderBlockStart("Overview") %]
+<div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
+    <h1>[% Translate("Manage Chat Channels") | html %]</h1>
+    <div class="SidebarColumn">
+[% RenderBlockStart("ActionList") %]
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("Actions") | html %]</h2>
+            </div>
+            <div class="Content">
+                <ul class="ActionList">
+[% RenderBlockStart("ActionOverview") %]
+                    <li>
+                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Nav=[% Data.Nav | uri %]" class="CallForAction Fullsize Center"><span><i class="fa fa-caret-left"></i>[% Translate("Go to overview") | html %]</span></a>
+                    </li>
+[% RenderBlockEnd("ActionOverview") %]
+[% RenderBlockStart("ActionAdd") %]
+                    <li>
+                        <form action="[% Env("CGIHandle") %]" method="post">
+                            <input type="hidden" name="Action" value="[% Env("Action") %]"/>
+                            <input type="hidden" name="Subaction" value="Add"/>
+                            <input type="hidden" name="Nav" value="[% Data.Nav | html %]"/>
+
+                            <button class="CallForAction Fullsize Center" type="submit">
+                                <span>
+                                    <i class="fa fa-plus-square"></i>
+                                    [% Translate("Add Chat Channel") | html %]
+                                </span>
+                            </button>
+                            <br/>
+                            <label class="InvisibleText" for="Source">[% Translate("Select") | html %]</label>
+                        </form>
+                    </li>
+[% RenderBlockEnd("ActionAdd") %]
+                </ul>
+            </div>
+        </div>
+[% RenderBlockEnd("ActionList") %]
+    </div>
+    <div class="ContentColumn">
+        <div class="WidgetSimple">
+[% RenderBlockStart("OverviewHeader") %]
+            <div class="Header">
+                <h2>[% Translate("List") | html %]</h2>
+            </div>
+[% RenderBlockEnd("OverviewHeader") %]
+[% RenderBlockStart("OverviewResult") %]
+            <div class="Content ">
+                <table class="DataTable" id="ChannelTable">
+                    <thead>
+                        <tr>
+                            <th>[% Translate("Name") | html %]</th>
+                            <th>[% Translate("Group") | html %]</th>
+                            <th>[% Translate("Comment") | html %]</th>
+                            <th>[% Translate("Validity") | html %]</th>
+                            <th>[% Translate("Changed") | html %]</th>
+                            <th>[% Translate("Created") | html %]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+[% RenderBlockStart("NoDataFoundMsg") %]
+                        <tr>
+                            <td colspan="[% Data.ColSpan | html %]">
+                                [% Translate("No data found.") | html %]
+                            </td>
+                        </tr>
+[% RenderBlockEnd("NoDataFoundMsg") %]
+
+[% RenderBlockStart("OverviewResultRow") %]
+                        <tr class="[% Data.RowClass %]">
+[% RenderBlockStart("OverviewResultRowLink") %]
+                            <td><a class="AsBlock" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Change;ID=[% Data.ChatChannelID | uri %]">[% Data.Name | html %]</a></td>
+[% RenderBlockEnd("OverviewResultRowLink") %]
+[% RenderBlockStart("OverviewResultRowLinkNone") %]
+                            <td><a class="AsBlock" href="#">[% Data.Name | html %]</a></td>
+[% RenderBlockEnd("OverviewResultRowLinkNone") %]
+                            <td>[% Data.Group | html %]</td>
+                            <td>[% Data.Comment | html %]</td>
+                            <td>[% Data.Valid | html %]</td>
+                            <td>[% Data.CreateTime | html %]</td>
+                            <td>[% Data.ChangeTime | html %]</td>
+                        </tr>
+[% RenderBlockEnd("OverviewResultRow") %]
+
+                    </tbody>
+                </table>
+            </div>
+[% RenderBlockEnd("OverviewResult") %]
+
+[% RenderBlockStart("OverviewUpdate") %]
+            <div class="Header">
+[% RenderBlockStart("HeaderAdd") %]
+                <h2>[% Translate("Add Chat Channel") | html %]</h2>
+[% RenderBlockEnd("HeaderAdd") %]
+[% RenderBlockStart("HeaderEdit") %]
+                <h2>[% Translate("Edit Chat Channel") | html %]</h2>
+[% RenderBlockEnd("HeaderEdit") %]
+            </div>
+
+            <div class="Content">
+                <form action="[% Env("CGIHandle") %]" enctype="multipart/form-data" method="post" name="compose" class="Validate PreventMultipleSubmits">
+                    <input type="hidden" name="Action" value="[% Env("Action") %]"/>
+                    <input type="hidden" name="Subaction" value="[% Data.Action | html %]Action"/>
+                    <input type="hidden" name="ID" value="[% Data.ID | html %]"/>
+                    <input type="hidden" name="Source" value="[% Data.Source | html %]"/>
+                    <input type="hidden" name="Nav" value="[% Data.Nav | html %]"/>
+                    <fieldset class="TableLike">
+                        <label class="Mandatory" for="Name">
+                            <span class="Marker">*</span>[% Translate('Name') | html %]:
+                        </label>
+                        <div class="Field">
+                            <input type="text" id="Name" name="Name" class="W50pc Mandatory Validate_Required" value="[% Data.Name | html %]" [% Data.ReadOnlyName | html %]/>
+                            <div class="TooltipErrorMessage" id="NameError">
+                                <p>[% Translate("This field is required") | html %].</p>
+                            </div>
+                            <div id="NameServerError" class="TooltipErrorMessage">
+                                <p>[% Translate("Name invalid") | html %]</p>
+                            </div>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label class="Mandatory" for="GroupID">
+                            <span class="Marker">*</span>[% Translate("Group") | html %]:
+                        </label>
+                        <div class="Field">
+                            [% Data.GroupOption %]
+                            <div class="TooltipErrorMessage" id="GroupIDError">
+                                <p>[% Translate("This field is required") | html %].</p>
+                            </div>
+                            <div id="GroupIDServerError" class="TooltipErrorMessage"><p>[% Translate("Need Group") | html %]</p></div>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label class="Mandatory" for="Valid">
+                            <span class="Marker">*</span>[% Translate("Valid") | html %]:
+                        </label>
+                        <div class="Field">
+                            [% Data.Valid %]
+                            <div class="TooltipErrorMessage" id="ValidError">
+                                <p>[% Translate("This field is required") | html %].</p>
+                            </div>
+                            <div id="ValidServerError" class="TooltipErrorMessage"><p>[% Translate("Need Valid") | html %]</p></div>
+                        </div>
+                        <div class="Clear"></div>
+                        <label class="" for="Comment">
+                            [% Translate("Comment") | html %]:
+                        </label>
+                        <div class="Field">
+                            <input type="text" id="Comment" name="Comment" class="W50pc " value="[% Data.Comment | html %]" />
+                            <div id="CommentServerError" class="TooltipErrorMessage">
+                                <p>[% Translate("Comment invalid") | html %]</p>
+                            </div>
+                        </div>
+                        <div class="Clear"></div>
+                        <div class="Field SpacingTop">
+                            <button class="Primary CallForAction" type="submit" value="[% Translate("Submit") | html %]">
+                                <span>[% Translate("Submit") | html %]</span>
+                            </button>
+                            [% Translate("or") | html %]
+                            <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Nav=[% Data.Nav | uri %]">[% Translate("Cancel") | html %]</a>
+                        </div>
+                        <div class="Clear"></div>
+                    </fieldset>
+                </form>
+            </div>
+[% RenderBlockEnd("OverviewUpdate") %]
+        </div>
+    </div>
+    <div class="Clear"></div>
+</div>
+[% RenderBlockEnd("Overview") %]

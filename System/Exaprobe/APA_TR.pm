@@ -223,6 +223,7 @@ sub DelTR {
 
 sub SaveTR {
 
+	use POSIX qw(strftime); 
 	my ( $Self, %Param ) = @_;
 	
 	# check needed stuff
@@ -301,12 +302,12 @@ sub SaveTR {
 	} else {
 		$Datef = $DateFin;
 	}
-		
-	my $Addrow  = "INSERT INTO APA_TR (TR_CustID, TR_Caff, TR_Type, TR_Option1, TR_Option2, TR_Perimetre, TR_Description, TR_DateDebut, TR_DateFin, TR_Commentaire, TR_Option3, TR_Option4) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+	my $createtime=strftime "%Y-%m-%d", localtime;	
+	my $Addrow  = "INSERT INTO APA_TR (TR_CustID, TR_Caff, TR_Type, TR_Option1, TR_Option2, TR_Perimetre, TR_Description, TR_DateDebut, TR_DateFin, TR_Commentaire, TR_Option3, TR_Option4, create_time, create_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	
 	$Self->{DBObjectotrs}->Prepare(
 				SQL   => $Addrow,
-				Bind => [\$Customer,\$Caff,\$Type,\$Option1,\$Option2,\$Perimeter,\$Description,\$Dated,\$Datef,\$Commentaire,\$Option3,\$Option4],
+				Bind => [\$Customer,\$Caff,\$Type,\$Option1,\$Option2,\$Perimeter,\$Description,\$Dated,\$Datef,\$Commentaire,\$Option3,\$Option4,\$createtime, \$UserID],
 		);
 	
 	my $CheckID = "SELECT LAST_INSERT_ID()";
@@ -512,10 +513,10 @@ sub ApplyTR {
 		$Dated = $DateDebut;
 	}
 
-	$Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  =>"$Dated:$TR_ID",
-    );
+	# $Kernel::OM->Get('Kernel::System::Log')->Log(
+            # Priority => 'error',
+            # Message  =>"$Dated:$TR_ID",
+    # );
 	
 	
 	my $Datef;
@@ -553,12 +554,12 @@ sub ApplyTR {
 	} elsif ($Type eq 'CONCIERGERIE') {
 			$Type='SO_COG-UO-6';
 	}
-	
-	my $Updaterow  = "UPDATE APA_TR SET TR_Caff=?, TR_Type=?, TR_Option1=?, TR_Option2=?, TR_Perimetre=?, TR_Description=?, TR_DateDebut=?, TR_DateFin=?, TR_Commentaire=?, TR_Option3=?, TR_Option4=? WHERE TR_ID=?";
+	my $changetime=strftime "%Y-%m-%d", localtime;
+	my $Updaterow  = "UPDATE APA_TR SET TR_Caff=?, TR_Type=?, TR_Option1=?, TR_Option2=?, TR_Perimetre=?, TR_Description=?, TR_DateDebut=?, TR_DateFin=?, TR_Commentaire=?, TR_Option3=?, TR_Option4=?, change_time=?, change_by=? WHERE TR_ID=?";
 	
 	$Self->{DBObjectotrs}->Prepare(
 				SQL   => $Updaterow,
-				Bind => [\$Caff,\$Type,\$Option1,\$Option2,\$Perimeter,\$Description,\$Dated,\$Datef,\$Commentaire,\$Option3,\$Option4,\$TR_ID],
+				Bind => [\$Caff,\$Type,\$Option1,\$Option2,\$Perimeter,\$Description,\$Dated,\$Datef,\$Commentaire,\$Option3,\$Option4, \$changetime, \$UserID,\$TR_ID],
 		);
 	
 	my $JSONString = $LayoutObject->JSONEncode(

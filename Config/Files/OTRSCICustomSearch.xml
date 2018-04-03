@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otrs_config version="1.0" init="Config">
+    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemCustomSearch" Required="0" Valid="1">
+        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
+        <Group>OTRSCICustomSearch</Group>
+        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+        <Setting>
+            <FrontendModuleReg>
+                <GroupRo>itsm-configitem</GroupRo>
+                <Description>Search Config Items (Custom)</Description>
+                <Title>Search</Title>
+                <NavBarName>Config Item</NavBarName>
+                <NavBar>
+                    <Description>Search Config Items (Custom)</Description>
+                    <Name>Search (Custom)</Name>
+                    <Link>Action=AgentITSMConfigItemCustomSearch</Link>
+                    <NavBar>Config Item</NavBar>
+                    <Type></Type>
+                    <Block></Block>
+                    <AccessKey></AccessKey>
+                    <Prio>350</Prio>
+                </NavBar>
+                <Loader>
+                    <CSS>ITSM.Agent.Detail.css</CSS>
+                    <CSS>ITSM.Table.css</CSS>
+                    <CSS>ITSM.Print.css</CSS>
+                    <JavaScript>thirdparty/jquery-tablesorter-2.0.5/jquery.tablesorter.js</JavaScript>
+                    <JavaScript>Core.UI.Table.Sort.js</JavaScript>
+                    <JavaScript>ITSM.Agent.Zoom.js</JavaScript>
+                </Loader>
+            </FrontendModuleReg>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="ITSMConfigItem::CustomSearchXMLFields" Required="1" Valid="1">
+        <Description Translatable="1">Defines the shown xml search fields for the custom CI search. Example (Owner, NIC::IPAddress, etc.).</Description>
+        <Group>OTRSCICustomSearch</Group>
+        <SubGroup>Frontend::Agent::ViewConfigItemSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Owner">1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</otrs_config>

@@ -1,0 +1,74 @@
+# --
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+[% RenderBlockStart("AcceptAJAX") %]
+<div class="InnerContent">
+    <form action="[% Env("CGIHandle") %]" method="post" id="ChatPreviewForm">
+        <input type="hidden" name="FromChatID" value="[% Data.FromChatID | html %]" id="FromChatID"/>
+        <fieldset class="TableLike">
+            <legend>[% Translate("Chat protocol") | html %]</legend>
+            <br/>
+[% RenderBlockStart("ChatProtocol") %]
+            <div>
+[% INCLUDE "ChatDisplay.tt" %]
+                <br/>
+            </div>
+[% RenderBlockEnd("ChatProtocol") %]
+            <br/>
+            <div class="Clear"></div>
+        </fieldset>
+[% RenderBlockStart("ChatChannelChange") %]
+        <fieldset class="TableLike" id="ChangeChannelData">
+            <legend>[% Translate("Change chat channel") | html %]</legend>
+            <label>[% Translate("Current chat channel") %]:</label>
+            <div class="Field">
+                <span>[% Data.Channel | html %]</span>
+            </div>
+            <div class="Clear"></div>
+
+            <label>[% Translate("Available channels") | html %]:</label>
+            <div class="Field">
+                [% Data.ChatChannels %]
+                <a class="Reload" id="ReloadAvailableChannels" href="#" title="[% Translate("Reload") | html %]">
+                    <i class="fa fa-refresh"></i>
+                    <span class="InvisibleText">[% Translate("Reload") | html %]</span>
+                </a>
+                <span id="AJAXLoaderReload" class="AJAXLoader" style="display:none;"></span>
+            </div>
+            <div class="Clear"></div>
+        </fieldset>
+[% RenderBlockEnd("ChatChannelChange") %]
+    </form>
+</div>
+
+<div class="ContentFooter Center">
+[% RenderBlockStart("ChannelUpdate") %]
+    <button id="UpdateChatChannel" class="Primary CallForAction" value="[% Translate("Update Channel") | html %]">
+        <span>[% Translate("Update Channel") | html %]</span>
+    </button>
+[% RenderBlockEnd("ChannelUpdate") %]
+[% RenderBlockStart("AcceptChat") %]
+    <button id="ChatRequestAccept" class="Primary CallForAction" value="[% Translate("Accept") | html %]">
+        <span>[% Translate("Accept") | html %]</span>
+    </button>
+[% RenderBlockEnd("AcceptChat") %]
+[% RenderBlockStart("Decline") %]
+    <button id="ChatRequestDecline" class="Primary CallForAction" value="[% Data.FromChatID | html %]" >
+        <span>[% Translate("Decline") | html %]</span>
+    </button>
+[% RenderBlockEnd("Decline") %]
+    <button id="Cancel" class="Primary CallForAction" value="[% Translate("Cancel") | html %]">
+        <span>[% Translate("Cancel") | html %]</span>
+    </button>
+</div>
+
+<script type="text/javascript">//<![CDATA[
+    Core.Agent.Chat.InitChatPreview();
+//]]></script>
+
+[% RenderBlockEnd("AcceptAJAX") %]

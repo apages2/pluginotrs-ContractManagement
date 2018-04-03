@@ -1,0 +1,45 @@
+# --
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+# Timeline view
+[% Translate("Ticket Created") | html %]
+[% Translate("Note Added") | html %]
+[% Translate("Note Added (Customer)") | html %]
+[% Translate("Outgoing Email") | html %]
+[% Translate("Incoming Customer Email") | html %]
+[% Translate("Dynamic Field Updated") | html %]
+[% Translate("Outgoing Phone Call") | html %]
+[% Translate("Incoming Phone Call") | html %]
+[% Translate("Outgoing Answer") | html %]
+[% Translate("New Responsible") | html %]
+[% Translate("New Owner") | html %]
+[% Translate("SLA Updated") | html %]
+[% Translate("Service Updated") | html %]
+[% Translate("Customer Updated") | html %]
+[% Translate("State Updated") | html %]
+[% Translate("Incoming Follow-Up") | html %]
+[% Translate("Escalation Update Time Stopped") | html %]
+[% Translate("Escalation Solution Time Stopped") | html %]
+[% Translate("Escalation First Response Time Stopped") | html %]
+[% Translate("Escalation Response Time Stopped") | html %]
+[% Translate("Link Added") | html %]
+[% Translate("Link Deleted") | html %]
+[% Translate("Ticket Merged") | html %]
+[% Translate("Pending Time Set") | html %]
+[% Translate("Ticket Locked") | html %]
+[% Translate("Ticket Unlocked") | html %]
+[% Translate("Queue Updated") | html %]
+[% Translate("Priority Updated") | html %]
+[% Translate("Title Updated") | html %]
+[% Translate("Type Updated") | html %]
+[% Translate("Incoming Web Request") | html %]
+[% Translate("Automatic Follow-Up Sent") | html %]
+[% Translate("Automatic Reply Sent") | html %]
+[% Translate("Time Accounted") | html %]
+[% Translate("External Chat") | html %]
+[% Translate("Internal Chat") | html %]

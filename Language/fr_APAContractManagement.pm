@@ -28,9 +28,11 @@ sub Data {
 	$Self->{Translation}->{'Starting Date ='} = 'Date de Démarrage =';
 	$Self->{Translation}->{'Starting Date >='} = 'Date de Démarrage >=';
 	$Self->{Translation}->{'Starting Date <='} = 'Date de Démarrage <=';
+	$Self->{Translation}->{'Starting Date Between'} = 'Date de Démarrage Comprise Entre';
 	$Self->{Translation}->{'Entry Date ='} = 'Date de Saisie =';
 	$Self->{Translation}->{'Entry Date >='} = 'Date de Saisie >=';
 	$Self->{Translation}->{'Entry Date <='} = 'Date de Saisie <=';
+	$Self->{Translation}->{'Entry Date Between'} = 'Date de Saisie Comprise Entre';
 	$Self->{Translation}->{'End Date'} = 'Date de Fin';
 	$Self->{Translation}->{'Entry Date'} = 'Date de Saisie';
 	$Self->{Translation}->{'Wildcards like \'*\' are allowed. Date Format is YYYY-MM-DD'} = 'Les jokers comme \'*\' sont autorisés. Le format des dates est YYYY-MM-DD';
@@ -73,6 +75,7 @@ sub Data {
 	$Self->{Translation}->{'Perimeter'} = 'Perimetre';
 	$Self->{Translation}->{'Reporting'} = 'Rapport';
 	$Self->{Translation}->{'Contracts Subscribed'} = 'Contrats Souscrits';
+	$Self->{Translation}->{' Search in finished MEP'} = ' Rechercher dans les MEP terminées';
 		
 	#AboZoomContractManagement
 	$Self->{Translation}->{'Contract'} = 'Contrat';

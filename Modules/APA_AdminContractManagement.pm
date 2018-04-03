@@ -37,15 +37,16 @@ sub Run {
 
 	my $ContractManagement = $Kernel::OM->Get('Kernel::System::Exaprobe::APA_AdminContractManagement');
 	my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+	my $UserID=$Self->{UserID};
 	my $Output;
 	
 	if ($Self->{DocorAbo} eq 'Doc') {
 		if ( $Self->{Subaction} eq 'AJAXUpdate' ) {
-			$Output .= $ContractManagement->UpdatefollowDoc();
+			$Output .= $ContractManagement->UpdatefollowDoc(UserID => $UserID);
 		}
 		
 		elsif ( $Self->{Subaction} eq 'AJAXUpdateSelect' ) {
-			$Output .= $ContractManagement->UpdateselectDoc();
+			$Output .= $ContractManagement->UpdateselectDoc(UserID => $UserID);
 		}
 		
 		elsif ( $Self->{Subaction} eq 'ViewAll' ) {
@@ -75,11 +76,11 @@ sub Run {
 	} elsif ($Self->{DocorAbo} eq 'Abo') {
 		
 		if ( $Self->{Subaction} eq 'AJAXUpdate' ) {
-			$Output .= $ContractManagement->UpdatefollowAbo();
+			$Output .= $ContractManagement->UpdatefollowAbo(UserID => $UserID);
 		}
 		
 		elsif ( $Self->{Subaction} eq 'AJAXUpdateSelect' ) {
-			$Output .= $ContractManagement->UpdateselectAbo();
+			$Output .= $ContractManagement->UpdateselectAbo(UserID => $UserID);
 		}
 		
 		elsif ( $Self->{Subaction} eq 'ViewAll' ) {

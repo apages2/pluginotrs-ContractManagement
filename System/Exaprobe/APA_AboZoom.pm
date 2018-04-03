@@ -418,7 +418,7 @@ sub AddTR {
 sub TRCancel {
 
 	my ( $Self, %Param ) = @_;
-			
+		
 	my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
 	my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
 	
@@ -441,7 +441,7 @@ sub TRCancel {
 sub SaveTR {
 
 	my ( $Self, %Param ) = @_;
-	
+	use POSIX qw(strftime);
 	# check needed stuff
     if ( !$Param{UserID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -528,11 +528,12 @@ sub SaveTR {
 		$Datef = $DateFin;
 	}
 	
-	my $Addrow  = "INSERT INTO APA_TR (TR_CustID, TR_Caff, TR_Type, TR_Option1, TR_Option2, TR_Perimetre, TR_Description, TR_DateDebut, TR_DateFin, TR_Commentaire, TR_Sage_Ligne, TR_IC, TR_Montant, TR_EnrIDSage, TR_Type_Sage, TR_Option3, TR_Option4) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+	my $createtime=strftime "%Y-%m-%d", localtime;
+	my $Addrow  = "INSERT INTO APA_TR (TR_CustID, TR_Caff, TR_Type, TR_Option1, TR_Option2, TR_Perimetre, TR_Description, TR_DateDebut, TR_DateFin, TR_Commentaire, TR_Sage_Ligne, TR_IC, TR_Montant, TR_EnrIDSage, TR_Type_Sage, TR_Option3, TR_Option4, create_time, create_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	
 	$Self->{DBObjectotrs}->Prepare(
 				SQL   => $Addrow,
-				Bind => [\$Customer,\$Caff,\$Type,\$Option1,\$Option2,\$Perimeter,\$Description,\$Dated,\$Datef,\$Commentaire,\$TR_Ligne,\$IC,\$Montant,\$TR_ID,\$Type_Sage,\$Option3,\$Option4],
+				Bind => [\$Customer,\$Caff,\$Type,\$Option1,\$Option2,\$Perimeter,\$Description,\$Dated,\$Datef,\$Commentaire,\$TR_Ligne,\$IC,\$Montant,\$TR_ID,\$Type_Sage,\$Option3,\$Option4, \$createtime, \$UserID],
 		);
 		
 	if ($Type eq 'SO_COG-UO-1' || $Type eq 'SO_COG-UO-2' || $Type eq 'SO_COG-UO-3' || $Type eq 'SO_COG-UO-4' || $Type eq 'SO_COG-UO-5' || $Type eq 'SO_COG-UO-6') {
@@ -917,11 +918,12 @@ sub ApplyTR {
 		$Datef = $DateFin;
 	}
 	
-	my $Addrow  = "UPDATE APA_TR set TR_CustID=?, TR_Caff=?, TR_Type=?, TR_Option1=?, TR_Option2=?, TR_Perimetre=?, TR_Description=?, TR_DateDebut=?, TR_DateFin=?, TR_Commentaire=?, TR_IC=?, TR_Montant=?, TR_Type_Sage=?, TR_Option3=?, TR_Option4=?  WHERE TR_EnrIDSage=? AND TR_Sage_Ligne=?";
+	my $changetime=strftime "%Y-%m-%d", localtime;
+	my $Addrow  = "UPDATE APA_TR set TR_CustID=?, TR_Caff=?, TR_Type=?, TR_Option1=?, TR_Option2=?, TR_Perimetre=?, TR_Description=?, TR_DateDebut=?, TR_DateFin=?, TR_Commentaire=?, TR_IC=?, TR_Montant=?, TR_Type_Sage=?, TR_Option3=?, TR_Option4=?, change_time=?, change_by=?  WHERE TR_EnrIDSage=? AND TR_Sage_Ligne=?";
 	
 	$Self->{DBObjectotrs}->Prepare(
 				SQL   => $Addrow,
-				Bind => [\$Customer,\$Caff,\$Type,\$Option1,\$Option2,\$Perimeter,\$Description,\$Dated,\$Datef,\$Commentaire,\$IC,\$Montant,\$Type_Sage,\$Option3,\$Option4,\$TR_ID,\$TR_Ligne],
+				Bind => [\$Customer,\$Caff,\$Type,\$Option1,\$Option2,\$Perimeter,\$Description,\$Dated,\$Datef,\$Commentaire,\$IC,\$Montant,\$Type_Sage,\$Option3,\$Option4,\$changetime, \$UserID,\$TR_ID,\$TR_Ligne],
 		);
 		
 	

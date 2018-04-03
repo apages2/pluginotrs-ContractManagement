@@ -1,0 +1,228 @@
+# --
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+<div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
+    <h1>[% Translate("Cloud Service Management") | html %] » [% Translate("SMS (Short Message Service)") | html %]</h1>
+
+    <div class="Clear"></div>
+
+    <div class="SidebarColumn">
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("Actions") | html %]</h2>
+            </div>
+            <div class="Content">
+                <ul class="ActionList">
+                    <li>
+                        <a href="[% Env("Baselink") %]Action=AdminCloudServices" class="CallForAction Fullsize Center"><span><i class="fa fa-caret-left"></i>[% Translate("Go to overview") | html %]</span></a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("Cloud service status") | html %]</h2>
+            </div>
+            <div class="Content">
+[% RenderBlockStart("SuccessCheck") %]
+                <p class="FieldExplanation">
+                    <strong>[% Translate("Cloud service availability") | html %]:</strong> [% Data.CloudServiceCheckMessage | html %]
+                </p>
+                <p class="FieldExplanation">
+                    <strong>[% Translate("Remaining SMS units") | html %]:</strong> [% Data.AvailableSMS | html %]
+                </p>
+[% RenderBlockEnd("SuccessCheck") %]
+[% RenderBlockStart("NoSuccessCheck") %]
+                <p class="FieldExplanation">
+                    <strong> [% Translate("Is currently not possible to check the state for this cloud service.") | html %] </strong>
+                </p>
+[% RenderBlockEnd("NoSuccessCheck") %]
+            </div>
+        </div>
+    </div>
+    <div class="ContentColumn">
+[% RenderBlockStart("Details") %]
+        <form action="[% Env("CGIHandle") %]" method="post" class="Validate PreventMultipleSubmits">
+            <input type="hidden" name="Action" value="[% Env("Action") %]"/>
+            <input type="hidden" name="Subaction" value="[% Data.Action | html %]Action"/>
+            <input type="hidden" name="CloudServiceID" value="[% Data.CloudServiceID | html %]" id="CloudServiceID"/>
+            <input type="hidden" name="CloudServiceName" value="[% Data.CloudServiceName | html %]" id="CloudServiceName"/>
+            <div class="WidgetSimple">
+                <div class="Header">
+                    <h2>[% Translate("Configuration") | html %]</h2>
+                </div>
+                <div class="Content">
+                    <fieldset class="TableLike">
+                        <label for="Name">[% Translate("Name") | html %]:</label>
+                        <div class="Field">
+                            [% Data.CloudServiceName | html %]
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label class="Mandatory" for="AgentPhoneField"><span class="Marker">*</span> [% Translate("Phone field for agent") | html %]:</label>
+                        <div class="Field">
+                            <input type="text" name="AgentPhoneField" id="AgentPhoneField" value="[% Data.Config.AgentPhoneField | html %]" class="Validate_Required W50pc [% Data.AgentPhoneFieldServerError %]"/>
+                            <p class="FieldExplanation">
+                                [% Translate("Agent data field from which the mobile phone number for sending messages via SMS should be taken.") | html %]
+                            </p>
+                            <div id="AgentPhoneFieldError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                            <div id="AgentPhoneFieldServerError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label class="Mandatory" for="CustomerPhoneField"><span class="Marker">*</span> [% Translate("Phone field for customer") | html %]:</label>
+                        <div class="Field">
+                            <input type="text" name="CustomerPhoneField" id="CustomerPhoneField" value="[% Data.Config.CustomerPhoneField | html %]" class="Validate_Required W50pc [% Data.CustomerPhoneFieldServerError %]"/>
+                            <p class="FieldExplanation">
+                                [% Translate("Customer data field from which the mobile phone number for sending messages via SMS should be taken.") | html %]
+                            </p>
+                            <div id="CustomerPhoneFieldError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                            <div id="CustomerPhoneFieldServerError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label class="Mandatory" for="SenderString"><span class="Marker">*</span> [% Translate("Sender string") | html %]:</label>
+                        <div class="Field">
+                            <input type="text" maxlength="11" name="SenderString" id="SenderString" value="[% Data.Config.SenderString | html %]" class="Validate_Required W50pc [% Data.SenderStringServerError %]"/>
+                            <p class="FieldExplanation">
+                                [% Translate("Will be shown as sender name of the SMS (Not longer than 11 characters).") | html %]
+                            </p>
+                            <div id="SenderStringError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required and must be not longer than 11 characters.") | html %]</p>
+                            </div>
+                            <div id="SenderStringServerError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required and must be not longer than 11 characters.") | html %]</p>
+                            </div>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label for="RecipientRoles">[% Translate("Allowed role members") | html %]: </label>
+                        <div class="Field">
+                            [% Data.AllowedRolesStrg %]
+                            <p class="FieldExplanation">
+                                [% Translate("If selected, only users assigned to these roles will be able to receive messages via SMS (optional).") | html %]
+                            </p>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label for="Comment">[% Translate("Comment") | html %]:</label>
+                        <div class="Field">
+                            <input id="Comment" class="W50pc HideTrigger" type="text" maxlength="250" value="[% Data.Config.Comment | html %]" name="Comment"/>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label for="ValidID">[% Translate("Validity") | html %]:</label>
+                        <div class="Field">
+                            [% Data.ValidtyStrg %]
+                        </div>
+                        <div class="Clear"></div>
+
+                    [% IF Data.Action == 'Add' %]
+                        <div class="Field" id="DataProtectionRegulationsField">
+                            <input id="DataProtectionRegulations" name="DataProtectionRegulations" value="Accept" type="checkbox" class="Validate_Required [% Data.DataProtectionRegulationsServerError %]" />
+                            <label for="DataProtectionRegulations" class="Mandatory" style="max-width:380px; display: inline-block; vertical-align: top;">
+                            [% IF Env("UserLanguage") == 'de' %]
+                                Hiermit versichere ich, dass ich den <a href="#" id="DataProtectionRegulationsLink">Hinweis zum Datenschutz</a> verstanden und akzeptiert habe, um den SMS-Versand der OTRS AG nutzen zu können.
+                            [% ELSE %]
+                                In order to be able to use the SMS transmission feature of the OTRS AG, I hereby declare that I have read and understood the <a href="#" id="DataProtectionRegulationsLink">Data Protection Information</a>.
+                            [% END %]
+                            <div id="DataProtectionRegulationsError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                            <div id="DataProtectionRegulationsServerError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                        </div>
+                        <div class="Clear"></div>
+                    [% END %]
+
+                        <div class="Field SpacingTop">
+                            <button type="submit" id="Submit" class="Primary CallForAction" value="[% Translate("Save configuration") | html %]"><span>[% Translate("Save") | html %]</span></button>
+                            [% Translate("or") | html %]
+                            <a href="[% Env("Baselink") %]Action=AdminCloudServices">[% Translate("Cancel") | html %]</a>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <div id="DataProtectionRegulationsDialog" class="Hidden">
+                            <div class="TextDialog">
+                            [% IF Env("UserLanguage") == 'de' %]
+                                <p>
+                                    Sehr geehrter <strong>OTRS Business Solution</strong>™-Nutzer,
+                                </p>
+                                <p>
+                                    um unseren SMS-Versand nutzen zu können, sind wir gesetzlich verpflichtet Sie darüber zu informieren, dass wir diesen Service an einen externen Cloud-Dienstleister ausgelagert haben, damit eine stabile Verfügbarkeit garantiert werden kann. Um Ihnen diesen Service zu ermöglichen und Ihnen bei Klärungsbedarf zuverlässig Auskunft über dessen Nutzung zu geben, verarbeiten und speichern wir, die OTRS AG, folgende Daten datenschutzkonform in einer Datenbank:
+                                </p>
+                                <ul>
+                                    <li>Datum/Uhrzeit</li>
+                                    <li>Kundenfirma (nicht personenbezogene Daten)</li>
+                                    <li>System</li>
+                                    <li>SMS-Zielnummer</li>
+                                    <li>Nachrichtentext</li>
+                                    <li>Anzahl der SMS, die für diesen Nachrichtentext benötigt wurde</li>
+                                </ul>
+                                <p>
+                                    Wir garantieren, dass diese Daten einzig und allein an den für diesen Service zuständigen Cloud-Dienstleister und keinem anderen Drittanbieter übermittelt werden, um Ihnen diesen Service zu ermöglichen. Der Cloud-Dienstleister nutzt Rechenzentren, die nach ISO/IEC 27001 zertifiziert sind und es liegen von beiden Vertragspartnern unterzeichnete TOMs gemäß § 9 / 11 BDSG vor.
+                                </p>
+                            [% ELSE %]
+                                <p>
+                                    Dear user of the <strong>OTRS Business Solution</strong>™,
+                                </p>
+                                <p>
+                                    Before you can start using the SMS transmission feature, we are bound by law to inform you that we have outsourced this service to an external cloud service provider to ensure its overall stability and availability. In order to be able to offer this service and to be able to provide you with all information needed in case of clarification, the OTRS AG processes and stores the following data within a database in line with data protection regulations:
+                                </p>
+                                <ul>
+                                    <li>Date/Time</li>
+                                    <li>Customer company (non-personal data)</li>
+                                    <li>System</li>
+                                    <li>SMS target phone number</li>
+                                    <li>Message text</li>
+                                    <li>Amount of SMS units which have been used in order to send this particular message</li>
+                                </ul>
+                                <p>
+                                    Hereby we ensure, that this data is solely transferred to the cloud service company responsible for providing this service and to no other third-party supplier. This cloud service company is operating datacenters certified to ISO/IEC 27001 and both contractual partners have signed TOMs (technical and organisational measures) according to the German National Law (§ 9 / 11 BDSG).
+                                </p>
+                            [% END %]
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+        </form>
+
+[% RenderBlockEnd("Details") %]
+    </div>
+    <div class="Clear"></div>
+</div>
+
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">//<![CDATA[
+// show a text dialog on click of the 'read' link
+$('#DataProtectionRegulationsLink').bind('click', function() {
+    Core.UI.Dialog.ShowDialog({
+        Modal: true,
+        Title: [% Translate("Data Protection Information") | JSON %],
+        HTML: $('#DataProtectionRegulationsDialog').html(),
+        PositionTop: '10px',
+        PositionLeft: 'Center',
+        CloseOnEscape: true,
+        CloseOnClickOutside: true
+    });
+    return false;
+});
+//]]></script>
+[% END %]

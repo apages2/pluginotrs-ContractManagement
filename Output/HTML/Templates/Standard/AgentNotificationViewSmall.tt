@@ -1,0 +1,338 @@
+# --
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+[% RenderBlockStart("DocumentActionRow") %]
+<ul class="Actions">
+[% RenderBlockStart("DocumentActionRowBulk") %]
+    <li id="BulkAction" class="AlwaysPresent Inactive [% Data.CSS | html %]"><a href="#">[% Translate(Data.Name) | html %]</a></li>
+[% RenderBlockEnd("DocumentActionRowBulk") %]
+
+[% RenderBlockStart("DocumentActionRowLastColumnFilter") %]
+    <li class=""><a href="[% Env("Baselink") %]Action=[% Env("Action") %];DeleteFilters=DeleteFilters">[% Translate("Reset overview") | html %]</a></li>
+[% RenderBlockEnd("DocumentActionRowLastColumnFilter") %]
+
+[% RenderBlockStart("DocumentActionRowItem") %]
+    <li class="[% Data.CSS | html %]"><a href="#">[% Translate(Data.Name) | html %]</a></li>
+[% RenderBlockEnd("DocumentActionRowItem") %]
+</ul>
+[% RenderBlockEnd("DocumentActionRow") %]
+
+[% RenderBlockStart("DocumentContent") %]
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">//<![CDATA[
+    $('.ColumnFilter').bind('change', function (Event) {
+        var URL, ColumnFilter, NewColumnFilterStrg, MyRegEx, SessionInformation;
+
+        // define variables
+        URL = Core.Config.Get('Baselink') + 'Action=' + '[% Env("Action") %]' + ';[% Data.LinkPage %]';
+        SessionInformation = Core.App.GetSessionInformation();
+        $.each(SessionInformation, function (Key, Value) {
+            URL += encodeURIComponent(Key) + '=' + encodeURIComponent(Value) + ';';
+        });
+        ColumnFilter = $(this)[0].name;
+        NewColumnFilterStrg = $(this)[0].name + '=' + $(this).val() + ';';
+        MyRegEx = new  RegExp(ColumnFilter+"=[^;]*;");
+
+        // check for already set parameter and replace
+        if (URL.match(MyRegEx)) {
+            URL = URL.replace(MyRegEx, NewColumnFilterStrg);
+        }
+
+        // otherwise add the new column filter
+        else {
+            URL = URL + NewColumnFilterStrg;
+        }
+
+        // redirect
+        window.location.href =  URL;
+    });
+//]]></script>
+[% END %]
+
+<div id="OverviewBody" class="Overview TicketList">
+[% RenderBlockStart("NoNotificationFound") %]
+    <div id="EmptyMessageSmall">
+        [% Translate("No notification data found.") | html %]
+    </div>
+[% RenderBlockEnd("NoNotificationFound") %]
+    <form action="[% Env("CGIHandle") %]" method="post" enctype="multipart/form-data" name="matrix">
+        <input type="hidden" name="LastColumnFilter" id="LastColumnFilter" value="[% Data.LastColumnFilter | html %]"/>
+[% RenderBlockStart("OverviewTable") %]
+        <table class="TableSmall NoCellspacing">
+[% RenderBlockStart("TableHeader") %]
+            <thead>
+                <tr>
+
+[% RenderBlockStart("GeneralOverviewHeader") %]
+
+[% RenderBlockStart("BulkNavBar") %]
+                    <th class="Checkbox">
+                        <input type="checkbox" class="Checkbox" title="[% Translate("Select all") | html %]" id="SelectAllNotifications" autocomplete="off" />
+                    </th>
+[% RenderBlockEnd("BulkNavBar") %]
+[% RenderBlockStart("OverviewNavBarPageFlag") %]
+                    <th class="OverviewHeader [% Data.CSS | html %]">
+[% RenderBlockStart("OverviewNavBarPageFlagLink") %]
+                        <a name="OverviewControl" href="[% Env("Baselink") %]Action=[% Env("Action") %];[% Data.LinkSort %];SortBy=[% Data.Name | uri %];OrderBy=[% Data.OrderBy | uri %]" title="[% Translate(Data.Title) | html %]">
+                            <em class="PrintOnly">[% Translate(Data.Title) %]</em>
+                        </a>
+[% RenderBlockEnd("OverviewNavBarPageFlagLink") %]
+[% RenderBlockStart("OverviewNavBarPageFlagEmpty") %]
+                        <span title="[% Translate(Data.Name) | html %]">
+                            <em class="PrintOnly">[% Translate(Data.Name) %]</em>
+                        </span>
+[% RenderBlockEnd("OverviewNavBarPageFlagEmpty") %]
+                    </th>
+[% RenderBlockEnd("OverviewNavBarPageFlag") %]
+
+[% RenderBlockStart("OverviewNavBarPageNotificationHeader") %]
+[% RenderBlockStart("OverviewNavBarPageName") %]
+                    <th class="OverviewHeader [% Data.CSS | html %]">
+                        <a href="#" class="ColumnSettingsTrigger" title="[% Data.FilterTitle | html %]">
+                            <i class="fa fa-filter"></i>
+                        </a>
+                        <div class="ColumnSettingsContainer DontPrint">
+                            <div class="ColumnSettingsBox">
+                                [% Data.ColumnFilterStrg %]
+                            </div>
+                        </div>
+                        <a name="OverviewControl" href="[% Env("Baselink") %]Action=[% Env("Action") %];[% Data.LinkSort %];SortBy=Name;OrderBy=[% Data.OrderBy | uri %]" title="[% Translate(Data.Title) | html %]">[% Translate("Name") %]</a>
+                    </th>
+[% RenderBlockEnd("OverviewNavBarPageName") %]
+[% RenderBlockStart("OverviewNavBarPageObjectReference") %]
+                    <th class="OverviewHeader [% Data.CSS | html %]">
+                        <a href="#" class="ColumnSettingsTrigger" title="[% Data.FilterTitle | html %]">
+                            <i class="fa fa-filter"></i>
+                        </a>
+                        <div class="ColumnSettingsContainer DontPrint">
+                            <div class="ColumnSettingsBox">
+                                [% Data.ColumnFilterStrg %]
+                            </div>
+                        </div>
+                        <a name="OverviewControl" href="[% Env("Baselink") %]Action=[% Env("Action") %];[% Data.LinkSort %];SortBy=ObjectReference;OrderBy=[% Data.OrderBy | uri %]" title="[% Translate("Related To") | html %]">[% Translate("Related To") %]</a>
+                    </th>
+[% RenderBlockEnd("OverviewNavBarPageObjectReference") %]
+
+[% RenderBlockStart("OverviewNavBarPageColumn") %]
+                    <th class="OverviewHeader [% Data.HeaderColumnName | html %] [% Data.CSS | html %]">
+
+[% RenderBlockStart("OverviewNavBarPageColumnFilterLink") %]
+                        <a href="#" class="ColumnSettingsTrigger" title="[% Data.FilterTitle | html %]">
+                            <i class="fa fa-filter"></i>
+                        </a>
+                        <div class="ColumnSettingsContainer DontPrint">
+                            <div class="ColumnSettingsBox">
+                                [% Data.ColumnFilterStrg %]
+                            </div>
+                        </div>
+                        <a name="OverviewControl" href="[% Env("Baselink") %]Action=[% Env("Action") %];[% Data.LinkSort %];SortBy=[% Data.ColumnName | uri %];OrderBy=[% Data.OrderBy | uri %]" title="[% Translate(Data.Title) | html %]">[% Data.ColumnNameTranslated | html %]</a>
+[% RenderBlockEnd("OverviewNavBarPageColumnFilterLink") %]
+
+[% RenderBlockStart("OverviewNavBarPageColumnLink") %]
+                        <a name="OverviewControl" href="[% Env("Baselink") %]Action=[% Env("Action") %];[% Data.LinkSort %];SortBy=[% Data.ColumnName | uri %];OrderBy=[% Data.OrderBy | uri %]" title="[% Translate(Data.Title) | html %]">[% Data.ColumnNameTranslated | html %]</a>
+[% RenderBlockEnd("OverviewNavBarPageColumnLink") %]
+
+[% RenderBlockStart("OverviewNavBarPageColumnEmpty") %]
+                        <span class="Gray" title="[% Data.Title | html %]">[% Data.ColumnNameTranslated | html %]</span>
+[% RenderBlockEnd("OverviewNavBarPageColumnEmpty") %]
+
+                    </th>
+[% RenderBlockEnd("OverviewNavBarPageColumn") %]
+[% RenderBlockEnd("OverviewNavBarPageNotificationHeader") %]
+
+[% RenderBlockEnd("GeneralOverviewHeader") %]
+
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">//<![CDATA[
+$('.OverviewHeader').off('click').on('click', '.ColumnSettingsTrigger', function() {
+
+    var $TriggerObj = $(this),
+        FilterName;
+
+    if ($TriggerObj.hasClass('Active')) {
+
+        $TriggerObj
+            .next('.ColumnSettingsContainer')
+            .find('.ColumnSettingsBox')
+            .fadeOut('fast', function() {
+                $TriggerObj.removeClass('Active');
+            });
+    }
+    else {
+
+        // slide up all open settings widgets
+        $('.ColumnSettingsTrigger')
+            .next('.ColumnSettingsContainer')
+            .find('.ColumnSettingsBox')
+            .fadeOut('fast', function() {
+                $(this).parent().prev('.ColumnSettingsTrigger').removeClass('Active');
+            });
+
+        // show THIS settings widget
+        $TriggerObj
+            .next('.ColumnSettingsContainer')
+            .find('.ColumnSettingsBox')
+            .fadeIn('fast', function() {
+
+                $TriggerObj.addClass('Active');
+
+                // refresh filter dropdown
+                FilterName = $TriggerObj
+                    .next('.ColumnSettingsContainer')
+                    .find('select')
+                    .attr('name');
+
+
+                Core.AJAX.FormUpdate($('#ColumnFilterAttributes'), 'AJAXFilterUpdate', FilterName, [ FilterName ]);
+        });
+    }
+
+    return false;
+});
+
+//]]></script>
+[% END %]
+                </tr>
+            </thead>
+[% RenderBlockEnd("TableHeader") %]
+[% RenderBlockStart("TableBody") %]
+            <tbody>
+[% RenderBlockStart("Record") %]
+                <tr id="NotificationID_[% Data.NotificationID | html %]" class="MasterAction">
+
+[% RenderBlockStart("GeneralOverviewRow") %]
+
+[% RenderBlockStart("Bulk") %]
+                    <td class="Checkbox NonTextContent">
+                        <input class="Checkbox" type="checkbox" name="NotificationID" title="[% Translate("Select this notification") | html %]" value="[% Data.NotificationID | html %]"  autocomplete="off" />
+                    </td>
+[% RenderBlockEnd("Bulk") %]
+[% RenderBlockStart("ContentLargeNotificationGenericRowMeta") %]
+                    <td class="MetaElement [% Data.ClassTable | html %]" title="[% Translate(Data.Title) | html %]">
+[% RenderBlockStart("ContentLargeNotificationGenericRowMetaImage") %]
+                        <div class="[% Data.Class | html %] Small" title="[% Translate(Data.Title) | html %]">
+                            <span class="[% Data.ClassSpan | html %]">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <em>[% Translate(Data.Title) | html %]</em>
+                            </span>
+                        </div>
+[% RenderBlockEnd("ContentLargeNotificationGenericRowMetaImage") %]
+                    </td>
+[% RenderBlockEnd("ContentLargeNotificationGenericRowMeta") %]
+
+[% RenderBlockStart("RecordNotificationData") %]
+[% RenderBlockStart("RecordName") %]
+                    <td>
+                        <a href="#" title="[% Data.Name | html %]" class="MasterActionLink" data-notificationid="[% Data.NotificationID | uri %]">[% Data.Name %]</a>
+                    </td>
+[% RenderBlockEnd("RecordName") %]
+[% RenderBlockStart("RecordObjectType") %]
+                    <td>
+                        <div title="[% Translate(Data.ObjectType) | html %]">[% Translate(Data.ObjectType) | html %]</div>
+                    </td>
+[% RenderBlockEnd("RecordObjectType") %]
+
+[% RenderBlockStart("RecordObjectReferenceLink") %]
+                    <td>
+                        <a href="[% Env("Baselink") %][%Data.Link | Interpolate %]" title="[% Translate("Zoom into") | html%] [% Data.ObjectType | html %]: [% Data.ObjectReference | html %]" class="AsBlock ObjectZoom"><i class="fa fa-search"></i> [% Data.Hook | Interpolate %] [% Data.ObjectReference | html %]</a>
+                    </td>
+[% RenderBlockEnd("RecordObjectReferenceLink") %]
+[% RenderBlockStart("RecordObjectReference") %]
+                    <td>
+                        <div title="[% Data.ObjectReference | html %]"><i class="fa fa-chain-broken"></i> [% Data.ObjectReference | html %]</div>
+                    </td>
+[% RenderBlockEnd("RecordObjectReference") %]
+
+[% RenderBlockStart("RecordDismiss") %]
+                    <td class="Center">
+                        <a href="#" data-query-string="Action=AgentNotificationView;Subaction=Dismiss;NotificationID=[% Data.NotificationID | uri %]" title="[% Translate("Dismiss this notification") | html %]" class="AsBlock NotificationDismiss"><span class="InvisibleText">Dismiss this notification</span><i class="fa fa-trash-o"></i></a>
+                    </td>
+[% RenderBlockEnd("RecordDismiss") %]
+[% RenderBlockStart("RecordNotificationColumn") %]
+                    <td>
+                        <div title="[% Data.GenericValue | html %]">[% Data.GenericValue | truncate(60) | html %]</div>
+                    </td>
+[% RenderBlockEnd("RecordNotificationColumn") %]
+[% RenderBlockStart("RecordNotificationColumnTranslatable") %]
+                    <td>
+                        <div title="[% Translate(Data.GenericValue) | html %]">[% Translate(Data.GenericValue) | html %]</div>
+                    </td>
+[% RenderBlockEnd("RecordNotificationColumnTranslatable") %]
+
+[% RenderBlockEnd("RecordNotificationData") %]
+
+[% RenderBlockEnd("GeneralOverviewRow") %]
+                </tr>
+[% RenderBlockEnd("Record") %]
+            </tbody>
+[% RenderBlockEnd("TableBody") %]
+        </table>
+[% RenderBlockEnd("OverviewTable") %]
+    </form>
+</div>
+[% RenderBlockStart("DocumentReadyStart") %]
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">//<![CDATA[
+    Core.UI.InitCheckboxSelection($('table td.Checkbox'));
+
+    Core.Agent.NotificationView.Init({
+        Localization: {
+            CommunicationErrorMsg: [% Translate("An error occurred during communication.") | JSON %],
+            DismissBulkNotificationTitle: [% Translate("Dismiss Selected Notifications") | JSON %],
+            DismissBulkNotificationMsg: [% Translate("Do you really want to dismiss the selected notifications?") | JSON %],
+            NotificationTitle: [% Translate("OTRS Notification") | JSON %],
+            DismissMsg: [% Translate("Dismiss") | JSON %],
+            CancelMsg: [% Translate("Cancel") | JSON %],
+            CloseMsg: [% Translate("Close") | JSON %]
+        },
+        NotificationDetails: {
+        [% FOREACH NotificationID IN Data.NotificationDetails.keys.sort %]
+            [% NotificationID %]: { Body: [% Data.NotificationDetails.$NotificationID.Body | JSON %], Subject: [% Data.NotificationDetails.$NotificationID.Subject | JSON %]}[% IF !loop.last %],[% END %]
+        [% END %]
+        }
+    });
+
+    $('.MasterAction').bind('click', function (Event) {
+        var $MasterActionLink = $(this).find('.MasterActionLink');
+        // prevent MasterAction certain elements
+        if ($(Event.target).hasClass('ObjectZoom') || $(Event.target).hasClass('fa-search') || $(Event.target).hasClass('NotificationDismiss') || $(Event.target).hasClass('fa-trash-o')){
+            return true;
+        }
+        Core.Agent.NotificationView.ShowNotificationDialog(Event, $MasterActionLink);
+        return false;
+    });
+//]]></script>
+[% END %]
+[% RenderBlockEnd("DocumentReadyStart") %]
+
+<div class="Hidden" id="DismissDialogContainer">
+    <div id ="DismissDialog" class="InnerContent NotificationViewDialog">
+        <span class="WarningDialog ">&nbsp;</span>
+        <p class="Center DialogMessage"></p>
+        <div class="SpacingTop"></div>
+    </div>
+</div>
+<div class="Hidden" id="NotificationContainer">
+    <div id ="NotificationDialog" class="InnerConten NotificationViewDialog">
+        <div id="Notification">
+            <label id="NotificationSubject"></label>
+            <div class="SpacingTop"></div>
+            <div class="" id="NotificationBody" name="NotificationBody" title=""/></div>
+        </div>
+    </div>
+</div>
+
+[% RenderBlockEnd("DocumentContent") %]
+
+[% RenderBlockStart("DocumentColumnFilterForm") %]
+<form title="[% Translate("Column Filters Form") | html %]" action="[% Env("CGIHandle") %]" method="post" name="ColumnFilterAttributes" id="ColumnFilterAttributes">
+[% RenderBlockStart("DocumentColumnFilterFormElement") %]
+    <input type="hidden" name="[% Data.ElementName | html %]" value="[% Data.ElementValue | html %]"/>
+[% RenderBlockEnd("DocumentColumnFilterFormElement") %]
+</form>
+[% RenderBlockEnd("DocumentColumnFilterForm") %]

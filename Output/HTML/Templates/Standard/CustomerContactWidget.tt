@@ -1,0 +1,24 @@
+# --
+# Copyright (C) 2001-2016 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+<ul class="GenericSidebarWidget">
+    <li class="Header">
+        <div class="MessageHeader">
+            <h3>[% Translate("Contact information") | html %]</h3>
+            <div class="Clear"></div>
+        </div>
+    </li>
+    <li class="Items">
+[% RenderBlockStart("ContactRow") %]
+        <div class="Item">
+            <h4>[% Data.Title | html %]</h4>
+            [% Data.Firstname | html %] [% Data.Lastname | html %]<br />
+            [% Data.Email | html %]
+        </div>
+[% RenderBlockEnd("ContactRow") %]
+    </li>
+</ul>

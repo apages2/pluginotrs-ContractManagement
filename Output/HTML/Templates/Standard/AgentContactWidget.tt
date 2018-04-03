@@ -1,0 +1,64 @@
+# --
+# Copyright (C) 2001-2016 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+<!--STARTAgentContactWidget-->
+<div id="ContactInfo" class="WidgetSimple">
+    <div class="Header">
+        <h2>[% Translate("Contact information") | html %]</h2>
+    </div>
+    <div class="Content Accordeon">
+[% RenderBlockStart("ContactRow") %]
+        <div class="Contact [% Data.ID | html %]">
+            <h5>
+                [% Data.Title | html %]
+                <p>[% Data.Firstname | html %] [% Data.Lastname | html %]</p>
+            </h5>
+            <div class="ContactData [% Data.Class | html %]">
+                [% Data.ContactTable %]
+            </div>
+            <div class="SpacingTopSmall"></div>
+        </div>
+[% RenderBlockEnd("ContactRow") %]
+        <p class="None Hidden">[% Translate("none") | html %]</p>
+    </div>
+    <div class="ContactTemplate Hidden">
+        <h5></h5>
+        <div class="ContactData"></div>
+        <div class="SpacingTopSmall"></div>
+    </div>
+</div>
+<!--ENDAgentContactWidget-->
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">//<![CDATA[
+//STARTAgentContactWidget
+[% RenderBlockStart("ContactRowEmpty") %]
+$('.WidgetSimple > .Content.Accordeon > p.None.Hidden').removeClass('Hidden');
+[% RenderBlockEnd("ContactRowEmpty") %]
+
+$('.WidgetSimple > .Content.Accordeon h5').on('click', function() {
+    if ($(this).next('.ContactData').is(':visible')) {
+        $('.WidgetSimple > .Content.Accordeon')
+            .find('.ContactData')
+            .slideUp('fast', function() {
+                $(this).hide().addClass('Hidden');
+            });
+        return false;
+    }
+    $('.WidgetSimple > .Content.Accordeon')
+        .find('.ContactData')
+        .slideUp('fast', function() {
+            $(this).hide().addClass('Hidden');
+        });
+    $(this).next('.ContactData')
+        .slideDown('fast', function() {
+            $(this).show().removeClass('Hidden');
+        });
+});
+//ENDAgentContactWidget
+//]]></script>
+[% END %]

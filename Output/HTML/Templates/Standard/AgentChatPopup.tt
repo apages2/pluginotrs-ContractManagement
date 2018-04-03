@@ -1,0 +1,65 @@
+# --
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+<div class="MainBox ARIARoleMain MainBoxResponsive">
+    <input type="hidden" id="CurrentUserID" name="CurrentUserID" value="[% Env("UserID") | html %]" />
+    <input type="hidden" id="ChatID" name="ChatID" value="[% Data.ChatID | html %]" />
+    <div class="Size1of2 ChatContainer ChatContainerResponsive" id="Chat[% Data.ChatID | html %]">
+        <ul class="Tablelike">
+            <li class="Header">
+                <strong>
+                    [% Translate('Chat with') | html %]
+                <span class="MoreParticipants Hidden">
+                    <em></em>
+                    <span class="List"></span>
+                </span>
+                </strong>
+                <strong class="ChannelName">
+                    [% Translate('Channel') | html %]:
+                <span></span>
+                </strong>
+                <strong class="RelatedTicketData Hidden">
+                    [% Config("Ticket::Hook") %]:
+                <span><a href="[% Env("CGIHandle") %]?Action=AgentTicketZoom;TicketID=" target="_blank" class="TicketLink"></a></span>
+                </strong>
+                <strong class="PermissionLevel">
+                    [% Translate('Permission') | html %]:
+                <span></span>
+                </strong>
+                <a class="LeaveChat Hidden" href="#">
+                    <i class="fa fa-sign-out" title="[% Translate('Leave Chat') | html %]">
+                        <span>[% Translate('Leave Chat') | html %]</span>
+                    </i>
+                </a>
+            </li>
+            <li class="ChatMessages ChatMessagesResponsive">
+                <div></div>
+            </li>
+            <li class="ChatActions ChatActionsResponsive">
+                <div class="SendIconResponsive">
+                    <a href="#" id="Send" class="SendResponsive"><i class="fa fa-send-o"></i></a>
+                </div>
+                <div class="TextAreaDivResponsive">
+                    <textarea class="TextAreaResponsive Validate_Required Message [% Data.MessageError | html %]" placeholder="[% Translate('New Message') | html %]"></textarea>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">
+    Core.Config.Set('Core.Agent.Chat.UserActive', [% Translate('User is currently in the chat.') | JSON %]);
+    Core.Config.Set('Core.Agent.Chat.UserInactive', [% Translate('User has already left the chat or has not yet joined it.') | JSON %]);
+    Core.Config.Set('Core.Agent.Chat.UserAway', [% Translate('User was inactive for a while.') | JSON %]);
+    Core.Config.Set('Core.Agent.Chat.UserUnavailable', [% Translate('User set their status to unavailable.') | JSON %]);
+    Core.Config.Set('Core.Agent.Chat.UserOffline', [% Translate('User is currently offline.') | JSON %]);
+    Core.Config.Set('Core.Agent.Chat.ChatInactiveMessage', [% Translate('You are no longer in this chat. Click this message to remove the chat box.') | JSON %]);
+    Core.Config.Set('Core.Agent.Chat.You', [% Translate('You') | JSON %]);
+    Core.Agent.Chat.InitChatPopupScreen();
+</script>
+[% END %]

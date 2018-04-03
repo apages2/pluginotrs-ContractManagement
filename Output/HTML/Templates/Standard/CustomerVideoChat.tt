@@ -1,0 +1,84 @@
+# --
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+
+<div class="VideoChatWindow">
+    <video id="RequesterVideo" autoplay muted></video>
+    <video id="TargetVideo" autoplay></video>
+
+    <div class="MediaToolbar Hidden">
+        <a id="CloseButton" href="#" class="ActionButton fa-stack fa-2x" title="[% Translate("Close video call") | html %]">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-times fa-stack-1x fa-inverse"></i>
+        </a>
+        <a id="AudioMute" href="#" class="MediaButton fa-stack fa-2x" title="[% Translate("Toggle audio") | html %]">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-microphone fa-stack-1x fa-inverse"></i>
+            <i class="fa fa-ban fa-stack-2x" style="display: none;"></i>
+        </a>
+        <a id="VideoMute" href="#" class="MediaButton fa-stack fa-2x" title="[% Translate("Toggle video") | html %]">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-video-camera fa-stack-1x fa-inverse"></i>
+            <i class="fa fa-ban fa-stack-2x" style="display: none;"></i>
+        </a>
+        <a id="FullScreen" href="#" class="MediaButton fa-stack fa-2x" title="[% Translate("Fullscreen") | html %]">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-arrows-alt fa-stack-1x fa-inverse"></i>
+            <i class="fa fa-ban fa-stack-2x" style="display: none;"></i>
+        </a>
+    </div>
+
+    <div id="StatusMessage"></div>
+
+    <div id="AudioCall" class="Hidden">
+        <div class="fa-stack fa-5x">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-microphone fa-stack-1x fa-inverse"></i>
+            <i class="fa fa-ban fa-stack-2x"></i>
+        </div>
+        <p>[% Data.TargetName | html %]</p>
+    </div>
+</div>
+
+<script type="text/javascript">
+    Core.Config.Set('Core.VideoChat.TURNServers', {
+        'iceServers': [
+[% RenderBlockStart('TURNServer') %]
+            [% Data.JSONConfig %]
+[% RenderBlockStart('TURNServerComma') %]
+            ,
+[% RenderBlockEnd('TURNServerComma') %]
+[% RenderBlockEnd('TURNServer') %]
+        ]
+    });
+    Core.Config.Set('Core.VideoChat.Close', [% Translate("Close") | JSON %]);
+    Core.Config.Set('Core.VideoChat.DialogTitle', [% IF Data.NoVideo %][% Translate("Audio call") | JSON %][% ELSE %][% Translate("Video call") | JSON %][% END %]);
+    Core.Config.Set('Core.VideoChat.InviteDeclined', [% Translate("User has declined your invitation.") | JSON %]);
+    Core.Config.Set('Core.VideoChat.InviteUnsupported', [% Translate("Target user's browser does not support video and audio calling.") | JSON %]);
+    Core.Config.Set('Core.VideoChat.LeaveReceived', [% Translate("User has left the call.") | JSON %]);
+    Core.Config.Set('Core.VideoChat.ConnectionFailed', [% Translate("Attempt to connect was unsuccessful. Please try again.") | JSON %]);
+    Core.Config.Set('Core.VideoChat.ErrorInternalErrorMessage', [% Translate("An internal error occurred.") | JSON %]);
+    Core.Config.Set('Core.VideoChat.ErrorPermissionDenied', [% Translate("Permission to media stream has been denied.") | JSON %]);
+    Core.Config.Set('Core.VideoChat.ErrorAllowMediaStream', [% Translate("Please allow this page to use your video and audio stream.") | JSON %]);
+    Core.Config.Set('Core.VideoChat.StatusRequestMedia', [% Translate("Requesting media stream...") | JSON %]);
+    Core.Config.Set('Core.VideoChat.StatusWaitingInvitation', [% Translate("Waiting for other party to respond...") | JSON %]);
+    Core.Config.Set('Core.VideoChat.StatusWaitingInvitationAccept', [% Translate("Accepting the invitation...") | JSON %]);
+    Core.Config.Set('Core.VideoChat.StatusInitializing', [% Translate("Initializing...") | JSON %]);
+    Core.Config.Set('Core.VideoChat.StatusConnecting', [% Translate("Connecting, please wait...") | JSON %]);
+    Core.Config.Set('Core.VideoChat.StatusConnectionEstablished', [% Translate("Connection established!") | JSON %]);
+
+    Core.VideoChat.Init({
+        ChatID: [% Data.ChatID | JSON %],
+        RequesterID: [% Data.RequesterID | JSON %],
+        RequesterType: [% Data.RequesterType | JSON %],
+        TargetID: [% Data.TargetID | JSON %],
+        TargetType: [% Data.TargetType | JSON %],
+        InviteAccept: [% Data.InviteAccept | JSON %],
+        NoVideo: [% Data.NoVideo | JSON %]
+    });
+</script>

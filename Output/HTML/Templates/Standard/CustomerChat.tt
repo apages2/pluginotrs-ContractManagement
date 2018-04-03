@@ -1,0 +1,298 @@
+# --
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+# Messages needed for the perl code.
+# [% Translate("%s has left this chat.") | html %]
+# [% Translate("%s has joined this chat.") | html %]
+
+[% RenderBlockStart('ChatOverview') %]
+<div id="MainBox" class="TicketView ARIARoleMain Sortable">
+    <div class="ActionRow">
+        <ul class="Filter Tabs">
+            [% SET FilterDescriptions = {
+            IncomingChatRequests => Translate('Incoming chat requests'),
+            OutgoingChatRequests => Translate('Outgoing chat requests'),
+            ActiveChats          => Translate('Active chats'),
+            ClosedChats          => Translate('Closed chats'),
+            } %]
+            [% FOREACH Filter IN Data.Filters %]
+            <li class="[% Data.ClassLI | html %]">
+                <a class="[% IF Data.ActiveFilter == Filter.ID %]Selected[% END %]" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=[% Env("Subaction") %];Filter=[% Filter.ID | uri %];">
+                    [% FilterDescriptions.item(Filter.ID) | html %] ([% Data.Chats.item(Filter.ID).size | html %])
+                </a>
+            </li>
+            [% END %]
+            <li class="Clear"></li>
+        </ul>
+    </div>
+
+    <div class="Content">
+        <table class="Overview Sortable">
+            <thead>
+                <tr>
+                    <th><span>[% Translate('From') | html %]</span></th>
+                    <th><span>[% Translate('Chat request description') | html %]<span></th>
+                    <th><span>[% Translate('Created') | html %]</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                [% FOREACH Chat IN Data.Chats.item(Data.ActiveFilter) %]
+                <tr>
+                    <td>
+                        <a class="AsBlock" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=ChatScreen;ChatID=[% Chat.ChatID | uri %];" target="OTRSCustomerChat_[% Chat.ChatID | html %]">
+                            [% Chat.RequesterName | html %]
+                        </a>
+                    </td>
+                    <td>
+                        <a class="AsBlock" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=ChatScreen;ChatID=[% Chat.ChatID | uri %];" target="OTRSCustomerChat_[% Chat.ChatID | html %]">
+                            [% Chat.FirstMessage | truncate(150) | html %]
+                        </a>
+                    </td>
+                    <td>
+                        <a class="AsBlock" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=ChatScreen;ChatID=[% Chat.ChatID | uri %];" target="OTRSCustomerChat_[% Chat.ChatID | html %]">
+                            [% Chat.CreateTime | html %]
+                        </a>
+                    </td>
+                </tr>
+                [% END %]
+                [% IF !Data.Chats.item(Data.ActiveFilter).size %]
+                <tr>
+                    <td colspan="3">[% Translate('No data found.') | html %]</td>
+                </tr>
+                [% END %]
+            </tbody>
+        </table>
+    </div>
+</div>
+
+[% RenderBlockEnd('ChatOverview') %]
+
+[% RenderBlockStart('CreateChatRequest') %]
+<div id="MainBox" class="ARIARoleMain Sortable ChatRequest">
+    <div class="Content">
+[% RenderBlockStart('ChatNotAvailable') %]
+        <div class="NoAgentsAvailable MessageBox Notice Error" id="NoAgentsAvailable">
+            <p>[% Config("ChatEngine::Texts::CustomerFrontend::NoAgentsAvailable::NewTicket") | Translate | html %]
+                <a href="[% Env("CGIHandle") %]?Action=CustomerTicketMessage" id="SubmitNewTicket" title="[% Translate("Create new ticket") | html %]">
+                    [% Translate("Create new ticket") | html %]
+                </a>
+            </p>
+        </div>
+[% RenderBlockEnd('ChatNotAvailable') %]
+[% RenderBlockStart('ChatNotAvailableTicket') %]
+        <form action="[% Env("CGIHandle") %]" method="post" id="FormArticleAdd" enctype="multipart/form-data" class="Validate PreventMultipleSubmits" autocomplete="off">
+            <input type="hidden" name="Action" value="CustomerTicketZoom" />
+            <input type="hidden" name="Subaction" value="Store" />
+            <input type="hidden" name="TicketID" value="[% Data.TicketID %]" />
+            <input type="hidden" name="FromChat" value="1" />
+            <div class="NoAgentsAvailable MessageBox Notice Error" id="NoAgentsAvailable">
+                <p>[% Config("ChatEngine::Texts::CustomerFrontend::NoAgentsAvailable::AddToExisiting") | Translate | html %]
+                    <a id="ArticleAdd" href="[% Env("CGIHandle") %]?Action=CustomerTicketZoom;Subaction=Store;FromChat=1;TicketNumber=2015061571000014" id="SubmitNewArticle" title="[% Translate("Add an article") | html %]">
+                        [% Translate("Add an article") | html %]
+                    </a>
+                </p>
+            </div>
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">
+    // Check if Start chat button should be disabled
+    $('#ArticleAdd').on('click',function(){
+        $('#FormArticleAdd').submit();
+        return false;
+    });
+</script>
+[% END %]
+        </form>
+[% RenderBlockEnd('ChatNotAvailableTicket') %]
+        <form action="[% Env("CGIHandle") %]" method="post" enctype="multipart/form-data" class="Validate PreventMultipleSubmits" autocomplete="off">
+            <input type="hidden" name="Action" value="[% Env("Action") %]" />
+            <input type="hidden" name="Subaction" value="CreateChatRequest" />
+            <input type="hidden" name="TicketID" value="[% Data.TicketID %]" />
+            <input type="hidden" name="PreselectedChannelID" value="[% Data.PreselectedChannelID %]" />
+            <fieldset>
+                <h2>[% Translate('Start a new chat') | html %]</h2>
+[% IF Config("ChatEngine::CustomerInterface::AllowChatChannels") == 1 %]
+                <div class="Channel">
+                    <label for="ChannelID">
+                        <span class="Mandatory">*</span>
+                        [% Translate('Select channel') | html %]
+                    </label>
+                    [% Data.Channel %]
+                    <div id="ChannelIDError" class="TooltipErrorMessage" ><p>[% Translate("This field is required.") | html %]</p></div>
+                    <div id="ChannelIDServerError" class="TooltipErrorMessage" ><p>[% Translate("This field is required.") | html %]</p></div>
+                </div>
+[% END %]
+                <div class="Message">
+                    <label>
+                        <span class="Mandatory">*</span>
+                        [% Translate('Chat request description') | html %]:</label>
+                        <textarea title="[% Translate('Chat request description') | html %]" id="Message" name="Message" class="Validate_Required [% Data.MessageError | html %]"></textarea>
+                        <div id="MessageError" class="TooltipErrorMessage" ><p>[% Translate("This field is required.") | html %]</p></div>
+                        <div id="MessageServerError" class="TooltipErrorMessage" ><p>[% Translate("This field is required.") | html %]</p></div>
+                        <button type="submit" id="Create" name="CreateAction" value="1">[% Translate('Start chat') | html %]</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">
+// Check if Start chat button should be disabled
+if ($("#NoAgentsAvailable").length > 0) {
+    $("button#Create").attr('disabled','disabled');
+}
+[% END %]
+[% RenderBlockEnd('CreateChatRequest') %]
+
+[% RenderBlockStart('NoChatUsersAvailable') %]
+<div id="MainBox" class="ARIARoleMain Sortable ChatRequest">
+    <div class="Content">
+        <h2>[% Translate('Start a new chat') | html %]</h2>
+        <p>
+            [% Config("ChatEngine::Texts::CustomerFrontend::NoAgentsAvailable::NewTicket") | Translate | html %]
+        </p>
+    </div>
+</div>
+[% RenderBlockEnd('NoChatUsersAvailable') %]
+
+[% RenderBlockStart('ChatScreen') %]
+<div id="MainBox" class="ARIARoleMain Sortable ChatScreen">
+    <input type="hidden" name="Threshold" value="[% Data.Threshold | html %]" />
+    <input type="hidden" name="TicketID" id="TicketID" value="[% Data.TicketID | html %]" />
+    <div class="ActionRow">
+        <ul class="Tabs">
+            <li>
+                <a href="#" id="ChatLeaveLink" title="[% Translate('Leave chat') | html %]">
+                    <i class="fa fa-times-circle"></i>
+                    [% Translate('Leave chat') | html %]
+                </a>
+            </li>
+        </ul>
+        <div class="Clear"></div>
+    </div>
+    <div class="NotYetAccepted MessageBox Notice" style="display:none;">
+        <p>[% Config("ChatEngine::Texts::CustomerFrontend::NotYetAccepted") | Translate | html %]</p>
+    </div>
+    <div class="NoAgentsAvailable MessageBox Notice Error" style="display:none;">
+        <p>[% Config("ChatEngine::Texts::CustomerFrontend::NoAgentsAvailable::NewTicket") | Translate | html %]
+            <a href="#" id="SubmitNewTicket" title="[% Translate("Create new ticket") | html %]">
+                [% Translate("Create new ticket") | html %]
+            </a>
+        </p>
+        <form action="[% Env("CGIHandle") %]" id="CreateNewTicket" method="post" enctype="multipart/form-data" class="PreventMultipleSubmits" autocomplete="off">
+            <input type="hidden" name="Action" value="CustomerTicketMessage" />
+            <input type="hidden" name="FromChatID" value="[% Data.ChatID %]" />
+        </form>
+    </div>
+    <div class="ChatClosed MessageBox Notice Error" style="display:none;">
+        <p>[% Config("ChatEngine::Texts::CustomerFrontend::ChatClosed") | Translate | html %]</p>
+    </div>
+    <div class="NoAgentsAvailableTicket MessageBox Notice Error" style="display:none;">
+        <p>[% Config("ChatEngine::Texts::CustomerFrontend::NoAgentsAvailable::AddToExisiting") | Translate | html %]
+            <a href="#" id="SubmitNewArticle" title="[% Translate("Add to an existing ticket") | html %]">
+                [% Translate("Add to an existing ticket") | html %]
+            </a>
+        </p>
+        <form action="[% Env("CGIHandle") %]" id="CreateNewArticle" method="post" enctype="multipart/form-data" class="PreventMultipleSubmits" autocomplete="off">
+            <input type="hidden" name="Action" value="CustomerTicketZoom" />
+            <input type="hidden" name="FromChatID" value="[% Data.ChatID %]" />
+            <input type="hidden" name="TicketID" value="[% Data.TicketID %]" />
+            <input type="hidden" name="FromChat" value="1" />
+            <input type="hidden" name="Subaction" value="Store" />
+        </form>
+    </div>
+    <div class="Content ChatContent [% Data.Shrink | html %]">
+        <div class="ChatWindow">
+            <fieldset>
+                <h2>
+                    [% Translate('Active Chat') | html %]
+                    <a class="ChatDownload" href="[% Env("CGIHandle") %]?Action=CustomerChatDownload;ChatID=[% Data.ChatID %];Format=PDF" target="print" title="[% Translate('Download Chat') | html %]">
+                        <i class="fa fa-download" title="[% Translate('Download Chat') | html %]"></i>
+                        <span>[% Translate('Download Chat') | html %]</span>
+                    </a>
+                    <a class="AudioChat" href="#" title="[% Translate('Audio Call') | html %]">
+                        <i class="fa fa-microphone" title="[% Translate('Audio Call') | html %]"></i>
+                        <span>[% Translate('Audio Call') | html %]</span>
+                    </a>
+                    <a class="VideoChat" href="#" title="[% Translate('Video Call') | html %]">
+                        <i class="fa fa-video-camera" title="[% Translate('Video Call') | html %]"></i>
+                        <span>[% Translate('Video Call') | html %]</span>
+                    </a>
+                </h2>
+                <ul id="Chat">
+                    <li class="Placeholder">
+                        <span class="AJAXLoader"></span>
+                        [% Translate('Chat is being loaded...') | html %]
+                    </li>
+                </ul>
+            </fieldset>
+            <fieldset>
+                <input type="hidden" id="CurrentUserName" name="CurrentUserName" value="[% Data.SenderName | html %]" />
+                <div class="Message">
+                    <label>[% Translate('New Message') | html %]</label>
+                    <textarea id="Message" title="[% Translate('Message') | html %]" name="Message" class="Validate_Required [% Data.MessageError | html %]"></textarea>
+                    <a href="#" title="[% Translate('Send') | html %]" id="Send"><i class="fa fa-send"></i></a>
+                </div>
+            </fieldset>
+        </div>
+        <form action="[% Env("CGIHandle") %]" id="ChatLeave" method="post" enctype="multipart/form-data" class="Validate PreventMultipleSubmits Hidden" autocomplete="off">
+            <input type="hidden" name="Action" value="[% Env("Action") %]" />
+            <input type="hidden" name="Subaction" value="ChatLeave" />
+            <input type="hidden" name="ChatID" value="[% Data.ChatID | html %]" />
+            <input type="hidden" name="Message" value="[% Translate('%s has left this chat.', Data.SenderName) | html %]" />
+        </form>
+    </div>
+[% RenderBlockStart('Agent') %]
+    <div class="Sidebar">
+        <fieldset>
+            <h2>[% Config("ChatEngine::CustomerFrontend::AgentPreferencesText") | Translate | html %]</h2>
+            <div class="Content"></div>
+        </fieldset>
+    </div>
+    <div class="Clear"></div>
+[% RenderBlockEnd('Agent') %]
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">
+Core.Config.Set('Core.Customer.Chat.ThresholdTime', [% Config("ChatEngine::CustomerThreshold") | JSON %]);
+Core.Config.Set('Core.VideoChat.Enabled', [% Data.VideoChat | JSON %]);
+Core.Config.Set('Core.VideoChat.ErrorInternalErrorMessage', [% Translate("An internal error occurred.") | JSON %]);
+Core.Customer.Chat.InitChatScreen([% Data.ChatID | JSON %]);
+
+// Check if chat channel is selected before submitting
+$('#Create').on('submit', function (Event) {
+    if ($('#ChannelID').val() == "") {
+        Event.preventDefault();
+    }
+});
+
+// Create new ticket instead of chat
+$('#SubmitNewTicket').on('click', function (Event) {
+    $('#CreateNewTicket').submit();
+});
+
+// Add new article instead of chat
+$('#SubmitNewArticle').on('click', function (Event) {
+    $('#CreateNewArticle').submit();
+});
+
+[% RenderBlockStart('VideoChatStart') %]
+Core.Customer.Chat.VideoChatScreen($('.VideoChat'), $('.AudioChat'), 1, [% Data.NoVideo | JSON %]);
+[% RenderBlockEnd('VideoChatStart') %]
+</script>
+[% END %]
+[% RenderBlockEnd('ChatScreen') %]
+
+[% RenderBlockStart('ChatCompleted') %]
+    <div id="MainBox" class="ARIARoleMain Sortable ChatScreen">
+        <div class="Content">
+            <fieldset>
+                <h2>[% Translate('Chat completed') | html %]</h2>
+                <p class="Information">[% Config("ChatEngine::Texts::CustomerFrontend::ChatCompleted") | Translate | html %]</p>
+            </fieldset>
+        </div>
+    </div>
+[% RenderBlockEnd('ChatCompleted') %]

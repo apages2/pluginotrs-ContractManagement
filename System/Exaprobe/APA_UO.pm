@@ -570,6 +570,7 @@ sub GetUODetail {
 
 sub UpdateUO {
 
+	use POSIX qw(strftime); 
 	my ( $Self, %Param ) = @_;
 	
 	my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
@@ -613,16 +614,17 @@ sub UpdateUO {
 	my $SQLUpdateUO;
 	my $NewSolde;
 	my $TR_ID;
+	my $changetime=strftime "%Y-%m-%d", localtime;
 	if ($Type eq 'Owner') {
-		$SQLUpdateUO = "UPDATE APA_TR_UO_decompte SET owner=? WHERE id=?";
+		$SQLUpdateUO = "UPDATE APA_TR_UO_decompte SET owner=?, change_time=?, change_by=? WHERE id=?";
 	} elsif ($Type eq 'Subject') {
-		$SQLUpdateUO = "UPDATE APA_TR_UO_decompte SET subject=? WHERE id=?";
+		$SQLUpdateUO = "UPDATE APA_TR_UO_decompte SET subject=?, change_time=?, change_by=? WHERE id=?";
 	} elsif ($Type eq 'UODateFin') {
-		$SQLUpdateUO = "UPDATE APA_TR_UO_decompte SET date=? WHERE id=?";
+		$SQLUpdateUO = "UPDATE APA_TR_UO_decompte SET date=?, change_time=?, change_by=? WHERE id=?";
 	} elsif ($Type eq 'TRIC') {
-		$SQLUpdateUO = "UPDATE APA_TR SET TR_IC=? WHERE TR_ID=?";
+		$SQLUpdateUO = "UPDATE APA_TR SET TR_IC=?, change_time=?, change_by=? WHERE TR_ID=?";
 	} elsif ($Type eq 'TRDateDebut') {
-		$SQLUpdateUO = "UPDATE APA_TR SET TR_DateDebut=? WHERE TR_ID=?";
+		$SQLUpdateUO = "UPDATE APA_TR SET TR_DateDebut=?, change_time=?, change_by=? WHERE TR_ID=?";
 	} elsif ($Type eq 'TRDateFin') {
 		my %User = $UserObject->GetUserData(
 			UserID => $UserID,
@@ -642,10 +644,6 @@ sub UpdateUO {
 			$TR_Log = $Row[0];
 			$OldDate = $Row[1];
 		}
-	 $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => $OldDate,
-        );
 	
 		$Message= strftime("%Y-%m-%d", localtime)." ".$User{UserFirstname}. " ".$User{UserLastname}." : Report de la Date d'echeance ".$OldDate." => ".$Value."\r".$TR_Log;
 				
@@ -655,19 +653,19 @@ sub UpdateUO {
 			SQL   => $AddLog,
 			Bind => [\$Message,\$ID],
 		);
-		$SQLUpdateUO = "UPDATE APA_TR SET TR_DateFin=? WHERE TR_ID=?";
+		$SQLUpdateUO = "UPDATE APA_TR SET TR_DateFin=?, change_time=?, change_by=? WHERE TR_ID=?";
 		
 		
 	} elsif ($Type eq 'TRmontant') {
-		$SQLUpdateUO = "UPDATE APA_TR SET TR_Montant=? WHERE TR_ID=?";
+		$SQLUpdateUO = "UPDATE APA_TR SET TR_Montant=?, change_time=?, change_by=? WHERE TR_ID=?";
 	}  elsif ($Type eq 'TRCustomerMail') {
-		$SQLUpdateUO = "UPDATE APA_TR SET UO_CustomerMail=? WHERE TR_ID=?";
+		$SQLUpdateUO = "UPDATE APA_TR SET UO_CustomerMail=?, change_time=?, change_by=? WHERE TR_ID=?";
 	}  elsif ($Type eq 'TRSolde') {
-		$SQLUpdateUO = "UPDATE APA_TR SET TR_Option2=? WHERE TR_ID=?";
+		$SQLUpdateUO = "UPDATE APA_TR SET TR_Option2=?, change_time=?, change_by=? WHERE TR_ID=?";
 	} elsif ($Type eq 'TRCaff') {
-		$SQLUpdateUO = "UPDATE APA_TR SET TR_Caff=? WHERE TR_ID=?";
+		$SQLUpdateUO = "UPDATE APA_TR SET TR_Caff=?, change_time=?, change_by=? WHERE TR_ID=?";
 	} elsif ($Type eq 'TRLog') {
-		$SQLUpdateUO = "UPDATE APA_TR SET TR_Log=? WHERE TR_ID=?";
+		$SQLUpdateUO = "UPDATE APA_TR SET TR_Log=?, change_time=?, change_by=? WHERE TR_ID=?";
 	} elsif ($Type eq 'UODelete') {
 	
 		my $CheckInfoDecompte = "SELECT UO_unit, TR_ID from APA_TR_UO_decompte where id=?";
@@ -757,7 +755,7 @@ sub UpdateUO {
 
 	$Self->{DBObjectotrs}->Do(
 		SQL  => $SQLUpdateUO,
-		Bind => [ \$Value,\$ID]
+		Bind => [ \$Value, \$changetime, \$UserID,\$ID]
 	);
 				
 	my $JSON = $LayoutObject->JSONEncode(
@@ -842,7 +840,7 @@ sub AddDecompte {
 }
 
 sub RenewUO {
-
+	use POSIX qw(strftime); 
 	my ( $Self, %Param ) = @_;
 	
 	my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
@@ -851,19 +849,19 @@ sub RenewUO {
     my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
 	my $TR_ID= $ParamObject->GetParam( Param => 'TR_ID' );
 	my $UserID = $Param{UserID};
-	
-	my $SQLUpdateUO = "UPDATE APA_TR SET TR_DateDebut = DATE_ADD(TR_DateDebut,INTERVAL 1 YEAR) WHERE TR_ID=?";
+	my $changetime=strftime "%Y-%m-%d", localtime;
+	my $SQLUpdateUO = "UPDATE APA_TR SET TR_DateDebut = DATE_ADD(TR_DateDebut,INTERVAL 1 YEAR),change_time=?, change_by=? WHERE TR_ID=?";
 	
 	$Self->{DBObjectotrs}->Do(
 		SQL  => $SQLUpdateUO,
-		Bind => [\$TR_ID]
+		Bind => [\$changetime, \$UserID,\$TR_ID]
 	);
 	
-	$SQLUpdateUO = "UPDATE APA_TR SET TR_DateFin = DATE_ADD(TR_DateFin,INTERVAL 1 YEAR) WHERE TR_ID=?";
+	$SQLUpdateUO = "UPDATE APA_TR SET TR_DateFin = DATE_ADD(TR_DateFin,INTERVAL 1 YEAR),change_time=?, change_by=? WHERE TR_ID=?";
 	
 	$Self->{DBObjectotrs}->Do(
 		SQL  => $SQLUpdateUO,
-		Bind => [\$TR_ID]
+		Bind => [\$changetime, \$UserID,\$TR_ID]
 	);
 	
 	my $UOLog = "SELECT TR_Log,DATE_FORMAT(TR_DateDebut,\"%Y-%m-%d\"),DATE_FORMAT(TR_DateFin,\"%Y-%m-%d\") from APA_TR WHERE TR_ID=?";

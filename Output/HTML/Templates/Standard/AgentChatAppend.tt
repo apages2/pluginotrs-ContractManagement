@@ -1,0 +1,75 @@
+# --
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+<form action="[% Env("CGIHandle") %]" method="post" enctype="multipart/form-data" name="compose" class="Validate PreventMultipleSubmits">
+    <input type="hidden" name="Action"    value="AgentChatAppend"/>
+    <input type="hidden" name="Subaction" value="Append"/>
+    <input type="hidden" name="FromChatID" value="[% Data.FromChatID | html %]"/>
+    <input type="hidden" name="CustomerUser" value="[% Data.CustomerUser | html %]"/>
+
+    <div class="LayoutPopup ARIARoleMain">
+        <div class="Header">
+            <h1>[% Translate("Append Chat to Ticket") | html %]</h1>
+            <p class="AsteriskExplanation">[% Translate("All fields marked with an asterisk (*) are mandatory.") | html %]</p>
+        </div>
+        <div class="Content">
+            <fieldset class="TableLike FixedLabel">
+                <label class="Mandatory" for="SearchTicketNumber">
+                    <span class="Marker">*</span>
+                    [% Translate("Append to") | html %] [% Config("Ticket::Hook") %]:
+                </label>
+                <div class="Field">
+                    <input type="text" id="SearchTicketNumber" name="SearchTicketNumber" value="[% Data.SearchTicketNumber | html %]" class="Validate_Required [% Data.SearchTicketNumberInvalid %] W33pc TicketNumberAutocomplete" />
+                    <div id="SearchTicketNumberError" class="TooltipErrorMessage"><p>[% Translate("You need to use a ticket number!") | html %]</p></div>
+                    <div id="SearchTicketNumberServerError" class="TooltipErrorMessage"><p>[% Translate("A valid ticket number is required.") | html %]</p></div>
+                </div>
+                <div class="Clear"></div>
+[% RenderBlockStart("ChatArticlePreview") %]
+                <div class="Field">
+                    <div class="ChatArticlePreview">
+[% INCLUDE "ChatDisplay.tt" %]
+                    </div>
+                    <p class="FieldExplanation">[% Translate('The chat will be appended as a new article to the chosen ticket.') | html %]></p>
+                </div>
+                <div class="Clear"></div>
+[% RenderBlockEnd("ChatArticlePreview") %]
+            </fieldset>
+            <div id="CustomerTickets"></div>
+        </div>
+        <div class="Footer">
+            <button class="CallForAction Primary" id="submitRichText" accesskey="g" title="[% Translate("Submit") | html %] (g)" type="submit" value="[% Translate("Submit") | html %]">
+                <span>
+                    <i class="fa fa-check-square-o"></i>
+                    [% Translate("Submit") | html %]
+                </span>
+            </button>
+        </div>
+    </div>
+</form>
+
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">//<![CDATA[
+    Core.Config.Set('CustomerSearch.ShowCustomerTickets', "[% Config("Ticket::Frontend::ShowCustomerTickets") %]");
+    Core.Config.Set('TicketNumberAutocomplete.QueryDelay', "[% Data.queryDelay | html %]");
+    Core.Config.Set('TicketNumberAutocomplete.MaxResultsDisplayed', "[% Data.maxResultsDisplayed | html %]");
+    Core.Config.Set('TicketNumberAutocomplete.MinQueryLength', "[% Data.minQueryLength | html %]");
+    Core.Agent.Chat.Append.InitTicketAutocomplete( $(".TicketNumberAutocomplete"), 'AJAXTicketSearch', '[% Data.FromChatID | html %]' );
+
+[% IF Data.CustomerUser %]
+    Core.Agent.CustomerSearch.ReloadCustomerInfo([% Data.CustomerUser | JSON %]);
+    $('#CustomerTickets').on('click', '.MasterAction, .MasterActionLink', function() {
+        var $Element = $(this);
+        if ($Element.hasClass('MasterAction')) {
+            $Element = $Element.find('.MasterActionLink');
+        }
+        $('#SearchTicketNumber').val($Element.text());
+        return false;
+    });
+[% END %]
+//]]></script>
+[% END %]

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<otrs_config version="1.0" init="Config">
+    <ConfigItem Name="Ticket::CustomModule###OTRSEscalationSuspend" Required="1" Valid="1">
+        <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::Ticket. Used to easily add customizations.</Description>
+        <Group>OTRSEscalationSuspend</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <String Regex="">Kernel::System::Ticket::OTRSEscalationSuspend</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="EscalationSuspendStates" Required="0" Valid="1">
+        <Description Translatable="1">List of states for which escalations should be suspended.</Description>
+        <Group>OTRSEscalationSuspend</Group>
+        <SubGroup>EscalationSuspend</SubGroup>
+        <Setting>
+            <Array>
+                <Item>pending auto close+</Item>
+                <Item>pending auto close-</Item>
+                <Item>pending reminder</Item>
+            </Array>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="Frontend::Module###AgentTicketEscalationViewWithoutSuspended" Required="0" Valid="1">
+        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
+        <Group>OTRSEscalationSuspend</Group>
+        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+        <Setting>
+            <FrontendModuleReg>
+                <Description>Overview of all escalated tickets without suspend states</Description>
+                <Title>Escalation view Without Suspended</Title>
+                <NavBarName>Ticket</NavBarName>
+                <NavBar>
+                    <Description Translatable="1">Overview Escalated Tickets Without Suspend State</Description>
+                    <Name Translatable="1">Escalation view - Without Suspend State</Name>
+                    <Link>Action=AgentTicketEscalationViewWithoutSuspended</Link>
+                    <LinkOption></LinkOption>
+                    <NavBar>Ticket</NavBar>
+                    <Type></Type>
+                    <Block></Block>
+                    <AccessKey>e</AccessKey>
+                    <Prio>121</Prio>
+                </NavBar>
+                <Loader>
+                    <CSS>Core.AllocationList.css</CSS>
+                    <JavaScript>Core.UI.AllocationList.js</JavaScript>
+                    <JavaScript>Core.Agent.TableFilters.js</JavaScript>
+                </Loader>
+            </FrontendModuleReg>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="SuspendEscalatedTickets" Required="1" Valid="1">
+        <Description Translatable="1">Suspend already escalated tickets.</Description>
+        <Group>OTRSEscalationSuspend</Group>
+        <SubGroup>EscalationSuspend</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0">No</Item>
+                <Item Key="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="Daemon::SchedulerCronTaskManager::Task###RebuildEscalationIndexOnline" Required="1" Valid="1" ReadOnly="1">
+        <Description Translatable="1">Resets the escalation times to the point it was suspended.</Description>
+        <Group>OTRSEscalationSuspend</Group>
+        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">RebuildEscalationIndexOnline</Item>
+                <Item Key="Schedule">*/3 * * * *</Item>
+                <Item Key="Module">Kernel::System::Console::Command::Maint::Ticket::RebuildEscalationIndexOnline</Item>
+                <Item Key="Function">Execute</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+                <Item Key="Params">
+                    <Array>
+                    </Array>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</otrs_config>

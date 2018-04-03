@@ -251,22 +251,22 @@ sub Run {
 					
 					my $NewSolde = $UOSolde+$OldDecompte-$DecompteUO;
 					
-					$Kernel::OM->Get('Kernel::System::Log')->Log(
-				Priority => 'error',
-				Message  => $UOSolde
-			);
-			$Kernel::OM->Get('Kernel::System::Log')->Log(
-				Priority => 'error',
-				Message  => $OldDecompte
-			);
-			$Kernel::OM->Get('Kernel::System::Log')->Log(
-				Priority => 'error',
-				Message  => $DecompteUO
-			);
-			$Kernel::OM->Get('Kernel::System::Log')->Log(
-				Priority => 'error',
-				Message  => $NewSolde
-			);
+					# $Kernel::OM->Get('Kernel::System::Log')->Log(
+				# Priority => 'error',
+				# Message  => $UOSolde
+			# );
+			# $Kernel::OM->Get('Kernel::System::Log')->Log(
+				# Priority => 'error',
+				# Message  => $OldDecompte
+			# );
+			# $Kernel::OM->Get('Kernel::System::Log')->Log(
+				# Priority => 'error',
+				# Message  => $DecompteUO
+			# );
+			# $Kernel::OM->Get('Kernel::System::Log')->Log(
+				# Priority => 'error',
+				# Message  => $NewSolde
+			# );
 					
 					my $DF_DecompteSolde = $DynamicFieldValueObject->ValueSet(
 						FieldID  => $DF_DecompteSolde_ID,                 # ID of the dynamic field

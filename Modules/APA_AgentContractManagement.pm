@@ -46,18 +46,20 @@ sub Run {
 
 	if ($Self->{DocorAbo} eq 'Doc') {
 		if ( $Self->{Subaction} eq 'AJAXUpdateSelect' ) {
-			$Output .= $ContractManagement->Updateselect();
+			$Output .= $ContractManagement->Updateselect(UserID => $UserID);
 		} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonDel' ) {
-			$Output .= $ContractManagement->ClickDel();
+			$Output .= $ContractManagement->ClickDel(UserID => $UserID);
 		}  elsif ( $Self->{Subaction} eq 'AJAXAvancement' ) {
-			$Output .= $ContractManagement->ClickAvancement();
+			$Output .= $ContractManagement->ClickAvancement(UserID => $UserID);
 			
 		} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonAdd' ) {
-			$Output .= $ContractManagement->ClickAdd();
+			$Output .= $ContractManagement->ClickAdd(UserID => $UserID);
 		} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonNotif') {
 			$Output .= $ContractManagement->SendmailDoc();
 		} elsif ( $Self->{Subaction} eq 'AJAXUpdateDate') {
 			$Output .= $ContractManagement->UpdateDate(UserID => $UserID);
+		} elsif ( $Self->{Subaction} eq 'AJAXResponsible') {
+			$Output .= $ContractManagement->Responsible();
 		} else {
 		
 			$Data{contract} = $ContractManagement->GetSubscriptionFollowedDoc(UserID => $UserID);
@@ -73,17 +75,17 @@ sub Run {
 		}
 	} elsif ($Self->{DocorAbo} eq 'Abo') {
 		if ( $Self->{Subaction} eq 'AJAXUpdateSelect' ) {
-			$Output .= $ContractManagement->Updateselect();
+			$Output .= $ContractManagement->Updateselect(UserID => $UserID);
 		} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonDel' ) {
-			$Output .= $ContractManagement->ClickDel();
+			$Output .= $ContractManagement->ClickDel(UserID => $UserID);
 		}  elsif ( $Self->{Subaction} eq 'AJAXAvancement' ) {
-			$Output .= $ContractManagement->ClickAvancement();
+			$Output .= $ContractManagement->ClickAvancement(UserID => $UserID);
 			
 		} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonAdd' ) {
-			$Output .= $ContractManagement->ClickAdd();
+			$Output .= $ContractManagement->ClickAdd(UserID => $UserID);
 		} elsif ( $Self->{Subaction} eq 'AJAXClickBoutonNotif') {
 			$Output .= $ContractManagement->SendmailAbo();
-		}else {
+		} else {
 		
 			$Data{contract} = $ContractManagement->GetSubscriptionFollowedAbo(UserID => $UserID);
 			$Output .= $LayoutObject->Header(Title => "Contract Management");

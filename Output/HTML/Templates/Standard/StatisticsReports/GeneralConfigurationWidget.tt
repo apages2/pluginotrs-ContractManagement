@@ -1,0 +1,54 @@
+# --
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+<fieldset class="TableLike">
+    <label for="Name" class="Mandatory">
+        <span class="Marker">*</span>
+        [% Translate('Name') | html %]:
+    </label>
+    <div class="Field">
+        <input id="Name" name="Name" class="W50pc Validate_Required [% Data.NameServerError %]" value="[% Data.Name | html %]" />
+        <div id="NameError" class="TooltipErrorMessage">
+            <p>[% Translate("This field is required.") | html %]</p>
+        </div>
+        <div id="NameServerError" class="TooltipErrorMessage">
+            <p>[% Translate(Data.NameServerErrorText) | html %]</p>
+        </div>
+    </div>
+    <div class="Clear"></div>
+
+    <label for="Description" class="Mandatory">
+        <span class="Marker">*</span>
+        [% Translate('Description') | html %]:
+    </label>
+    <div class="Field">
+        <textarea id="Description" name="Description" class="W50pc Validate_Required [% Data.DescriptionServerError %]" rows="5">[% Data.Description || Data.Config.Description | html %]</textarea>
+        <div id="DescriptionError" class="TooltipErrorMessage">
+            <p>[% Translate("This field is required.") | html %]</p>
+        </div>
+        <div id="DescriptionServerError" class="TooltipErrorMessage">
+            <p>[% Translate(Data.DescriptionServerErrorText) | html %]</p>
+        </div>
+    </div>
+    <div class="Clear"></div>
+
+    <label for="ValidID" class="Mandatory">
+        <span class="Marker">*</span>
+        [% Translate('Valid') | html %]:
+    </label>
+    <div class="Field">
+        [% Data.ValidOption %]
+        <div id="ValidIDError" class="TooltipErrorMessage">
+            <p>[% Translate("This field is required.") | html %]</p>
+        </div>
+        <div id="ValidIDServerError" class="TooltipErrorMessage">
+            <p>[% Translate(Data.ValidIDServerErrorText) | html %]</p>
+        </div>
+    </div>
+    <div class="Clear"></div>
+</fieldset>

@@ -66,7 +66,6 @@ sub new {
 	return $Self;
 }
 
-
 sub GetSubscriptionFollowedAbo {
 
 	my ( $Self, %Param ) = @_;
@@ -524,26 +523,65 @@ sub GetSubscriptionFollowedDoc {
 	
 	my $Nav = $ParamObject->GetParam( Param => 'Nav' ) || 0;
 	my $Search = $ParamObject->GetParam( Param => 'Search' );
+	my $IsTreated = $ParamObject->GetParam( Param => 'IsTreated' );
 	my $SearchList = $ParamObject->GetParam( Param => 'SearchList' ) || 0;
 	 $Search
         ||= $ConfigObject->Get('AdminCustomerCompany::RunInitialWildcardSearch') ? '*' : '';
 	my $Filter= $ParamObject->GetParam( Param => 'Filter' );
 	my $StartHit = $ParamObject->GetParam( Param => 'StartHit' ) || 1;
+	my $showall='';
+	
+	if (!$IsTreated) {
+		$IsTreated ='off';
+		$showall =' and Avancement!=100 ';
+	} else {
+		$showall ='';
+	}
 	
 	my $SearchSQL = $Search;
 	$SearchSQL =~ s/\*/%/g;
 	$Param{Search}=$Search;
 	$Param{SearchList}=$SearchList;
+	$Param{IsTreated}=$IsTreated;
 	$Param{SageTable}=$Self->{DocorAbo};
+	
+	
 	$LayoutObject->Block( Name => 'ActionList' );
 	$LayoutObject->Block(
         Name => 'ActionSearch',
         Data => \%Param,
     );	
 	
+	my %ResponsibleListSearch = $UserObject->UserList(
+		Type => 'Long',
+	);
+		
+	
+	my %ResponsibleSearch;
+	for my $RespListID ( sort keys %ResponsibleListSearch ) {
+		my $RespFullname=$ResponsibleListSearch{$RespListID};
+		$ResponsibleSearch{$RespFullname}=$RespListID;
+		
+	}
+	
+	my @UserDataSearch;
+	for my $RespTri ( sort keys %ResponsibleSearch ) {
+		
+		my $RespIDTri=$ResponsibleSearch{$RespTri};
+		push @UserDataSearch, { RespFullName=>$RespTri, RespID=>$RespIDTri };
+		
+		}
+		
+	for my $DataItem3 (@UserDataSearch) {
+		$LayoutObject->Block(
+			Name => 'Responsible',
+			Data => $DataItem3,
+		);
+	}
+	
 	
 	if ( $Search ne "*" && $SearchList == 0) {
-		my $SQLOtrs = "SELECT EnrIDSage, CustomerIDOtrs, AB_Debut, AB_Fin, Avancement from APA_contract where Follow=1 and Avancement!=100 and CustomerIDOtrs LIKE ? ORDER BY Avancement ASC"; 
+		my $SQLOtrs = "SELECT EnrIDSage, CustomerIDOtrs, AB_Debut, AB_Fin, Avancement from APA_contract where Follow=1 " . $showall . " and CustomerIDOtrs LIKE ? ORDER BY Avancement ASC"; 
 		 
 		# get data
 		$Self->{DBObjectotrs}->Prepare(
@@ -551,7 +589,7 @@ sub GetSubscriptionFollowedDoc {
 				Bind => [\$SearchSQL]
 		);
 	} elsif ( $Search ne "*" && $SearchList == 2 ) {
-		my $SQLOtrs = "SELECT EnrIDSage, CustomerIDOtrs, AB_Debut, AB_Fin, Avancement from APA_contract where Follow=1 and Avancement!=100 and AB_Debut = ? ORDER BY Avancement ASC"; 
+		my $SQLOtrs = "SELECT EnrIDSage, CustomerIDOtrs, AB_Debut, AB_Fin, Avancement from APA_contract where Follow=1 " . $showall . " and AB_Debut = ? ORDER BY Avancement ASC"; 
 		 
 		# get data
 		$Self->{DBObjectotrs}->Prepare(
@@ -559,7 +597,7 @@ sub GetSubscriptionFollowedDoc {
 				Bind => [\$SearchSQL]
 		);
 	} elsif ( $Search ne "*" && $SearchList == 3 ) {
-		my $SQLOtrs = "SELECT EnrIDSage, CustomerIDOtrs, AB_Debut, AB_Fin, Avancement from APA_contract where Follow=1 and Avancement!=100 and AB_Debut >= ? ORDER BY Avancement ASC"; 
+		my $SQLOtrs = "SELECT EnrIDSage, CustomerIDOtrs, AB_Debut, AB_Fin, Avancement from APA_contract where Follow=1 " . $showall . " and AB_Debut >= ? ORDER BY Avancement ASC"; 
 		 
 		# get data
 		$Self->{DBObjectotrs}->Prepare(
@@ -567,7 +605,15 @@ sub GetSubscriptionFollowedDoc {
 				Bind => [\$SearchSQL]
 		);
 	} elsif ( $Search ne "*" && $SearchList == 4 ) {
-		my $SQLOtrs = "SELECT EnrIDSage, CustomerIDOtrs, AB_Debut, AB_Fin, Avancement from APA_contract where Follow=1 and Avancement!=100 and AB_Debut <= ? ORDER BY Avancement ASC"; 
+		my $SQLOtrs = "SELECT EnrIDSage, CustomerIDOtrs, AB_Debut, AB_Fin, Avancement from APA_contract where Follow=1 " . $showall . " and AB_Debut <= ? ORDER BY Avancement ASC"; 
+		 
+		# get data
+		$Self->{DBObjectotrs}->Prepare(
+				SQL   => $SQLOtrs,
+				Bind => [\$SearchSQL]
+		);
+	} elsif ( $Search ne "*" && $SearchList == 5 ) {
+		my $SQLOtrs = "SELECT EnrIDSage, CustomerIDOtrs, AB_Debut, AB_Fin, Avancement from APA_contract where Follow=1 " . $showall . " and EnrIDSage IN (select distinct EnrIDSage from APA_contract_mep where Proprietaire=?) ORDER BY Avancement ASC"; 
 		 
 		# get data
 		$Self->{DBObjectotrs}->Prepare(
@@ -575,14 +621,13 @@ sub GetSubscriptionFollowedDoc {
 				Bind => [\$SearchSQL]
 		);
 	} else {
-		my $SQLOtrs = "SELECT EnrIDSage, CustomerIDOtrs, AB_Debut, AB_Fin, Avancement from APA_contract WHERE Follow=1 and Avancement!=100 ORDER BY Avancement ASC";
+		my $SQLOtrs = "SELECT EnrIDSage, CustomerIDOtrs, AB_Debut, AB_Fin, Avancement from APA_contract WHERE Follow=1 " . $showall . " ORDER BY Avancement ASC";
 		# get data
 		$Self->{DBObjectotrs}->Prepare(
 				SQL   => $SQLOtrs
 		);
 	}
-	
-	
+
 	my $ClassMEP = $GeneralCatalogObject->ItemList(
         Class         => 'ContractManagement::MEP',
     );
@@ -641,14 +686,14 @@ sub GetSubscriptionFollowedDoc {
 			# build SQL request
 			my $SQLSage;
 			if ( $SearchList == 1) {
-				$SQLSage = "SELECT Do_Tiers, CA_Num from F_DOCENTETE where DO_Piece= ? and CA_Num LIKE ?";
+				$SQLSage = "SELECT Do_Tiers, CA_Num, DO_TotalHT from F_DOCENTETE where DO_Piece= ? and CA_Num LIKE ?";
 				$Self->{DBObjectsage}->Prepare(
 					SQL   => $SQLSage,
 					Encode => [1,1],
 					Bind => [\${$DataItem}{EnrIDSage},\$SearchSQL]
 				);
 			} else {
-				$SQLSage = "SELECT Do_Tiers, CA_Num from F_DOCENTETE where DO_Piece= ?";
+				$SQLSage = "SELECT Do_Tiers, CA_Num, DO_TotalHT from F_DOCENTETE where DO_Piece= ?";
 				# get data
 				$Self->{DBObjectsage}->Prepare(
 						SQL   => $SQLSage,
@@ -666,6 +711,7 @@ sub GetSubscriptionFollowedDoc {
 				$Data{CustIDOtrs} = ${$DataItem}{CustIDOtrs};
 				$Data{EnrIDSage} = ${$DataItem}{EnrIDSage};
 				$Data{AvancementG} = ${$DataItem}{AvancementG};
+				$Data{Price} = sprintf("%.2f", $Row[2]);
 				$count++;
 				$Data{etat} = $EnrID;
 				
@@ -709,7 +755,7 @@ sub GetSubscriptionFollowedDoc {
 		WindowSize  => 5,
         AllHits   => $count,
         Action    => 'Action=' . $LayoutObject->{Action},
-		Link        => 'Search='.$Search.';SearchList='.$SearchList.';',
+		Link        => 'IsTreated='.$IsTreated.';Search='.$Search.';SearchList='.$SearchList.';',
         IDPrefix  => $LayoutObject->{Action},
     );
 
@@ -877,6 +923,7 @@ sub Updateselect {
 	my $MEPID = $ParamObject->GetParam( Param => 'MEPID' );
 	my $Value = $ParamObject->GetParam( Param => 'Value' );
 	my $Champ = $ParamObject->GetParam( Param => 'Champ' );
+	my $UserID = $Param{UserID};
 	
 	
 	my $CheckFollow  = "select MEPID from APA_contract_mep where MEPID=?";
@@ -897,11 +944,11 @@ sub Updateselect {
 		
 	# no data found...
     if ( !@IsExist) {
-							
-		my $SQLotrs = "INSERT INTO APA_contract_mep (MEPID) VALUES (?)";
+		my $createtime=strftime "%Y-%m-%d", localtime;					
+		my $SQLotrs = "INSERT INTO APA_contract_mep (MEPID, create_time, create_by) VALUES (?, ?, ?)";
 		$Self->{DBObjectotrs}->Do(
 			SQL  => $SQLotrs,
-			Bind => [ \$MEPID],
+			Bind => [ \$MEPID, \$createtime, \$UserID],
 		);
 	} else {
 		if ($Champ eq 'Responsible') {
@@ -1025,6 +1072,7 @@ sub ClickAvancement {
 	
 	my ( $Self, %Param ) = @_;
 	use POSIX qw(floor);
+	use POSIX qw(strftime);
 	
 	# get needed objects
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
@@ -1036,6 +1084,7 @@ sub ClickAvancement {
 	
 	# get params
 	
+	my $UserID = $Param{UserID};
 	my $MEPID = $ParamObject->GetParam( Param => 'MEPID' );
 	my $Value = $ParamObject->GetParam( Param => 'Value' );
 	
@@ -1045,11 +1094,12 @@ sub ClickAvancement {
 	} elsif ($Value eq 'true') {
 		$State=0;
 	}
-	my $UpdateAvanc  = "UPDATE APA_contract_mep SET Avancement=? WHERE MEPID=?";
+	my $changetime=strftime "%Y-%m-%d", localtime;	
+	my $UpdateAvanc  = "UPDATE APA_contract_mep SET Avancement=?, change_time=?, change_by=? WHERE MEPID=?";
 		
 	$Self->{DBObjectotrs}->Prepare(
 		SQL   => $UpdateAvanc,
-		Bind => [\$State,\$MEPID],
+		Bind => [\$State,\$changetime,\$UserID,\$MEPID],
 	);
 	
 	my $EnrIDSageR = "SELECT EnrIDSage from APA_contract_mep WHERE MEPID=?";
@@ -1076,14 +1126,14 @@ sub ClickAvancement {
 		$SAvancement = $SAvancement+$Row[0];
 		$count=$count+1;
 	}
-	
-	my $UpdateAvancG  = "UPDATE APA_contract SET Avancement=? WHERE EnrIDSage=?";
+	my $changetime=strftime "%Y-%m-%d", localtime;	
+	my $UpdateAvancG  = "UPDATE APA_contract SET Avancement=?, change_time=?, change_by=? WHERE EnrIDSage=?";
 		
 	my $ValueAv = floor(($SAvancement/$count));
 	
 	$Self->{DBObjectotrs}->Prepare(
 		SQL   => $UpdateAvancG,
-		Bind => [\$ValueAv,\$EnrIDSage],
+		Bind => [\$ValueAv,\$changetime,\$UserID,\$EnrIDSage],
 	);
 	
 	my $JSON = $LayoutObject->JSONEncode(
@@ -1108,6 +1158,7 @@ sub ClickDel {
 		
 	my ( $Self, %Param ) = @_;
 	use POSIX qw(floor);
+	use POSIX qw(strftime);
 	
 	# get needed objects
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
@@ -1115,7 +1166,7 @@ sub ClickDel {
 	my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
 	
 	# get params
-
+	my $UserID = $Param{UserID};
 	my $MEPID = $ParamObject->GetParam( Param => 'MEPID' );
 
 	my $EnrIDSageR = "SELECT EnrIDSage from APA_contract_mep WHERE MEPID=?";
@@ -1150,14 +1201,14 @@ sub ClickDel {
 		$SAvancement = $SAvancement+$Row[0];
 		$count=$count+1;
 	}
-	
-	my $UpdateAvancG  = "UPDATE APA_contract SET Avancement=? WHERE EnrIDSage=?";
+	my $changetime=strftime "%Y-%m-%d", localtime;	
+	my $UpdateAvancG  = "UPDATE APA_contract SET Avancement=?, change_time=?, change_by=? WHERE EnrIDSage=?";
 		
 	my $ValueAv = floor($SAvancement/$count);
 	
 	$Self->{DBObjectotrs}->Prepare(
 		SQL   => $UpdateAvancG,
-		Bind => [\$ValueAv,\$EnrIDSage],
+		Bind => [\$ValueAv,\$changetime,\$UserID,\$EnrIDSage],
 	);
 	
 	my $JSON = $LayoutObject->JSONEncode(
@@ -1179,6 +1230,7 @@ sub ClickAdd {
 	
 	my ( $Self, %Param ) = @_;
 	use POSIX qw(floor);
+	use POSIX qw(strftime);
 	
 	# get needed objects
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
@@ -1186,17 +1238,17 @@ sub ClickAdd {
 	my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
 	my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 	my $GeneralCatalogObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
-	
+	my $UserID = $Param{UserID};
 	my $EnrIDSage = $ParamObject->GetParam( Param => 'EnrIDSage' );
 
-					
-	my $Addrow  = "INSERT INTO APA_contract_mep (EnrIDSage) VALUES (?)";
+	my $changetime=strftime "%Y-%m-%d", localtime;				
+	my $Addrow  = "INSERT INTO APA_contract_mep (EnrIDSage, create_time, create_by) VALUES (?, ?, ?)";
 	
 	
 	if ($EnrIDSage) {
 		$Self->{DBObjectotrs}->Prepare(
 				SQL   => $Addrow,
-				Bind => [\$EnrIDSage],
+				Bind => [\$EnrIDSage,\$changetime,\$UserID],
 		);
 	}
 	
@@ -1225,13 +1277,13 @@ sub ClickAdd {
 		$count=$count+1;
 	}
 	
-	my $UpdateAvancG  = "UPDATE APA_contract SET Avancement=? WHERE EnrIDSage=?";
+	my $UpdateAvancG  = "UPDATE APA_contract SET Avancement=?, change_time=?, change_by=? WHERE EnrIDSage=?";
 		
 	my $ValueAv = floor($SAvancement/$count);
 	
 	$Self->{DBObjectotrs}->Prepare(
 		SQL   => $UpdateAvancG,
-		Bind => [\$ValueAv,\$EnrIDSage],
+		Bind => [\$ValueAv,\$changetime,\$UserID,\$EnrIDSage],
 	);
 	
 	
@@ -1387,13 +1439,10 @@ sub SendmailAbo {
 			MimeType      => 'text/html', # "text/plain" or "text/html"
 			Body          => $Self->{MailBody},
 			Loop          => 1, # not required, removes smtp from
-		);
+	);
 		
 	# my $Date = date(); 
 	# my $Notif = $Date->{date};
-	
-	
-	
 		
 	my $JSON;	
 	if ($Sent) {
@@ -1414,7 +1463,7 @@ sub SendmailAbo {
 				'Notif' =>$Notif,
 				'NbNotif' =>$NbNotif,
 				'MEPID' => $MEPID,
-				},
+			},
 			NoQuotes    => 0,
 		);
 			
@@ -1567,5 +1616,56 @@ sub SendmailDoc {
         NoCache     => 1,
     );
 }
+
+sub Responsible {
+	
+	my ( $Self, %Param ) = @_;
+	use POSIX qw(floor);
+	
+	# get needed objects
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
+	my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+	my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+	
+	my %ResponsibleList = $UserObject->UserList(
+		Type => 'Long',
+	);
+		
+	my %Responsible;
+	for my $RespListID ( sort keys %ResponsibleList ) {
+		my $RespFullname=$ResponsibleList{$RespListID};
+		$Responsible{$RespFullname}=$RespListID;
+		
+	}
+	
+	my @UserData;
+	for my $RespTri ( sort keys %Responsible ) {
+		
+		my $RespIDTri=$Responsible{$RespTri};		
+		push @UserData, {
+						RespIDTri => $RespIDTri,
+						RespFullName => $RespTri,
+					};	 
+			
+	}
+	
+	my $JSONString = $LayoutObject->JSONEncode(
+		Data => {
+			'Responsable' =>\@UserData
+			},
+		NoQuotes    => 0,
+	);
+	
+	# $Kernel::OM->Get('Kernel::System::Log')->Dumper($JSONString);
+
+    return $LayoutObject->Attachment(
+        ContentType => 'application/json; charset=' . $LayoutObject->{Charset},
+        Content     => $JSONString,
+        Type        => 'inline',
+        NoCache     => 1,
+    );
+}
+
 
 1;

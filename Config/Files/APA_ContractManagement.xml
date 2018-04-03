@@ -111,6 +111,46 @@
 			<String Translatable="0">35</String>
         </Setting>
     </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config::Admin###UOResponsible" Required="1" Valid="1">
+        <Description Translatable="1">Default Responsible for UO Tasks</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config::Admin</SubGroup>
+        <Setting>
+			<String Translatable="0">16</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config::Admin###RTCResponsible" Required="1" Valid="1">
+        <Description Translatable="1">Default Responsible for RTC Tasks</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config::Admin</SubGroup>
+        <Setting>
+			<String Translatable="0">16</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config::Admin###SUPResponsible" Required="1" Valid="1">
+        <Description Translatable="1">Default Responsible for Supervision Tasks</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config::Admin</SubGroup>
+        <Setting>
+			<String Translatable="0">16</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config::Admin###BackupResponsible" Required="1" Valid="1">
+        <Description Translatable="1">Default Responsible for Backup Tasks</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config::Admin</SubGroup>
+        <Setting>
+			<String Translatable="0">16</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="ContractManagement::Config::Admin###CMResponsible" Required="1" Valid="1">
+        <Description Translatable="1">Default Responsible for Contract Manager Tasks</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>ContractManagement::Config::Admin</SubGroup>
+        <Setting>
+			<String Translatable="0">81</String>
+        </Setting>
+    </ConfigItem>
 	<ConfigItem Name="ContractManagement::Config::Admin###EntryDate" Required="1" Valid="1">
         <Description Translatable="1">Limits the search according to the date of entry. Default : 2 months ago</Description>
         <Group>APA Contract Management</Group>
@@ -197,6 +237,34 @@
         <SubGroup>ContractManagement::Config</SubGroup>
         <Setting>
 			<String Translatable="1">Document en Attente pour la Mise en Production de l'affaire : $Caff (Client : $Client )</String>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="Daemon::SchedulerCronTaskManager::Task###MepStatJ" Required="0" Valid="1" ConfigLevel="100">
+        <Description Translatable="1">Generate Daily MEP statistics.</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">APA_MEPSuiviJ</Item>
+                <Item Key="Schedule">00 21 * * 1-5</Item> <!-- default every day from mondat to friday at 09:00 PM -->
+                <Item Key="Module">Kernel::System::Console::Command::Maint::Stats::Exaprobe::APA_MEPSuiviJ</Item>
+                <Item Key="Function">Execute</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+	<ConfigItem Name="Daemon::SchedulerCronTaskManager::Task###MepStatH" Required="0" Valid="1" ConfigLevel="100">
+        <Description Translatable="1">Generate Weekly MEP statistics.</Description>
+        <Group>APA Contract Management</Group>
+        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">APA_MEPSuiviH</Item>
+                <Item Key="Schedule">00 22 * * 5</Item> <!-- default every friday 10:00 PM -->
+                <Item Key="Module">Kernel::System::Console::Command::Maint::Stats::Exaprobe::APA_MEPSuiviH</Item>
+                <Item Key="Function">Execute</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
 </otrs_config>

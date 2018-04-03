@@ -1,0 +1,85 @@
+# --
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+<div class="MainBox AriaRoleMain LayoutFixedSidebar SidebarFirst">
+    <h1>[% Translate("Reports » View — %s", Data.Name) | html %]</h1>
+
+    <div class="SidebarColumn">
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("Actions") | html %]</h2>
+            </div>
+            <div class="Content">
+                <ul class="ActionList">
+                    <li>
+                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Overview;" class="CallForAction Fullsize Center"><span><i class="fa fa-caret-left"></i>[% Translate("Go to overview") | html %]</span></a>
+                    </li>
+                    [% IF Data.AccessRw %]
+                    <li>
+                        <a href="[% Env("Baselink") %]Action=AgentStatisticsReports;Subaction=Edit;StatsReportID=[% Data.ID | uri %]" class="CallForAction Fullsize Center"><span><i class="fa fa-edit"></i>[% Translate("Edit") | html %]</span></a>
+                    </li>
+                    [% END %]
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="ContentColumn">
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("Settings") | html %]</h2>
+            </div>
+            <div class="Content">
+                <form id="MainForm" action="[% Env("CGIHandle") %]" method="post" enctype="multipart/form-data" class="Validate">
+                    <input type="hidden" name="Action"    value="[% Env("Action") %]"/>
+                    <input type="hidden" name="Subaction" value="Run"/>
+                    <input type="hidden" name="StatsReportID" value="[% Data.ID %]"/>
+
+                    [% IF Data.Errors %]
+                    <div class="MessageBox Warning">
+                        <p>[% Translate('This statistics report contains configuration errors and can currently not be used.') | html %]</p>
+                    </div>
+                    [% ELSE %]
+                    <fieldset class="TableLike">
+                        <label>[% Translate('Name') | html %]:</label>
+                        <div class="Value">
+                            [% Data.Name | html %]
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label>[% Translate('Statistics') | html %]:</label>
+                        <div class="Value">
+                            <ul>
+                                [% FOR Stat IN Data.Stats %]
+                                <li>[% Stat %]</li>
+                                [% END %]
+                            </ul>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <div class="Field SpacingTop">
+                            <button class="Primary CallForAction" type="submit" name="Start" value="[% Translate("Run now") | html %]">
+                                <span><i class="fa fa-caret-square-o-right"></i> [% Translate("Run now") | html %]</span>
+                            </button>
+                        [% Translate('or') | html %]
+                            <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Overview">
+                            [% Translate('Cancel') | html %]
+                            </a>
+                        </div>
+                    </fieldset>
+                    [% END %]
+                </form>
+            </div>
+        </div>
+    </div>
+
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">//<![CDATA[
+//Core.Agent.StatisticsReports.InitViewScreen();
+//]]></script>
+[% END %]
